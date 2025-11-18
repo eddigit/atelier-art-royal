@@ -14,7 +14,10 @@ export default function Catalog() {
     category: '',
     search: '',
     minPrice: '',
-    maxPrice: ''
+    maxPrice: '',
+    size: 'all',
+    color: 'all',
+    material: 'all'
   });
   const [sortBy, setSortBy] = useState('-created_date');
 
@@ -46,17 +49,20 @@ export default function Catalog() {
         if (filters.search && !product.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
         if (filters.minPrice && product.price < parseFloat(filters.minPrice)) return false;
         if (filters.maxPrice && product.price > parseFloat(filters.maxPrice)) return false;
+        if (filters.size !== 'all' && (!product.sizes || !product.sizes.includes(filters.size))) return false;
+        if (filters.color !== 'all' && (!product.colors || !product.colors.includes(filters.color))) return false;
+        if (filters.material !== 'all' && (!product.materials || !product.materials.includes(filters.material))) return false;
         return true;
       });
     },
     initialData: []
   });
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = (newFilters) => {
     setFilters(prev => ({
       ...prev,
-      [key]: value,
-      ...(key === 'rite' ? { grade: '' } : {}) // Reset grade when rite changes
+      ...newFilters,
+      ...(newFilters.rite ? { grade: '' } : {}) // Reset grade when rite changes
     }));
   };
 
@@ -67,7 +73,10 @@ export default function Catalog() {
       category: '',
       search: '',
       minPrice: '',
-      maxPrice: ''
+      maxPrice: '',
+      size: 'all',
+      color: 'all',
+      material: 'all'
     });
   };
 
@@ -104,11 +113,12 @@ export default function Catalog() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="-created_date">Plus récents</SelectItem>
-                <SelectItem value="created_date">Plus anciens</SelectItem>
+                <SelectItem value="relevance">Pertinence</SelectItem>
+                <SelectItem value="-created_date">Nouveautés</SelectItem>
                 <SelectItem value="price">Prix croissant</SelectItem>
                 <SelectItem value="-price">Prix décroissant</SelectItem>
                 <SelectItem value="name">Nom A-Z</SelectItem>
+                <SelectItem value="-name">Nom Z-A</SelectItem>
               </SelectContent>
             </Select>
           </div>
