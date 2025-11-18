@@ -9,6 +9,10 @@ import { X, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Filters({ filters, onFilterChange, onReset }) {
+  const handleChange = (key, value) => {
+    onFilterChange({ [key]: value });
+  };
+
   const { data: rites = [] } = useQuery({
     queryKey: ['rites'],
     queryFn: () => base44.entities.Rite.list('order', 50),
@@ -54,7 +58,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
           <Input
             placeholder="Nom du produit..."
             value={filters.search || ''}
-            onChange={(e) => onFilterChange('search', e.target.value)}
+            onChange={(e) => handleChange('search', e.target.value)}
             className="w-full"
           />
         </div>
@@ -62,7 +66,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
         {/* Rite */}
         <div className="space-y-2">
           <Label>Rite</Label>
-          <Select value={filters.rite || 'all'} onValueChange={(v) => onFilterChange('rite', v === 'all' ? '' : v)}>
+          <Select value={filters.rite || 'all'} onValueChange={(v) => handleChange('rite', v === 'all' ? '' : v)}>
             <SelectTrigger>
               <SelectValue placeholder="Tous les Rites" />
             </SelectTrigger>
@@ -81,7 +85,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
         {filters.rite && grades.length > 0 && (
           <div className="space-y-2">
             <Label>Grade</Label>
-            <Select value={filters.grade || 'all'} onValueChange={(v) => onFilterChange('grade', v === 'all' ? '' : v)}>
+            <Select value={filters.grade || 'all'} onValueChange={(v) => handleChange('grade', v === 'all' ? '' : v)}>
               <SelectTrigger>
                 <SelectValue placeholder="Tous les Grades" />
               </SelectTrigger>
@@ -100,7 +104,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
         {/* Category */}
         <div className="space-y-2">
           <Label>Catégorie</Label>
-          <Select value={filters.category || 'all'} onValueChange={(v) => onFilterChange('category', v === 'all' ? '' : v)}>
+          <Select value={filters.category || 'all'} onValueChange={(v) => handleChange('category', v === 'all' ? '' : v)}>
             <SelectTrigger>
               <SelectValue placeholder="Toutes les Catégories" />
             </SelectTrigger>
@@ -115,6 +119,67 @@ export default function Filters({ filters, onFilterChange, onReset }) {
           </Select>
         </div>
 
+        {/* Size */}
+        <div className="space-y-2">
+          <Label>Taille</Label>
+          <Select value={filters.size || 'all'} onValueChange={(v) => handleChange('size', v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Toutes tailles" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes tailles</SelectItem>
+              <SelectItem value="S">S</SelectItem>
+              <SelectItem value="M">M</SelectItem>
+              <SelectItem value="L">L</SelectItem>
+              <SelectItem value="XL">XL</SelectItem>
+              <SelectItem value="XXL">XXL</SelectItem>
+              <SelectItem value="Unique">Taille unique</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Color */}
+        <div className="space-y-2">
+          <Label>Couleur</Label>
+          <Select value={filters.color || 'all'} onValueChange={(v) => handleChange('color', v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Toutes couleurs" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes couleurs</SelectItem>
+              <SelectItem value="Or">Or</SelectItem>
+              <SelectItem value="Argent">Argent</SelectItem>
+              <SelectItem value="Noir">Noir</SelectItem>
+              <SelectItem value="Blanc">Blanc</SelectItem>
+              <SelectItem value="Rouge">Rouge</SelectItem>
+              <SelectItem value="Bleu">Bleu</SelectItem>
+              <SelectItem value="Vert">Vert</SelectItem>
+              <SelectItem value="Violet">Violet</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Material */}
+        <div className="space-y-2">
+          <Label>Matière</Label>
+          <Select value={filters.material || 'all'} onValueChange={(v) => handleChange('material', v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Toutes matières" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes matières</SelectItem>
+              <SelectItem value="Soie">Soie</SelectItem>
+              <SelectItem value="Velours">Velours</SelectItem>
+              <SelectItem value="Satin">Satin</SelectItem>
+              <SelectItem value="Coton">Coton</SelectItem>
+              <SelectItem value="Lin">Lin</SelectItem>
+              <SelectItem value="Cuir">Cuir</SelectItem>
+              <SelectItem value="Or massif">Or massif</SelectItem>
+              <SelectItem value="Argent massif">Argent massif</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Price Range */}
         <div className="space-y-2">
           <Label>Prix</Label>
@@ -123,13 +188,13 @@ export default function Filters({ filters, onFilterChange, onReset }) {
               type="number"
               placeholder="Min"
               value={filters.minPrice || ''}
-              onChange={(e) => onFilterChange('minPrice', e.target.value)}
+              onChange={(e) => handleChange('minPrice', e.target.value)}
             />
             <Input
               type="number"
               placeholder="Max"
               value={filters.maxPrice || ''}
-              onChange={(e) => onFilterChange('maxPrice', e.target.value)}
+              onChange={(e) => handleChange('maxPrice', e.target.value)}
             />
           </div>
         </div>
