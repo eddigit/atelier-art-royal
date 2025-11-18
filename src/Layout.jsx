@@ -91,14 +91,24 @@ export default function Layout({ children, currentPageName }) {
       <header className="sticky top-0 z-50 glass border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <Link to={createPageUrl('Home')} className="group">
-              <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/d0a84d191_Logo-Atelier-Art-Royal.png" 
-                alt="Atelier Art Royal - Haute Couture Maçonnique" 
-                className="h-12 w-auto object-contain transition-opacity group-hover:opacity-80"
-              />
-            </Link>
+            {/* Logo & Made in France */}
+            <div className="flex items-center gap-4">
+              <Link to={createPageUrl('Home')} className="group">
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/d0a84d191_Logo-Atelier-Art-Royal.png" 
+                  alt="Atelier Art Royal - Haute Couture Maçonnique" 
+                  className="h-12 w-auto object-contain transition-opacity group-hover:opacity-80"
+                />
+              </Link>
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+                <div className="flex gap-0.5">
+                  <div className="w-1 h-4 bg-blue-600 rounded-l"></div>
+                  <div className="w-1 h-4 bg-white"></div>
+                  <div className="w-1 h-4 bg-red-600 rounded-r"></div>
+                </div>
+                <span className="text-xs font-semibold text-primary">Made in France</span>
+              </div>
+            </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-6">

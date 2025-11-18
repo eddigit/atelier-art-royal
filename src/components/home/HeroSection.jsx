@@ -27,11 +27,21 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <Sparkles className="w-5 h-5 text-primary" />
-          <span className="text-sm font-medium text-primary uppercase tracking-wider">
-            Haute Couture Maçonnique
-          </span>
+        <div className="flex flex-col items-center gap-3 mb-6">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary" />
+            <span className="text-sm font-medium text-primary uppercase tracking-wider">
+              Haute Couture Maçonnique
+            </span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 backdrop-blur-sm shadow-lg">
+            <div className="flex gap-0.5">
+              <div className="w-1.5 h-5 bg-blue-600 rounded-l"></div>
+              <div className="w-1.5 h-5 bg-white border-x border-gray-200"></div>
+              <div className="w-1.5 h-5 bg-red-600 rounded-r"></div>
+            </div>
+            <span className="text-xs font-bold text-gray-900 uppercase tracking-wide">Sur-Mesure • Made in France</span>
+          </div>
         </div>
         
         <h1 className="text-hero text-gradient mb-6 drop-shadow-lg">
