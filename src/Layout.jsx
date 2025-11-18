@@ -60,6 +60,12 @@ export default function Layout({ children, currentPageName }) {
     initialData: []
   });
 
+  const { data: grades = [] } = useQuery({
+    queryKey: ['grades'],
+    queryFn: () => base44.entities.Grade.list('level', 100),
+    initialData: []
+  });
+
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -101,42 +107,75 @@ export default function Layout({ children, currentPageName }) {
               </Link>
 
               {!isAdminPage && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
-                      Explorer
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    <DropdownMenuLabel>Rechercher par Rite</DropdownMenuLabel>
-                    {rites.slice(0, 5).map(rite => (
-                      <DropdownMenuItem key={rite.id} asChild>
-                        <Link to={createPageUrl('Catalog') + `?rite=${rite.id}`} className="cursor-pointer">
-                          <Award className="w-4 h-4 mr-2" />
-                          {rite.name}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Rechercher par Catégorie</DropdownMenuLabel>
-                    {categories.slice(0, 5).map(category => (
-                      <DropdownMenuItem key={category.id} asChild>
-                        <Link to={createPageUrl('Catalog') + `?category=${category.id}`} className="cursor-pointer">
-                          <Grid className="w-4 h-4 mr-2" />
-                          {category.name}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to={createPageUrl('Catalog')} className="cursor-pointer font-medium">
-                        <Package className="w-4 h-4 mr-2" />
-                        Tous les produits
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                  {/* Menu Rites */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
+                        Par Rite
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56">
+                      <DropdownMenuLabel>Sélectionner un Rite</DropdownMenuLabel>
+                      {rites.map(rite => (
+                        <DropdownMenuItem key={rite.id} asChild>
+                          <Link to={createPageUrl('Catalog') + `?rite=${rite.id}`} className="cursor-pointer">
+                            <Award className="w-4 h-4 mr-2" />
+                            {rite.name}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Menu Catégories */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
+                        Par Catégorie
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56">
+                      <DropdownMenuLabel>Sélectionner une Catégorie</DropdownMenuLabel>
+                      {categories.map(category => (
+                        <DropdownMenuItem key={category.id} asChild>
+                          <Link to={createPageUrl('Catalog') + `?category=${category.id}`} className="cursor-pointer">
+                            <Grid className="w-4 h-4 mr-2" />
+                            {category.name}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Menu Grades */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
+                        Par Grade
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 max-h-96 overflow-y-auto">
+                      <DropdownMenuLabel>Sélectionner un Grade</DropdownMenuLabel>
+                      {grades.map(grade => (
+                        <DropdownMenuItem key={grade.id} asChild>
+                          <Link to={createPageUrl('Catalog') + `?grade=${grade.id}`} className="cursor-pointer">
+                            <Award className="w-4 h-4 mr-2" />
+                            {grade.name}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Lien Catalogue complet */}
+                  <Link to={createPageUrl('Catalog')} className="text-sm font-medium hover:text-primary transition-colors">
+                    Catalogue
+                  </Link>
+                </>
               )}
             </nav>
 
@@ -252,7 +291,7 @@ export default function Layout({ children, currentPageName }) {
                 {!isAdminPage && (
                   <>
                     <div className="text-xs text-muted-foreground font-semibold mt-2">Par Rite</div>
-                    {rites.slice(0, 4).map(rite => (
+                    {rites.map(rite => (
                       <Link 
                         key={rite.id}
                         to={createPageUrl('Catalog') + `?rite=${rite.id}`}
@@ -263,8 +302,8 @@ export default function Layout({ children, currentPageName }) {
                       </Link>
                     ))}
 
-                    <div className="text-xs text-muted-foreground font-semibold mt-2">Par Catégorie</div>
-                    {categories.slice(0, 4).map(category => (
+                    <div className="text-xs text-muted-foreground font-semibold mt-4">Par Catégorie</div>
+                    {categories.map(category => (
                       <Link 
                         key={category.id}
                         to={createPageUrl('Catalog') + `?category=${category.id}`}
@@ -275,12 +314,24 @@ export default function Layout({ children, currentPageName }) {
                       </Link>
                     ))}
 
+                    <div className="text-xs text-muted-foreground font-semibold mt-4">Par Grade</div>
+                    {grades.slice(0, 10).map(grade => (
+                      <Link 
+                        key={grade.id}
+                        to={createPageUrl('Catalog') + `?grade=${grade.id}`}
+                        className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {grade.name}
+                      </Link>
+                    ))}
+
                     <Link 
                       to={createPageUrl('Catalog')} 
-                      className="text-sm font-medium hover:text-primary transition-colors py-2 mt-2"
+                      className="text-sm font-medium hover:text-primary transition-colors py-2 mt-4 font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Tous les produits
+                      Catalogue Complet
                     </Link>
                   </>
                 )}

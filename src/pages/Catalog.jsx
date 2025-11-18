@@ -22,9 +22,15 @@ export default function Catalog() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const riteParam = urlParams.get('rite');
-    if (riteParam) {
-      setFilters(prev => ({ ...prev, rite: riteParam }));
-    }
+    const categoryParam = urlParams.get('category');
+    const gradeParam = urlParams.get('grade');
+    
+    setFilters(prev => ({
+      ...prev,
+      ...(riteParam && { rite: riteParam }),
+      ...(categoryParam && { category: categoryParam }),
+      ...(gradeParam && { grade: gradeParam })
+    }));
   }, []);
 
   const { data: products = [], isLoading } = useQuery({
