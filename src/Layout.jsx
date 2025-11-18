@@ -16,7 +16,8 @@ import {
   Award,
   UserCircle,
   ShoppingBag,
-  Settings
+  Settings,
+  Heart
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -238,12 +239,20 @@ export default function Layout({ children, currentPageName }) {
                       </Link>
                     </DropdownMenuItem>
                     {!isAdminPage && (
-                      <DropdownMenuItem asChild>
-                        <Link to={createPageUrl('Orders')} className="cursor-pointer">
-                          <ShoppingBag className="w-4 h-4 mr-2" />
-                          Mes Commandes
-                        </Link>
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('Orders')} className="cursor-pointer">
+                            <ShoppingBag className="w-4 h-4 mr-2" />
+                            Mes Commandes
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('SavedCustomizations')} className="cursor-pointer">
+                            <Heart className="w-4 h-4 mr-2" />
+                            Mes Créations
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
                     )}
                     {isAdmin && (
                       <>
