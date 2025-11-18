@@ -10,7 +10,7 @@ export default function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 image-immersive">
         <img
-          src="https://images.unsplash.com/photo-1513828583688-c52646db42da?q=80&w=2940"
+          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/01e4593f1_GeneratedImageNovember182025-9_37PM.png"
           alt="Haute Couture Maçonnique"
           className="w-full h-full object-cover"
         />
