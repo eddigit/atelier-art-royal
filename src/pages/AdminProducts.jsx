@@ -28,12 +28,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import CsvFieldMapper from '@/components/admin/CsvFieldMapper';
 
 export default function AdminProducts() {
   const queryClient = useQueryClient();
   const [isImporting, setIsImporting] = useState(false);
   const [importResults, setImportResults] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [csvHeaders, setCsvHeaders] = useState(null);
+  const [fieldMapping, setFieldMapping] = useState({});
+  const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -63,15 +67,42 @@ export default function AdminProducts() {
     const file = e.target.files[0];
     if (!file) return;
 
-    setIsImporting(true);
+    setCsvHeaders(null);
     setImportResults(null);
+    setFieldMapping({});
 
     try {
       // Upload file
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setUploadedFileUrl(file_url);
 
-      // Process import via backend function
-      const response = await base44.functions.invoke('importProducts', { file_url });
+      // Read CSV headers
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target.result;
+        const firstLine = text.split('\n')[0];
+        const headers = firstLine.split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+        setCsvHeaders(headers);
+      };
+      reader.readAsText(file);
+
+      toast.success('Fichier chargé, configurez le mappage ci-dessous');
+    } catch (error) {
+      toast.error('Erreur lors du chargement: ' + error.message);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!uploadedFileUrl || !fieldMapping) return;
+
+    setIsImporting(true);
+    setImportResults(null);
+
+    try {
+      const response = await base44.functions.invoke('importProducts', { 
+        file_url: uploadedFileUrl,
+        field_mapping: fieldMapping
+      });
       
       setImportResults(response.data);
       queryClient.invalidateQueries(['admin-products']);
@@ -110,84 +141,122 @@ export default function AdminProducts() {
       </div>
 
       {/* Import Section */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="w-5 h-5" />
-            Import CSV WooCommerce
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Input
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              disabled={isImporting}
-              className="max-w-md"
-            />
-            {isImporting && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Import en cours...
-              </div>
-            )}
-          </div>
+      <div className="space-y-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="w-5 h-5" />
+              Étape 1 : Charger le fichier CSV
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Input
+                type="file"
+                accept=".csv"
+                onChange={handleFileUpload}
+                disabled={isImporting}
+                className="max-w-md"
+              />
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <p className="font-medium mb-2">Format attendu :</p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li>Export CSV WooCommerce standard</li>
+                <li>Encodage UTF-8 recommandé</li>
+                <li>Les doublons (même UGS) seront mis à jour</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
 
-          {importResults && (
-            <div className={`p-4 rounded-lg border ${
-              importResults.success 
-                ? 'bg-green-50 border-green-200' 
-                : 'bg-red-50 border-red-200'
-            }`}>
-              <div className="flex items-start gap-3">
-                {importResults.success ? (
-                  <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5" />
-                ) : (
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                )}
-                <div className="flex-1">
-                  <h4 className="font-semibold mb-2">
-                    {importResults.success ? 'Import réussi' : 'Erreurs détectées'}
-                  </h4>
-                  <div className="text-sm space-y-1">
-                    {importResults.imported && (
-                      <p>✅ {importResults.imported} produits importés</p>
-                    )}
-                    {importResults.updated && (
-                      <p>🔄 {importResults.updated} produits mis à jour</p>
-                    )}
-                    {importResults.skipped && (
-                      <p>⏭️ {importResults.skipped} produits ignorés</p>
-                    )}
-                    {importResults.errors && importResults.errors.length > 0 && (
-                      <details className="mt-2">
-                        <summary className="cursor-pointer font-medium text-red-700">
-                          ❌ {importResults.errors.length} erreur(s)
-                        </summary>
-                        <ul className="mt-2 ml-4 space-y-1">
-                          {importResults.errors.slice(0, 10).map((err, i) => (
-                            <li key={i} className="text-xs">{err}</li>
-                          ))}
-                        </ul>
-                      </details>
-                    )}
+        {csvHeaders && (
+          <>
+            <CsvFieldMapper 
+              csvHeaders={csvHeaders}
+              mapping={fieldMapping}
+              onMappingChange={setFieldMapping}
+            />
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5" />
+                  Étape 3 : Lancer l'import
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={handleImport}
+                  disabled={isImporting || !uploadedFileUrl}
+                  size="lg"
+                  className="w-full"
+                >
+                  {isImporting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Import en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 mr-2" />
+                      Importer les produits
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {importResults && (
+          <Card>
+            <CardContent className="pt-6">
+              <div className={`p-4 rounded-lg border ${
+                importResults.success 
+                  ? 'bg-green-50 border-green-200' 
+                  : 'bg-red-50 border-red-200'
+              }`}>
+                <div className="flex items-start gap-3">
+                  {importResults.success ? (
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    <h4 className="font-semibold mb-2">
+                      {importResults.success ? 'Import réussi' : 'Erreurs détectées'}
+                    </h4>
+                    <div className="text-sm space-y-1">
+                      {importResults.imported && (
+                        <p>✅ {importResults.imported} produits importés</p>
+                      )}
+                      {importResults.updated && (
+                        <p>🔄 {importResults.updated} produits mis à jour</p>
+                      )}
+                      {importResults.skipped && (
+                        <p>⏭️ {importResults.skipped} produits ignorés</p>
+                      )}
+                      {importResults.errors && importResults.errors.length > 0 && (
+                        <details className="mt-2">
+                          <summary className="cursor-pointer font-medium text-red-700">
+                            ❌ {importResults.errors.length} erreur(s)
+                          </summary>
+                          <ul className="mt-2 ml-4 space-y-1">
+                            {importResults.errors.slice(0, 10).map((err, i) => (
+                              <li key={i} className="text-xs">{err}</li>
+                            ))}
+                          </ul>
+                        </details>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-
-          <div className="text-sm text-muted-foreground">
-            <p className="font-medium mb-2">Format attendu :</p>
-            <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>Export CSV WooCommerce standard</li>
-              <li>Colonnes mappées automatiquement : UGS, Nom, Prix, Catégories, Images, etc.</li>
-              <li>Les doublons (même UGS) seront mis à jour</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Products List */}
       <Card>

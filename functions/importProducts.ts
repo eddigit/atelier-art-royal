@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { file_url } = await req.json();
+    const { file_url, field_mapping } = await req.json();
 
     if (!file_url) {
       return Response.json({ error: 'file_url is required' }, { status: 400 });
@@ -75,21 +75,33 @@ Deno.serve(async (req) => {
         }
         values.push(currentValue.trim());
 
-        // Map columns by header name
-        const getColumn = (name) => {
-          const index = headers.findIndex(h => h.toLowerCase().includes(name.toLowerCase()));
+        // Map columns using field_mapping or fallback to auto-detection
+        const getColumn = (targetField) => {
+          if (field_mapping) {
+            const csvField = Object.keys(field_mapping).find(
+              key => field_mapping[key] === targetField
+            );
+            if (csvField) {
+              const index = headers.indexOf(csvField);
+              return index >= 0 ? values[index]?.replace(/^"|"$/g, '').trim() : '';
+            }
+          }
+          // Fallback to auto-detection
+          const index = headers.findIndex(h => h.toLowerCase().includes(targetField.toLowerCase()));
           return index >= 0 ? values[index]?.replace(/^"|"$/g, '').trim() : '';
         };
 
-        const sku = getColumn('UGS') || getColumn('SKU');
-        const name = getColumn('Nom') || getColumn('Name');
-        const priceStr = getColumn('Tarif régulier') || getColumn('Regular price');
-        const categoriesStr = getColumn('Catégories') || getColumn('Categories');
-        const tagsStr = getColumn('Étiquettes') || getColumn('Tags');
-        const imagesStr = getColumn('Images');
-        const stockStr = getColumn('Stock');
-        const shortDesc = getColumn('Description courte') || getColumn('Short description');
-        const desc = getColumn('Description');
+        const sku = getColumn('sku');
+        const name = getColumn('name');
+        const priceStr = getColumn('price');
+        const categoriesStr = getColumn('category_id');
+        const tagsStr = getColumn('tags');
+        const imagesStr = getColumn('images');
+        const stockStr = getColumn('stock_quantity');
+        const shortDesc = getColumn('short_description');
+        const desc = getColumn('description');
+        const riteHint = getColumn('rite_hint');
+        const gradeHint = getColumn('grade_hint');
 
         if (!name || !priceStr) {
           results.skipped++;
@@ -128,11 +140,12 @@ Deno.serve(async (req) => {
           if (matchedCat) category_id = matchedCat.id;
         }
 
-        // Try to match rite from tags
+        // Try to match rite from tags or hint
         let rite_id = defaultRite.id;
+        const riteSource = riteHint || tagsStr;
         const riteKeywords = ['REAA', 'RER', 'RF', 'GLDF', 'GODF', 'GLNF'];
         for (const keyword of riteKeywords) {
-          if (tagsStr.toUpperCase().includes(keyword)) {
+          if (riteSource.toUpperCase().includes(keyword)) {
             const matchedRite = rites.find(r => 
               r.code.toUpperCase().includes(keyword) || 
               r.name.toUpperCase().includes(keyword)
@@ -144,9 +157,10 @@ Deno.serve(async (req) => {
           }
         }
 
-        // Try to match grade from tags
+        // Try to match grade from tags or hint
         let grade_id = defaultGrade.id;
-        const degreeMatch = tagsStr.match(/(\d+)(er|ème|eme)\s*(degré|ordre|degree)/i);
+        const gradeSource = gradeHint || tagsStr;
+        const degreeMatch = gradeSource.match(/(\d+)(er|ème|eme)\s*(degré|ordre|degree)/i);
         if (degreeMatch) {
           const level = parseInt(degreeMatch[1]);
           const matchedGrade = grades.find(g => g.level === level && g.rite_id === rite_id);
