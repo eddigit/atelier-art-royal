@@ -91,17 +91,40 @@ Deno.serve(async (req) => {
           return index >= 0 ? values[index]?.replace(/^"|"$/g, '').trim() : '';
         };
 
+        const productId = getColumn('product_id');
         const sku = getColumn('sku');
         const name = getColumn('name');
         const priceStr = getColumn('price');
+        const compareAtPriceStr = getColumn('compare_at_price');
+        const productType = getColumn('product_type');
         const categoriesStr = getColumn('category_id');
         const tagsStr = getColumn('tags');
         const imagesStr = getColumn('images');
+        const sizesStr = getColumn('sizes');
         const stockStr = getColumn('stock_quantity');
+        const lowStockStr = getColumn('low_stock_threshold');
         const shortDesc = getColumn('short_description');
         const desc = getColumn('description');
         const riteHint = getColumn('rite_hint');
         const gradeHint = getColumn('grade_hint');
+        const isActiveStr = getColumn('is_active');
+        const featuredStr = getColumn('featured');
+        const promoStartDate = getColumn('promo_start_date');
+        const promoEndDate = getColumn('promo_end_date');
+        const allowBackordersStr = getColumn('allow_backorders');
+        const soldIndividuallyStr = getColumn('sold_individually');
+        const weightStr = getColumn('weight');
+        const lengthStr = getColumn('length');
+        const widthStr = getColumn('width');
+        const heightStr = getColumn('height');
+        const taxStatus = getColumn('tax_status');
+        const taxClass = getColumn('tax_class');
+        const shippingClass = getColumn('shipping_class');
+        const enableReviewsStr = getColumn('enable_reviews');
+        const customerNote = getColumn('customer_note');
+        const productGroupsStr = getColumn('product_groups');
+        const relatedProductsStr = getColumn('related_products');
+        const crossSellStr = getColumn('cross_sell_products');
 
         if (!name || !priceStr) {
           results.skipped++;
@@ -125,10 +148,25 @@ Deno.serve(async (req) => {
           ? tagsStr.split(',').map(t => t.trim()).filter(t => t)
           : [];
 
-        // Extract sizes from tags or metadata
-        const sizes = tags.filter(t => 
-          ['S', 'M', 'L', 'XL', 'XXL', 'Unique'].some(size => t.includes(size))
-        );
+        // Parse sizes
+        const sizes = sizesStr
+          ? sizesStr.split(',').map(s => s.trim()).filter(s => s)
+          : [];
+
+        // Parse product groups
+        const productGroups = productGroupsStr
+          ? productGroupsStr.split(',').map(g => g.trim()).filter(g => g)
+          : [];
+
+        // Parse related products
+        const relatedProducts = relatedProductsStr
+          ? relatedProductsStr.split(',').map(r => r.trim()).filter(r => r)
+          : [];
+
+        // Parse cross-sell products
+        const crossSellProducts = crossSellStr
+          ? crossSellStr.split(',').map(c => c.trim()).filter(c => c)
+          : [];
 
         // Try to match category
         let category_id = null;
@@ -170,7 +208,9 @@ Deno.serve(async (req) => {
         const productData = {
           name,
           price,
+          compare_at_price: compareAtPriceStr ? parseFloat(compareAtPriceStr.replace(/[^0-9.]/g, '')) : undefined,
           sku: sku || undefined,
+          product_type: productType || undefined,
           rite_id,
           grade_id,
           category_id,
@@ -178,14 +218,42 @@ Deno.serve(async (req) => {
           tags: tags.length > 0 ? tags : undefined,
           sizes: sizes.length > 0 ? sizes : undefined,
           stock_quantity: stockStr ? parseInt(stockStr) : 0,
+          low_stock_threshold: lowStockStr ? parseInt(lowStockStr) : undefined,
           short_description: shortDesc && !shortDesc.includes('Lorem') ? shortDesc : undefined,
           description: desc && !desc.includes('Lorem') ? desc : undefined,
-          is_active: true
+          is_active: isActiveStr === '1' || isActiveStr === 'true' || isActiveStr === 'yes',
+          featured: featuredStr === '1' || featuredStr === 'true' || featuredStr === 'yes',
+          promo_start_date: promoStartDate || undefined,
+          promo_end_date: promoEndDate || undefined,
+          allow_backorders: allowBackordersStr === '1' || allowBackordersStr === 'true',
+          sold_individually: soldIndividuallyStr === '1' || soldIndividuallyStr === 'true',
+          weight: weightStr ? parseFloat(weightStr) : undefined,
+          length: lengthStr ? parseFloat(lengthStr) : undefined,
+          width: widthStr ? parseFloat(widthStr) : undefined,
+          height: heightStr ? parseFloat(heightStr) : undefined,
+          tax_status: taxStatus || undefined,
+          tax_class: taxClass || undefined,
+          shipping_class: shippingClass || undefined,
+          enable_reviews: enableReviewsStr === '1' || enableReviewsStr === 'true' || enableReviewsStr !== '0',
+          customer_note: customerNote || undefined,
+          product_groups: productGroups.length > 0 ? productGroups : undefined,
+          related_products: relatedProducts.length > 0 ? relatedProducts : undefined,
+          cross_sell_products: crossSellProducts.length > 0 ? crossSellProducts : undefined
         };
 
-        // Check if product exists by SKU
+        // Check if product exists by ID or SKU
         let existingProduct = null;
-        if (sku) {
+        
+        if (productId) {
+          try {
+            const allProducts = await base44.asServiceRole.entities.Product.list('-created_date', 1000);
+            existingProduct = allProducts.find(p => p.id === productId);
+          } catch (e) {
+            // Product ID not found
+          }
+        }
+        
+        if (!existingProduct && sku) {
           const existing = await base44.asServiceRole.entities.Product.filter({ sku });
           existingProduct = existing[0];
         }
