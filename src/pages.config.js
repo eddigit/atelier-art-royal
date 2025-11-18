@@ -7,6 +7,7 @@ import Orders from './pages/Orders';
 import Account from './pages/Account';
 import AdminOrders from './pages/AdminOrders';
 import AdminSettings from './pages/AdminSettings';
+import AdminDashboard from './pages/AdminDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -20,6 +21,7 @@ export const PAGES = {
     "Account": Account,
     "AdminOrders": AdminOrders,
     "AdminSettings": AdminSettings,
+    "AdminDashboard": AdminDashboard,
 }
 
 export const pagesConfig = {
