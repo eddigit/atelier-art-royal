@@ -61,9 +61,11 @@ export default function Layout({ children, currentPageName }) {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link to={createPageUrl('Home')} className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Crown className="w-6 h-6 text-primary" />
-              </div>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/d0a84d191_Logo-Atelier-Art-Royal.png" 
+                alt="Atelier Art Royal" 
+                className="h-12 w-auto object-contain"
+              />
               <div className="hidden md:block">
                 <div className="text-xl font-bold tracking-tight text-gradient">Art Royal</div>
                 <div className="text-xs text-muted-foreground">Haute Couture Maçonnique</div>
@@ -212,10 +214,11 @@ export default function Layout({ children, currentPageName }) {
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Crown className="w-6 h-6 text-primary" />
-                <span className="font-bold text-lg text-gradient">Art Royal</span>
-              </div>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/d0a84d191_Logo-Atelier-Art-Royal.png" 
+                alt="Atelier Art Royal" 
+                className="h-10 w-auto object-contain mb-4"
+              />
               <p className="text-sm text-muted-foreground">
                 Haute Couture Maçonnique depuis 1985
               </p>
