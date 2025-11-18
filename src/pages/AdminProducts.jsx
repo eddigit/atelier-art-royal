@@ -1,320 +1,299 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, Package, Search } from 'lucide-react';
+import { 
+  Upload, 
+  Trash2, 
+  Package, 
+  AlertCircle, 
+  CheckCircle2,
+  Loader2,
+  Eye,
+  Edit
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
-import { Checkbox } from '@/components/ui/checkbox';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AdminProducts() {
-  const [search, setSearch] = useState('');
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const queryClient = useQueryClient();
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResults, setImportResults] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    queryFn: () => base44.auth.me()
+  });
 
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ['admin-products', search],
-    queryFn: async () => {
-      const allProducts = await base44.entities.Product.list('-created_date', 500);
-      if (!search) return allProducts;
-      return allProducts.filter(p => 
-        p.name.toLowerCase().includes(search.toLowerCase())
-      );
+    queryKey: ['admin-products'],
+    queryFn: () => base44.entities.Product.list('-created_date', 500),
+    initialData: []
+  });
+
+  const deleteAllMutation = useMutation({
+    mutationFn: async () => {
+      const allProducts = await base44.entities.Product.list('-created_date', 1000);
+      await Promise.all(allProducts.map(p => base44.entities.Product.delete(p.id)));
+      return allProducts.length;
     },
-    initialData: []
-  });
-
-  const { data: rites = [] } = useQuery({
-    queryKey: ['rites'],
-    queryFn: () => base44.entities.Rite.list('order', 50),
-    initialData: []
-  });
-
-  const { data: grades = [] } = useQuery({
-    queryKey: ['grades'],
-    queryFn: () => base44.entities.Grade.list('level', 100),
-    initialData: []
-  });
-
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => base44.entities.Category.list('order', 50),
-    initialData: []
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Product.delete(id),
-    onSuccess: () => {
+    onSuccess: (count) => {
       queryClient.invalidateQueries(['admin-products']);
-      toast.success('Produit supprimé');
+      toast.success(`${count} produits supprimés`);
+      setShowDeleteDialog(false);
     }
   });
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    setImportResults(null);
+
+    try {
+      // Upload file
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+
+      // Process import via backend function
+      const response = await base44.functions.invoke('importProducts', { file_url });
+      
+      setImportResults(response.data);
+      queryClient.invalidateQueries(['admin-products']);
+      
+      if (response.data.success) {
+        toast.success(`Import réussi: ${response.data.imported} produits importés`);
+      } else {
+        toast.error('Erreurs lors de l\'import');
+      }
+    } catch (error) {
+      toast.error('Erreur lors de l\'import: ' + error.message);
+      setImportResults({ success: false, error: error.message });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
+        <h2 className="text-2xl font-bold mb-4">Accès refusé</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-4xl font-bold">
-          Gestion des <span className="text-gradient">Produits</span>
-        </h1>
-        <ProductDialog
-          product={null}
-          rites={rites}
-          grades={grades}
-          categories={categories}
-          onSuccess={() => queryClient.invalidateQueries(['admin-products'])}
-        >
-          <Button className="bg-primary hover:bg-primary/90">
-            <Plus className="w-4 h-4 mr-2" />
-            Nouveau Produit
-          </Button>
-        </ProductDialog>
+        <div>
+          <h1 className="text-4xl font-bold mb-2">Gestion des Produits</h1>
+          <p className="text-muted-foreground">
+            {products.length} produit{products.length > 1 ? 's' : ''} dans le catalogue
+          </p>
+        </div>
       </div>
 
-      {/* Search */}
-      <div className="mb-6 relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Rechercher un produit..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+      {/* Import Section */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="w-5 h-5" />
+            Import CSV WooCommerce
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-4">
+            <Input
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              disabled={isImporting}
+              className="max-w-md"
+            />
+            {isImporting && (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Import en cours...
+              </div>
+            )}
+          </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <Card key={product.id} className="overflow-hidden">
-            <div className="aspect-square bg-muted relative">
-              <img
-                src={product.images?.[0] || 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105'}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-              {!product.is_active && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <Badge variant="secondary">Inactif</Badge>
+          {importResults && (
+            <div className={`p-4 rounded-lg border ${
+              importResults.success 
+                ? 'bg-green-50 border-green-200' 
+                : 'bg-red-50 border-red-200'
+            }`}>
+              <div className="flex items-start gap-3">
+                {importResults.success ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                )}
+                <div className="flex-1">
+                  <h4 className="font-semibold mb-2">
+                    {importResults.success ? 'Import réussi' : 'Erreurs détectées'}
+                  </h4>
+                  <div className="text-sm space-y-1">
+                    {importResults.imported && (
+                      <p>✅ {importResults.imported} produits importés</p>
+                    )}
+                    {importResults.updated && (
+                      <p>🔄 {importResults.updated} produits mis à jour</p>
+                    )}
+                    {importResults.skipped && (
+                      <p>⏭️ {importResults.skipped} produits ignorés</p>
+                    )}
+                    {importResults.errors && importResults.errors.length > 0 && (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer font-medium text-red-700">
+                          ❌ {importResults.errors.length} erreur(s)
+                        </summary>
+                        <ul className="mt-2 ml-4 space-y-1">
+                          {importResults.errors.slice(0, 10).map((err, i) => (
+                            <li key={i} className="text-xs">{err}</li>
+                          ))}
+                        </ul>
+                      </details>
+                    )}
+                  </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          <div className="text-sm text-muted-foreground">
+            <p className="font-medium mb-2">Format attendu :</p>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Export CSV WooCommerce standard</li>
+              <li>Colonnes mappées automatiquement : UGS, Nom, Prix, Catégories, Images, etc.</li>
+              <li>Les doublons (même UGS) seront mis à jour</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Products List */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Produits existants</CardTitle>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setShowDeleteDialog(true)}
+              disabled={products.length === 0}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Tout supprimer
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-center text-muted-foreground py-8">Chargement...</p>
+          ) : products.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              Aucun produit. Importez un fichier CSV pour commencer.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {products.slice(0, 50).map((product) => (
+                <div
+                  key={product.id}
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    {product.images?.[0] && (
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-12 h-12 object-cover rounded"
+                      />
+                    )}
+                    <div>
+                      <p className="font-medium">{product.name}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {product.sku && <span>SKU: {product.sku}</span>}
+                        <span>•</span>
+                        <span className="font-semibold text-primary">
+                          {product.price?.toFixed(2)}€
+                        </span>
+                        {product.stock_quantity !== undefined && (
+                          <>
+                            <span>•</span>
+                            <span>Stock: {product.stock_quantity}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!product.is_active && (
+                      <Badge variant="secondary">Inactif</Badge>
+                    )}
+                    <Link to={createPageUrl('ProductDetail') + `?id=${product.id}`}>
+                      <Button variant="ghost" size="icon">
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+              {products.length > 50 && (
+                <p className="text-center text-sm text-muted-foreground pt-4">
+                  ... et {products.length - 50} autres produits
+                </p>
               )}
             </div>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2 line-clamp-1">{product.name}</h3>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-lg font-bold text-primary">
-                  {product.price.toFixed(2)}€
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  Stock: {product.stock_quantity}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <ProductDialog
-                  product={product}
-                  rites={rites}
-                  grades={grades}
-                  categories={categories}
-                  onSuccess={() => queryClient.invalidateQueries(['admin-products'])}
-                >
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Pencil className="w-3 h-3 mr-1" />
-                    Modifier
-                  </Button>
-                </ProductDialog>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm('Supprimer ce produit ?')) {
-                      deleteMutation.mutate(product.id);
-                    }
-                  }}
-                >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+          )}
+        </CardContent>
+      </Card>
 
-      {products.length === 0 && (
-        <div className="text-center py-20">
-          <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">Aucun produit trouvé</p>
-        </div>
-      )}
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action supprimera définitivement <strong>tous les {products.length} produits</strong> de la base de données.
+              Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteAllMutation.mutate()}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {deleteAllMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                'Supprimer tout'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
-  );
-}
-
-function ProductDialog({ product, rites, grades, categories, onSuccess, children }) {
-  const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState(
-    product || {
-      name: '',
-      slug: '',
-      description: '',
-      short_description: '',
-      price: 0,
-      compare_at_price: 0,
-      rite_id: '',
-      grade_id: '',
-      category_id: '',
-      images: [],
-      stock_quantity: 0,
-      low_stock_threshold: 5,
-      sku: '',
-      is_active: true,
-      featured: false,
-      tags: []
-    }
-  );
-
-  const queryClient = useQueryClient();
-
-  const saveMutation = useMutation({
-    mutationFn: async (data) => {
-      if (product) {
-        return base44.entities.Product.update(product.id, data);
-      } else {
-        return base44.entities.Product.create(data);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['admin-products']);
-      toast.success(product ? 'Produit modifié' : 'Produit créé');
-      setOpen(false);
-      if (onSuccess) onSuccess();
-    }
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    saveMutation.mutate(formData);
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{product ? 'Modifier' : 'Créer'} un Produit</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <Label>Nom *</Label>
-              <Input
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Prix (€) *</Label>
-              <Input
-                type="number"
-                step="0.01"
-                required
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label>Stock *</Label>
-              <Input
-                type="number"
-                required
-                value={formData.stock_quantity}
-                onChange={(e) => setFormData({ ...formData, stock_quantity: parseInt(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label>Rite *</Label>
-              <Select
-                value={formData.rite_id}
-                onValueChange={(v) => setFormData({ ...formData, rite_id: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {rites.map((r) => (
-                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Grade *</Label>
-              <Select
-                value={formData.grade_id}
-                onValueChange={(v) => setFormData({ ...formData, grade_id: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {grades.map((g) => (
-                    <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="col-span-2">
-              <Label>Description courte</Label>
-              <Input
-                value={formData.short_description}
-                onChange={(e) => setFormData({ ...formData, short_description: e.target.value })}
-              />
-            </div>
-            <div className="col-span-2">
-              <Label>Description</Label>
-              <Textarea
-                rows={4}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
-            </div>
-            <div className="col-span-2 flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
-                />
-                <Label htmlFor="is_active">Actif</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="featured"
-                  checked={formData.featured}
-                  onCheckedChange={(v) => setFormData({ ...formData, featured: v })}
-                />
-                <Label htmlFor="featured">Coup de cœur</Label>
-              </div>
-            </div>
-          </div>
-          <Button type="submit" className="w-full" disabled={saveMutation.isPending}>
-            {saveMutation.isPending ? 'Enregistrement...' : 'Enregistrer'}
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }
