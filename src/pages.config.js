@@ -5,6 +5,8 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
 import Account from './pages/Account';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminProducts from './pages/AdminProducts';
 import __Layout from './Layout.jsx';
 
 
@@ -16,6 +18,8 @@ export const PAGES = {
     "Checkout": Checkout,
     "Orders": Orders,
     "Account": Account,
+    "AdminDashboard": AdminDashboard,
+    "AdminProducts": AdminProducts,
 }
 
 export const pagesConfig = {
