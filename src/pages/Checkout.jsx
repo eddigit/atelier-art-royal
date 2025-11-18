@@ -25,6 +25,8 @@ export default function Checkout() {
     phone: ''
   });
 
+  const [validationErrors, setValidationErrors] = useState({});
+
   const [billingAddress, setBillingAddress] = useState({
     name: '',
     street: '',
@@ -114,19 +116,42 @@ export default function Checkout() {
     }
   });
 
+  const validateField = (field, value) => {
+    const errors = { ...validationErrors };
+    
+    if (!value || value.trim() === '') {
+      errors[field] = 'Ce champ est requis';
+    } else if (field === 'postal_code' && !/^\d{5}$/.test(value)) {
+      errors[field] = 'Code postal invalide (5 chiffres)';
+    } else if (field === 'phone' && !/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/.test(value.replace(/\s/g, ''))) {
+      errors[field] = 'Numéro de téléphone invalide';
+    } else {
+      delete errors[field];
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
-    if (!shippingAddress.name || !shippingAddress.street || !shippingAddress.city || !shippingAddress.postal_code || !shippingAddress.phone) {
-      toast.error('Veuillez remplir tous les champs de livraison');
+    // Validation complète
+    const requiredFields = ['name', 'street', 'city', 'postal_code', 'phone'];
+    let hasErrors = false;
+    
+    requiredFields.forEach(field => {
+      if (!validateField(field, shippingAddress[field])) {
+        hasErrors = true;
+      }
+    });
+
+    if (hasErrors || Object.keys(validationErrors).length > 0) {
+      toast.error('Veuillez corriger les erreurs du formulaire');
       return;
     }
 
     setIsProcessing(true);
-    
-    // In production, integrate with Stripe Payment
-    // For now, we create the order directly
     createOrderMutation.mutate();
   };
 
@@ -165,18 +190,34 @@ export default function Checkout() {
                   <Input
                     id="ship-name"
                     value={shippingAddress.name}
-                    onChange={(e) => setShippingAddress({...shippingAddress, name: e.target.value})}
+                    onChange={(e) => {
+                      setShippingAddress({...shippingAddress, name: e.target.value});
+                      validateField('name', e.target.value);
+                    }}
+                    onBlur={(e) => validateField('name', e.target.value)}
+                    className={validationErrors.name ? 'border-red-500' : ''}
                     required
                   />
+                  {validationErrors.name && (
+                    <p className="text-xs text-red-500 mt-1">{validationErrors.name}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="ship-street">Adresse *</Label>
                   <Input
                     id="ship-street"
                     value={shippingAddress.street}
-                    onChange={(e) => setShippingAddress({...shippingAddress, street: e.target.value})}
+                    onChange={(e) => {
+                      setShippingAddress({...shippingAddress, street: e.target.value});
+                      validateField('street', e.target.value);
+                    }}
+                    onBlur={(e) => validateField('street', e.target.value)}
+                    className={validationErrors.street ? 'border-red-500' : ''}
                     required
                   />
+                  {validationErrors.street && (
+                    <p className="text-xs text-red-500 mt-1">{validationErrors.street}</p>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -184,18 +225,34 @@ export default function Checkout() {
                     <Input
                       id="ship-postal"
                       value={shippingAddress.postal_code}
-                      onChange={(e) => setShippingAddress({...shippingAddress, postal_code: e.target.value})}
+                      onChange={(e) => {
+                        setShippingAddress({...shippingAddress, postal_code: e.target.value});
+                        validateField('postal_code', e.target.value);
+                      }}
+                      onBlur={(e) => validateField('postal_code', e.target.value)}
+                      className={validationErrors.postal_code ? 'border-red-500' : ''}
                       required
                     />
+                    {validationErrors.postal_code && (
+                      <p className="text-xs text-red-500 mt-1">{validationErrors.postal_code}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="ship-city">Ville *</Label>
                     <Input
                       id="ship-city"
                       value={shippingAddress.city}
-                      onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
+                      onChange={(e) => {
+                        setShippingAddress({...shippingAddress, city: e.target.value});
+                        validateField('city', e.target.value);
+                      }}
+                      onBlur={(e) => validateField('city', e.target.value)}
+                      className={validationErrors.city ? 'border-red-500' : ''}
                       required
                     />
+                    {validationErrors.city && (
+                      <p className="text-xs text-red-500 mt-1">{validationErrors.city}</p>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -203,10 +260,19 @@ export default function Checkout() {
                   <Input
                     id="ship-phone"
                     type="tel"
+                    placeholder="06 12 34 56 78"
                     value={shippingAddress.phone}
-                    onChange={(e) => setShippingAddress({...shippingAddress, phone: e.target.value})}
+                    onChange={(e) => {
+                      setShippingAddress({...shippingAddress, phone: e.target.value});
+                      validateField('phone', e.target.value);
+                    }}
+                    onBlur={(e) => validateField('phone', e.target.value)}
+                    className={validationErrors.phone ? 'border-red-500' : ''}
                     required
                   />
+                  {validationErrors.phone && (
+                    <p className="text-xs text-red-500 mt-1">{validationErrors.phone}</p>
+                  )}
                 </div>
               </CardContent>
             </Card>

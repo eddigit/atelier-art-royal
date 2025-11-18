@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Package, Calendar, MapPin, CreditCard } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import OrderTimeline from '@/components/orders/OrderTimeline';
 
 const statusConfig = {
   pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
@@ -106,6 +107,11 @@ export default function Orders() {
               </CardHeader>
 
               <CardContent className="p-6">
+                {/* Timeline */}
+                <div className="mb-6">
+                  <OrderTimeline currentStatus={order.status} />
+                </div>
+
                 {/* Products */}
                 <div className="mb-6">
                   <h4 className="font-semibold mb-3">Produits</h4>
