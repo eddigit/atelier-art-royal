@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Save } from 'lucide-react';
-import { toast } from 'sonner';
+import { Settings, Package, Tag, Award } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 export default function AdminSettings() {
-  const queryClient = useQueryClient();
+  const sections = [
+    {
+      title: 'Rites',
+      description: 'Gérer les Rites maçonniques',
+      icon: Award,
+      link: '/admin/rites',
+      color: 'bg-blue-500'
+    },
+    {
+      title: 'Grades',
+      description: 'Gérer les Grades par Rite',
+      icon: Award,
+      link: '/admin/grades',
+      color: 'bg-purple-500'
+    },
+    {
+      title: 'Catégories',
+      description: 'Gérer les catégories de produits',
+      icon: Tag,
+      link: '/admin/categories',
+      color: 'bg-green-500'
+    }
+  ];
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -18,318 +35,53 @@ export default function AdminSettings() {
         <span className="text-gradient">Configuration</span>
       </h1>
 
-      <Tabs defaultValue="rites" className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="rites">Rites</TabsTrigger>
-          <TabsTrigger value="grades">Grades</TabsTrigger>
-          <TabsTrigger value="categories">Catégories</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="rites">
-          <RitesManager />
-        </TabsContent>
-
-        <TabsContent value="grades">
-          <GradesManager />
-        </TabsContent>
-
-        <TabsContent value="categories">
-          <CategoriesManager />
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-function RitesManager() {
-  const [newRite, setNewRite] = useState({ name: '', code: '', description: '', order: 0 });
-  const queryClient = useQueryClient();
-
-  const { data: rites = [] } = useQuery({
-    queryKey: ['rites'],
-    queryFn: () => base44.entities.Rite.list('order', 50),
-    initialData: []
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Rite.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['rites']);
-      setNewRite({ name: '', code: '', description: '', order: 0 });
-      toast.success('Rite créé');
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Rite.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['rites']);
-      toast.success('Rite supprimé');
-    }
-  });
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Ajouter un Rite</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Input
-              placeholder="Nom (ex: REAA)"
-              value={newRite.name}
-              onChange={(e) => setNewRite({ ...newRite, name: e.target.value })}
-            />
-            <Input
-              placeholder="Code (ex: reaa)"
-              value={newRite.code}
-              onChange={(e) => setNewRite({ ...newRite, code: e.target.value })}
-            />
-            <Input
-              placeholder="Description"
-              value={newRite.description}
-              onChange={(e) => setNewRite({ ...newRite, description: e.target.value })}
-            />
-            <Button
-              onClick={() => createMutation.mutate(newRite)}
-              disabled={!newRite.name || !newRite.code}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Ajouter
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Rites existants ({rites.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {rites.map((rite) => (
-              <div key={rite.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div>
-                  <p className="font-medium">{rite.name}</p>
-                  <p className="text-sm text-muted-foreground">{rite.code}</p>
-                </div>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm('Supprimer ce rite ?')) {
-                      deleteMutation.mutate(rite.id);
-                    }
-                  }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function GradesManager() {
-  const [newGrade, setNewGrade] = useState({ name: '', level: 1, rite_id: '', description: '' });
-  const queryClient = useQueryClient();
-
-  const { data: grades = [] } = useQuery({
-    queryKey: ['grades'],
-    queryFn: () => base44.entities.Grade.list('level', 100),
-    initialData: []
-  });
-
-  const { data: rites = [] } = useQuery({
-    queryKey: ['rites'],
-    queryFn: () => base44.entities.Rite.list('order', 50),
-    initialData: []
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Grade.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['grades']);
-      setNewGrade({ name: '', level: 1, rite_id: '', description: '' });
-      toast.success('Grade créé');
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Grade.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['grades']);
-      toast.success('Grade supprimé');
-    }
-  });
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Ajouter un Grade</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Input
-              placeholder="Nom"
-              value={newGrade.name}
-              onChange={(e) => setNewGrade({ ...newGrade, name: e.target.value })}
-            />
-            <Input
-              type="number"
-              placeholder="Niveau"
-              value={newGrade.level}
-              onChange={(e) => setNewGrade({ ...newGrade, level: parseInt(e.target.value) })}
-            />
-            <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              value={newGrade.rite_id}
-              onChange={(e) => setNewGrade({ ...newGrade, rite_id: e.target.value })}
-            >
-              <option value="">Sélectionner un rite</option>
-              {rites.map((rite) => (
-                <option key={rite.id} value={rite.id}>{rite.name}</option>
-              ))}
-            </select>
-            <Button
-              onClick={() => createMutation.mutate(newGrade)}
-              disabled={!newGrade.name}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Ajouter
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Grades existants ({grades.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {grades.map((grade) => {
-              const rite = rites.find(r => r.id === grade.rite_id);
-              return (
-                <div key={grade.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                  <div>
-                    <p className="font-medium">{grade.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Niveau {grade.level} {rite ? `- ${rite.name}` : ''}
-                    </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sections.map((section) => {
+          const Icon = section.icon;
+          return (
+            <Card key={section.title} className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-lg ${section.color} bg-opacity-10 flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${section.color.replace('bg-', 'text-')}`} />
                   </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => {
-                      if (confirm('Supprimer ce grade ?')) {
-                        deleteMutation.mutate(grade.id);
-                      }
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <CardTitle>{section.title}</CardTitle>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{section.description}</p>
+                <p className="text-xs text-muted-foreground italic">
+                  Configuration disponible via le dashboard Base44
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
-function CategoriesManager() {
-  const [newCategory, setNewCategory] = useState({ name: '', slug: '', description: '', order: 0 });
-  const queryClient = useQueryClient();
-
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => base44.entities.Category.list('order', 50),
-    initialData: []
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Category.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['categories']);
-      setNewCategory({ name: '', slug: '', description: '', order: 0 });
-      toast.success('Catégorie créée');
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Category.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['categories']);
-      toast.success('Catégorie supprimée');
-    }
-  });
-
-  return (
-    <div className="space-y-6">
-      <Card>
+      <Card className="mt-8">
         <CardHeader>
-          <CardTitle>Ajouter une Catégorie</CardTitle>
+          <CardTitle>Informations</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Input
-              placeholder="Nom (ex: Tabliers)"
-              value={newCategory.name}
-              onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-            />
-            <Input
-              placeholder="Slug (ex: tabliers)"
-              value={newCategory.slug}
-              onChange={(e) => setNewCategory({ ...newCategory, slug: e.target.value })}
-            />
-            <Input
-              placeholder="Description"
-              value={newCategory.description}
-              onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-            />
-            <Button
-              onClick={() => createMutation.mutate(newCategory)}
-              disabled={!newCategory.name || !newCategory.slug}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Ajouter
-            </Button>
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="font-semibold mb-2">Import CSV de Produits</h3>
+            <p className="text-sm text-muted-foreground">
+              Pour importer des produits en masse, utilisez la fonctionnalité d'import CSV disponible dans le dashboard Base44.
+              Assurez-vous que vos données incluent les champs obligatoires : <strong>Rite</strong> et <strong>Grade</strong>.
+            </p>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Catégories existantes ({categories.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <div key={category.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div>
-                  <p className="font-medium">{category.name}</p>
-                  <p className="text-sm text-muted-foreground">{category.slug}</p>
-                </div>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm('Supprimer cette catégorie ?')) {
-                      deleteMutation.mutate(category.id);
-                    }
-                  }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
+          <div>
+            <h3 className="font-semibold mb-2">Franco de Port</h3>
+            <p className="text-sm text-muted-foreground">
+              Le franco de port à partir de 500€ est configuré automatiquement dans le système de checkout.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-2">Paiement Stripe</h3>
+            <p className="text-sm text-muted-foreground">
+              L'intégration Stripe peut être configurée via les fonctions backend pour traiter les paiements de manière sécurisée.
+            </p>
           </div>
         </CardContent>
       </Card>
