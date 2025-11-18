@@ -34,11 +34,11 @@ export default function HeroSection() {
           </span>
         </div>
         
-        <h1 className="text-hero text-gradient mb-6">
+        <h1 className="text-hero text-gradient mb-6 drop-shadow-lg">
           Atelier Art Royal
         </h1>
         
-        <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow-lg">
           Création d'exception pour tous les Rites et Grades.<br />
           L'élégance au service de la Tradition.
         </p>
@@ -46,27 +46,27 @@ export default function HeroSection() {
         {/* AI-Powered Search */}
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
           <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-hover:text-primary group-focus-within:text-primary transition-colors z-10" />
             <Input
               type="text"
               name="search"
               placeholder="Recherchez un produit, un rite, un grade... (Recherche IA)"
-              className="h-16 pl-16 pr-6 text-lg glass border-2 border-border focus:border-primary transition-all rounded-full"
+              className="h-16 pl-16 pr-6 text-lg bg-black/60 hover:bg-black/80 focus:bg-black/90 text-white placeholder:text-gray-300 border-2 border-white/20 hover:border-primary/50 focus:border-primary transition-all rounded-full backdrop-blur-sm"
             />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-medium">
                 <Sparkles className="w-3 h-3" />
                 IA
               </div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-3 text-center">
+          <p className="text-sm text-white mt-3 text-center drop-shadow-lg">
             Recherche intelligente propulsée par Groq AI
           </p>
         </form>
 
         {/* Trust Indicators */}
-        <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
+        <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-white drop-shadow-lg">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-primary" />
             Livraison 5-7 jours
