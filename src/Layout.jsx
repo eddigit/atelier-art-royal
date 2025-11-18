@@ -9,9 +9,23 @@ import {
   User, 
   Menu, 
   X,
-  Crown,
-  LogOut
+  LogOut,
+  ChevronDown,
+  Package,
+  Grid,
+  Award,
+  UserCircle,
+  ShoppingBag,
+  Settings
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel
+} from '@/components/ui/dropdown-menu';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -31,6 +45,18 @@ export default function Layout({ children, currentPageName }) {
         return [];
       }
     },
+    initialData: []
+  });
+
+  const { data: rites = [] } = useQuery({
+    queryKey: ['rites'],
+    queryFn: () => base44.entities.Rite.list('order', 50),
+    initialData: []
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => base44.entities.Category.list('order', 50),
     initialData: []
   });
 
@@ -70,23 +96,47 @@ export default function Layout({ children, currentPageName }) {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-6">
+              <Link to={createPageUrl('Home')} className="text-sm font-medium hover:text-primary transition-colors">
+                Accueil
+              </Link>
+
               {!isAdminPage && (
-                <>
-                  <Link to={createPageUrl('Home')} className="text-sm font-medium hover:text-primary transition-colors">
-                    Accueil
-                  </Link>
-                  <Link to={createPageUrl('Catalog')} className="text-sm font-medium hover:text-primary transition-colors">
-                    Catalogue
-                  </Link>
-                  <Link to={createPageUrl('Orders')} className="text-sm font-medium hover:text-primary transition-colors">
-                    Mes Commandes
-                  </Link>
-                </>
-              )}
-              {isAdmin && (
-                <Link to={createPageUrl('AdminDashboard')} className="text-sm font-medium hover:text-primary transition-colors">
-                  Administration
-                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
+                      Explorer
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuLabel>Rechercher par Rite</DropdownMenuLabel>
+                    {rites.slice(0, 5).map(rite => (
+                      <DropdownMenuItem key={rite.id} asChild>
+                        <Link to={createPageUrl('Catalog') + `?rite=${rite.id}`} className="cursor-pointer">
+                          <Award className="w-4 h-4 mr-2" />
+                          {rite.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Rechercher par Catégorie</DropdownMenuLabel>
+                    {categories.slice(0, 5).map(category => (
+                      <DropdownMenuItem key={category.id} asChild>
+                        <Link to={createPageUrl('Catalog') + `?category=${category.id}`} className="cursor-pointer">
+                          <Grid className="w-4 h-4 mr-2" />
+                          {category.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to={createPageUrl('Catalog')} className="cursor-pointer font-medium">
+                        <Package className="w-4 h-4 mr-2" />
+                        Tous les produits
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </nav>
 
@@ -118,21 +168,52 @@ export default function Layout({ children, currentPageName }) {
 
               {/* User Menu */}
               {user ? (
-                <div className="flex items-center gap-2">
-                  <Link to={createPageUrl('Account')}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="rounded-full">
                       <User className="w-5 h-5" />
                     </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full"
-                    onClick={() => base44.auth.logout()}
-                  >
-                    <LogOut className="w-5 h-5" />
-                  </Button>
-                </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col">
+                        <span className="font-semibold">{user.full_name}</span>
+                        <span className="text-xs text-muted-foreground font-normal">{user.email}</span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to={createPageUrl('Account')} className="cursor-pointer">
+                        <UserCircle className="w-4 h-4 mr-2" />
+                        Mon Compte
+                      </Link>
+                    </DropdownMenuItem>
+                    {!isAdminPage && (
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('Orders')} className="cursor-pointer">
+                          <ShoppingBag className="w-4 h-4 mr-2" />
+                          Mes Commandes
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('AdminDashboard')} className="cursor-pointer">
+                            <Settings className="w-4 h-4 mr-2" />
+                            Administration
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => base44.auth.logout()} className="cursor-pointer text-destructive">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Déconnexion
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <Button
                   variant="default"
@@ -160,21 +241,59 @@ export default function Layout({ children, currentPageName }) {
           {mobileMenuOpen && (
             <div className="lg:hidden py-4 border-t border-border">
               <nav className="flex flex-col gap-3">
+                <Link 
+                  to={createPageUrl('Home')} 
+                  className="text-sm font-medium hover:text-primary transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Accueil
+                </Link>
+
                 {!isAdminPage && (
                   <>
-                    <Link 
-                      to={createPageUrl('Home')} 
-                      className="text-sm font-medium hover:text-primary transition-colors py-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Accueil
-                    </Link>
+                    <div className="text-xs text-muted-foreground font-semibold mt-2">Par Rite</div>
+                    {rites.slice(0, 4).map(rite => (
+                      <Link 
+                        key={rite.id}
+                        to={createPageUrl('Catalog') + `?rite=${rite.id}`}
+                        className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {rite.name}
+                      </Link>
+                    ))}
+
+                    <div className="text-xs text-muted-foreground font-semibold mt-2">Par Catégorie</div>
+                    {categories.slice(0, 4).map(category => (
+                      <Link 
+                        key={category.id}
+                        to={createPageUrl('Catalog') + `?category=${category.id}`}
+                        className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {category.name}
+                      </Link>
+                    ))}
+
                     <Link 
                       to={createPageUrl('Catalog')} 
+                      className="text-sm font-medium hover:text-primary transition-colors py-2 mt-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Tous les produits
+                    </Link>
+                  </>
+                )}
+
+                {user && !isAdminPage && (
+                  <>
+                    <div className="border-t border-border my-2" />
+                    <Link 
+                      to={createPageUrl('Account')} 
                       className="text-sm font-medium hover:text-primary transition-colors py-2"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Catalogue
+                      Mon Compte
                     </Link>
                     <Link 
                       to={createPageUrl('Orders')} 
@@ -185,14 +304,18 @@ export default function Layout({ children, currentPageName }) {
                     </Link>
                   </>
                 )}
+
                 {isAdmin && (
-                  <Link 
-                    to={createPageUrl('AdminDashboard')} 
-                    className="text-sm font-medium hover:text-primary transition-colors py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Administration
-                  </Link>
+                  <>
+                    <div className="border-t border-border my-2" />
+                    <Link 
+                      to={createPageUrl('AdminDashboard')} 
+                      className="text-sm font-medium hover:text-primary transition-colors py-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Administration
+                    </Link>
+                  </>
                 )}
               </nav>
             </div>
