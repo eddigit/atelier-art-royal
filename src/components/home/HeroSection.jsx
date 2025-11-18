@@ -2,9 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Search, Sparkles } from 'lucide-react';
 
 export default function HeroSection() {
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const searchQuery = e.target.search.value;
+    // TODO: Intégrer Groq AI pour recherche intelligente
+    console.log('Recherche:', searchQuery);
+  };
+
   return (
     <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -35,17 +43,27 @@ export default function HeroSection() {
           L'élégance au service de la Tradition.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link to={createPageUrl('Catalog')}>
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 h-14 text-base group">
-              Découvrir le Catalogue
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
-          <Button size="lg" variant="outline" className="px-8 h-14 text-base glass">
-            Franco de port dès 500€
-          </Button>
-        </div>
+        {/* AI-Powered Search */}
+        <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+          <div className="relative group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Input
+              type="text"
+              name="search"
+              placeholder="Recherchez un produit, un rite, un grade... (Recherche IA)"
+              className="h-16 pl-16 pr-6 text-lg glass border-2 border-border focus:border-primary transition-all rounded-full"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                <Sparkles className="w-3 h-3" />
+                IA
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mt-3 text-center">
+            Recherche intelligente propulsée par Groq AI
+          </p>
+        </form>
 
         {/* Trust Indicators */}
         <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
