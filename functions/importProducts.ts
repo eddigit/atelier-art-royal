@@ -190,10 +190,32 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // Parse images
-        const images = imagesStr 
-          ? imagesStr.split(',').map(img => img.trim()).filter(img => img.startsWith('http'))
-          : [];
+        // Parse and download images
+        let downloadedImages = [];
+        if (imagesStr) {
+          const imageUrls = imagesStr.split(',').map(img => img.trim()).filter(img => img.startsWith('http'));
+          
+          for (const imageUrl of imageUrls) {
+            try {
+              // Add delay between image downloads to avoid rate limiting
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              const imageResponse = await fetch(imageUrl);
+              if (!imageResponse.ok) {
+                results.errors.push(`Ligne ${i}: Impossible de télécharger l'image ${imageUrl}`);
+                continue;
+              }
+              
+              const imageBlob = await imageResponse.blob();
+              const imageFile = new File([imageBlob], `product-${i}-${Date.now()}.jpg`, { type: imageBlob.type });
+              
+              const { file_url } = await base44.asServiceRole.integrations.Core.UploadFile({ file: imageFile });
+              downloadedImages.push(file_url);
+            } catch (imgError) {
+              results.errors.push(`Ligne ${i}: ${imgError.message}`);
+            }
+          }
+        }
 
         // Parse tags
         const tags = tagsStr 
@@ -266,7 +288,7 @@ Deno.serve(async (req) => {
           rite_id,
           grade_id,
           category_id,
-          images: images.length > 0 ? images : undefined,
+          images: downloadedImages.length > 0 ? downloadedImages : undefined,
           tags: tags.length > 0 ? tags : undefined,
           sizes: sizes.length > 0 ? sizes : undefined,
           stock_quantity: stockStr ? parseInt(stockStr) : 0,
