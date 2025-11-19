@@ -214,14 +214,14 @@ export default function AdminProducts() {
             <CardContent className="pt-6">
               <div className={`p-4 rounded-lg border ${
                 importResults.success 
-                  ? 'bg-green-50 border-green-200' 
-                  : 'bg-red-50 border-red-200'
+                  ? 'bg-green-600/10 border-green-600/30' 
+                  : 'bg-red-600/10 border-red-600/30'
               }`}>
                 <div className="flex items-start gap-3">
                   {importResults.success ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5" />
                   ) : (
-                    <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-red-400 mt-0.5" />
                   )}
                   <div className="flex-1">
                     <h4 className="font-semibold mb-2">
@@ -239,7 +239,7 @@ export default function AdminProducts() {
                       )}
                       {importResults.errors && importResults.errors.length > 0 && (
                         <details className="mt-2">
-                          <summary className="cursor-pointer font-medium text-red-700">
+                          <summary className="cursor-pointer font-medium text-red-400">
                             ❌ {importResults.errors.length} erreur(s)
                           </summary>
                           <ul className="mt-2 ml-4 space-y-1">

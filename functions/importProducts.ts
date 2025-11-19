@@ -55,8 +55,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Process each product line
-    for (let i = 1; i < Math.min(lines.length, 500); i++) {
+    // Process each product line (no limit)
+    for (let i = 1; i < lines.length; i++) {
       try {
         // Simple CSV parsing (handles quoted fields)
         const values = [];
@@ -267,8 +267,9 @@ Deno.serve(async (req) => {
         }
 
       } catch (error) {
-        results.errors.push(`Ligne ${i}: ${error.message}`);
-        if (results.errors.length > 50) break; // Limit errors
+        results.errors.push(`Ligne ${i} (${name || 'inconnu'}): ${error.message}`);
+        results.skipped++;
+        // Continue processing other products
       }
     }
 

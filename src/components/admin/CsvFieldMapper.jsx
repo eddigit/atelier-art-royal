@@ -121,9 +121,9 @@ export default function CsvFieldMapper({ csvHeaders, mapping, onMappingChange })
           <CardTitle>Mappage des colonnes CSV</CardTitle>
           <div className="flex items-center gap-2">
             {allRequiredMapped ? (
-              <Badge className="bg-green-100 text-green-800">✓ Champs requis OK</Badge>
+              <Badge className="bg-green-600/20 text-green-400 border-green-600/30">✓ Champs requis OK</Badge>
             ) : (
-              <Badge variant="destructive">⚠ Champs requis manquants</Badge>
+              <Badge className="bg-red-600/20 text-red-400 border-red-600/30">⚠ Champs requis manquants</Badge>
             )}
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function CsvFieldMapper({ csvHeaders, mapping, onMappingChange })
           ))}
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mt-6 p-4 bg-blue-600/10 border border-blue-600/30 rounded-lg">
           <h4 className="font-semibold text-sm mb-2">📋 Résumé du mappage</h4>
           <div className="text-xs space-y-1">
             <p>• Colonnes CSV détectées : <strong>{csvHeaders.length}</strong></p>

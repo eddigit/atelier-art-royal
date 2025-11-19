@@ -10,18 +10,18 @@ import { fr } from 'date-fns/locale';
 import OrderTimeline from '@/components/orders/OrderTimeline';
 
 const statusConfig = {
-  pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-  processing: { label: 'En préparation', color: 'bg-blue-100 text-blue-800 border-blue-200' },
-  shipped: { label: 'Expédiée', color: 'bg-purple-100 text-purple-800 border-purple-200' },
-  delivered: { label: 'Livrée', color: 'bg-green-100 text-green-800 border-green-200' },
-  cancelled: { label: 'Annulée', color: 'bg-red-100 text-red-800 border-red-200' }
+  pending: { label: 'En attente', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
+  processing: { label: 'En préparation', color: 'bg-blue-600/20 text-blue-400 border-blue-600/30' },
+  shipped: { label: 'Expédiée', color: 'bg-purple-600/20 text-purple-400 border-purple-600/30' },
+  delivered: { label: 'Livrée', color: 'bg-green-600/20 text-green-400 border-green-600/30' },
+  cancelled: { label: 'Annulée', color: 'bg-red-600/20 text-red-400 border-red-600/30' }
 };
 
 const paymentStatusConfig = {
-  pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800' },
-  paid: { label: 'Payée', color: 'bg-green-100 text-green-800' },
-  failed: { label: 'Échec', color: 'bg-red-100 text-red-800' },
-  refunded: { label: 'Remboursée', color: 'bg-gray-100 text-gray-800' }
+  pending: { label: 'En attente', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
+  paid: { label: 'Payée', color: 'bg-green-600/20 text-green-400 border-green-600/30' },
+  failed: { label: 'Échec', color: 'bg-red-600/20 text-red-400 border-red-600/30' },
+  refunded: { label: 'Remboursée', color: 'bg-gray-600/20 text-gray-400 border-gray-600/30' }
 };
 
 export default function Orders() {
