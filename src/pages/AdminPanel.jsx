@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles } from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCustomers from './AdminCustomers';
 import AdminProduction from './AdminProduction';
 import AdminOrders from './AdminOrders';
 import AdminRites from './AdminRites';
+import AdminObediences from './AdminObediences';
+import AdminDegreeOrders from './AdminDegreeOrders';
 import AdminStock from './AdminStock';
 import AdminReviews from './AdminReviews';
 import AdminAI from './AdminAI';
@@ -47,7 +49,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-3 lg:grid-cols-9 gap-2 h-auto p-2">
+        <TabsList className="grid grid-cols-3 lg:grid-cols-11 gap-2 h-auto p-2">
           <TabsTrigger value="dashboard" className="flex flex-col gap-1 py-3">
             <LayoutDashboard className="w-5 h-5" />
             <span className="text-xs">Dashboard</span>
@@ -71,6 +73,14 @@ export default function AdminPanel() {
           <TabsTrigger value="rites" className="flex flex-col gap-1 py-3">
             <Award className="w-5 h-5" />
             <span className="text-xs">Rites</span>
+          </TabsTrigger>
+          <TabsTrigger value="obediences" className="flex flex-col gap-1 py-3">
+            <Building2 className="w-5 h-5" />
+            <span className="text-xs">Obédiences</span>
+          </TabsTrigger>
+          <TabsTrigger value="degrees" className="flex flex-col gap-1 py-3">
+            <GraduationCap className="w-5 h-5" />
+            <span className="text-xs">Degrés</span>
           </TabsTrigger>
           <TabsTrigger value="stock" className="flex flex-col gap-1 py-3">
             <Warehouse className="w-5 h-5" />
@@ -108,6 +118,14 @@ export default function AdminPanel() {
 
         <TabsContent value="rites" className="space-y-4">
           <AdminRites />
+        </TabsContent>
+
+        <TabsContent value="obediences" className="space-y-4">
+          <AdminObediences />
+        </TabsContent>
+
+        <TabsContent value="degrees" className="space-y-4">
+          <AdminDegreeOrders />
         </TabsContent>
 
         <TabsContent value="stock" className="space-y-4">
