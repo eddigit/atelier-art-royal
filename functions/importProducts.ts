@@ -17,11 +17,42 @@ Deno.serve(async (req) => {
 
     // Fetch CSV file
     const csvResponse = await fetch(file_url);
+    if (!csvResponse.ok) {
+      return Response.json({ 
+        success: false, 
+        error: `Impossible de charger le fichier CSV: ${csvResponse.statusText}` 
+      }, { status: 400 });
+    }
+    
     const csvText = await csvResponse.text();
 
     // Parse CSV manually (simple parsing)
     const lines = csvText.split('\n').filter(line => line.trim());
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    
+    if (lines.length === 0) {
+      return Response.json({ 
+        success: false, 
+        error: 'Le fichier CSV est vide' 
+      }, { status: 400 });
+    }
+    
+    // Parse headers with better handling
+    const firstLine = lines[0];
+    const headers = [];
+    let currentHeader = '';
+    let inQuotes = false;
+    
+    for (let char of firstLine) {
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        headers.push(currentHeader.trim().replace(/^"|"$/g, ''));
+        currentHeader = '';
+      } else {
+        currentHeader += char;
+      }
+    }
+    headers.push(currentHeader.trim().replace(/^"|"$/g, ''));
     
     const results = {
       success: true,
@@ -55,15 +86,24 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Process each product line (no limit)
+    // Process each product line in batches
+    const BATCH_SIZE = 20; // Process 20 products at a time
+    const totalLines = lines.length - 1;
+    
     for (let i = 1; i < lines.length; i++) {
       try {
+        const line = lines[i];
+        if (!line || line.trim().length === 0) {
+          results.skipped++;
+          continue;
+        }
+        
         // Simple CSV parsing (handles quoted fields)
         const values = [];
         let currentValue = '';
         let inQuotes = false;
         
-        for (let char of lines[i]) {
+        for (let char of line) {
           if (char === '"') {
             inQuotes = !inQuotes;
           } else if (char === ',' && !inQuotes) {
@@ -74,6 +114,12 @@ Deno.serve(async (req) => {
           }
         }
         values.push(currentValue.trim());
+        
+        // Skip if not enough columns
+        if (values.length < 3) {
+          results.skipped++;
+          continue;
+        }
 
         // Map columns using field_mapping or fallback to auto-detection
         const getColumn = (targetField) => {
@@ -126,14 +172,20 @@ Deno.serve(async (req) => {
         const relatedProductsStr = getColumn('related_products');
         const crossSellStr = getColumn('cross_sell_products');
 
-        if (!name || !priceStr) {
+        if (!name || name.length === 0) {
+          results.skipped++;
+          continue;
+        }
+
+        if (!priceStr || priceStr.length === 0) {
+          results.errors.push(`Ligne ${i}: Prix manquant pour "${name}"`);
           results.skipped++;
           continue;
         }
 
         const price = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
-        if (isNaN(price)) {
-          results.errors.push(`Ligne ${i}: Prix invalide pour "${name}"`);
+        if (isNaN(price) || price <= 0) {
+          results.errors.push(`Ligne ${i}: Prix invalide "${priceStr}" pour "${name}"`);
           results.skipped++;
           continue;
         }
@@ -266,24 +318,30 @@ Deno.serve(async (req) => {
           results.imported++;
         }
 
+        // Wait every BATCH_SIZE products to avoid timeouts
+        if (i % BATCH_SIZE === 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
       } catch (error) {
-        results.errors.push(`Ligne ${i} (${name || 'inconnu'}): ${error.message}`);
+        const errorMsg = `Ligne ${i}: ${error.message}`;
+        results.errors.push(errorMsg);
         results.skipped++;
-        // Continue processing other products
+        console.error(errorMsg);
       }
     }
 
-    if (results.errors.length > 0) {
-      results.success = false;
-    }
+    results.success = results.errors.length === 0 || results.imported > 0;
+    results.total_processed = results.imported + results.updated + results.skipped;
 
     return Response.json(results);
 
   } catch (error) {
+    console.error('Import error:', error);
     return Response.json({ 
       success: false, 
       error: error.message,
-      stack: error.stack 
+      details: error.stack?.split('\n').slice(0, 5).join('\n')
     }, { status: 500 });
   }
 });
