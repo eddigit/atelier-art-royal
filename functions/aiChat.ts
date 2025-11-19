@@ -113,7 +113,7 @@ Lorsque tu recommandes un produit, fournis son ID exact pour créer un lien.`;
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',
+        model: 'llama-3.3-70b-versatile',
         messages: [
           { role: 'system', content: systemMessage },
           ...messages
