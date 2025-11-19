@@ -46,12 +46,22 @@ export default function Catalog() {
     const riteParam = urlParams.get('rite');
     const categoryParam = urlParams.get('category');
     const gradeParam = urlParams.get('grade');
+    const searchParam = urlParams.get('search');
+    const minPriceParam = urlParams.get('minPrice');
+    const maxPriceParam = urlParams.get('maxPrice');
+    const showPromotionsParam = urlParams.get('showPromotions');
+    const showNewParam = urlParams.get('showNew');
     
     setFilters(prev => ({
       ...prev,
       ...(riteParam && { rite: riteParam }),
       ...(categoryParam && { category: categoryParam }),
-      ...(gradeParam && { grade: gradeParam })
+      ...(gradeParam && { grade: gradeParam }),
+      ...(searchParam && { search: searchParam }),
+      ...(minPriceParam && { minPrice: minPriceParam }),
+      ...(maxPriceParam && { maxPrice: maxPriceParam }),
+      ...(showPromotionsParam && { showPromotions: showPromotionsParam === 'true' }),
+      ...(showNewParam && { showNew: showNewParam === 'true' })
     }));
   }, []);
 

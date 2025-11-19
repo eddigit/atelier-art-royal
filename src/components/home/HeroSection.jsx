@@ -1,16 +1,80 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Sparkles } from 'lucide-react';
+import { Search, Sparkles, Loader2 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
 export default function HeroSection() {
-  const handleSearch = (e) => {
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleSearch = async (e) => {
     e.preventDefault();
-    const searchQuery = e.target.search.value;
-    // TODO: Intégrer Groq AI pour recherche intelligente
-    console.log('Recherche:', searchQuery);
+    const searchQuery = e.target.search.value.trim();
+    
+    if (!searchQuery) {
+      toast.error('Veuillez saisir une recherche');
+      return;
+    }
+
+    setIsSearching(true);
+    
+    try {
+      // Utiliser l'IA pour analyser la requête et extraire les critères de recherche
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Tu es un assistant de recherche pour une boutique de produits maçonniques (tabliers, sautoirs, bijoux, décors).
+        
+Analyse cette requête utilisateur et extrais les critères de recherche pertinents :
+"${searchQuery}"
+
+Retourne un objet JSON avec les champs suivants (uniquement ceux qui sont pertinents) :
+- search: terme de recherche général (string)
+- rite: ID ou nom du rite maçonnique mentionné (REAA, RER, GLDF, etc.) (string)
+- category: catégorie de produit (Tabliers, Sautoirs, Bijoux, Gants, Décors) (string)
+- grade: grade maçonnique mentionné (Apprenti, Compagnon, Maître, etc.) (string)
+- minPrice: prix minimum si mentionné (number)
+- maxPrice: prix maximum si mentionné (number)
+- showPromotions: true si l'utilisateur recherche des promotions/réductions (boolean)
+- showNew: true si l'utilisateur recherche des nouveautés (boolean)
+
+Si aucun critère spécifique n'est identifié, retourne juste { "search": "requête originale" }`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            search: { type: "string" },
+            rite: { type: "string" },
+            category: { type: "string" },
+            grade: { type: "string" },
+            minPrice: { type: "number" },
+            maxPrice: { type: "number" },
+            showPromotions: { type: "boolean" },
+            showNew: { type: "boolean" }
+          }
+        }
+      });
+
+      // Construire l'URL avec les paramètres
+      const params = new URLSearchParams();
+      
+      Object.entries(response).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString());
+        }
+      });
+
+      // Rediriger vers le catalogue avec les paramètres
+      window.location.href = createPageUrl('Catalog') + '?' + params.toString();
+      
+    } catch (error) {
+      console.error('Erreur recherche IA:', error);
+      toast.error('Erreur lors de la recherche');
+      // Fallback: recherche simple
+      window.location.href = createPageUrl('Catalog') + '?search=' + encodeURIComponent(searchQuery);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   return (
@@ -56,22 +120,27 @@ export default function HeroSection() {
         {/* AI-Powered Search */}
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
           <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-hover:text-primary group-focus-within:text-primary transition-colors z-10" />
+            {isSearching ? (
+              <Loader2 className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-primary animate-spin z-10" />
+            ) : (
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-hover:text-primary group-focus-within:text-primary transition-colors z-10" />
+            )}
             <Input
               type="text"
               name="search"
-              placeholder="Recherchez un produit, un rite, un grade... (Recherche IA)"
-              className="h-16 pl-16 pr-6 text-lg bg-black/60 hover:bg-black/80 focus:bg-black/90 text-white placeholder:text-gray-300 border-2 border-white/20 hover:border-primary/50 focus:border-primary transition-all rounded-full backdrop-blur-sm"
+              placeholder="Ex: tablier REAA en promotion, sautoir maître, nouveautés RER..."
+              disabled={isSearching}
+              className="h-16 pl-16 pr-32 text-lg bg-black/60 hover:bg-black/80 focus:bg-black/90 text-white placeholder:text-gray-300 border-2 border-white/20 hover:border-primary/50 focus:border-primary transition-all rounded-full backdrop-blur-sm disabled:opacity-70"
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-medium">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/20 text-primary text-xs font-medium">
                 <Sparkles className="w-3 h-3" />
-                IA
+                {isSearching ? 'Analyse...' : 'Recherche IA'}
               </div>
             </div>
           </div>
           <p className="text-sm text-white mt-3 text-center drop-shadow-lg">
-            Recherche intelligente propulsée par Groq AI
+            Recherche intelligente propulsée par Groq AI - Décrivez ce que vous cherchez en langage naturel
           </p>
         </form>
 
