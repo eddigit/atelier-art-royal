@@ -13,9 +13,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Package, Search, Eye, Truck, User } from 'lucide-react';
-import { toast } from 'sonner';
+import { Package, Search, Eye, Truck, User, Download, Bell } from 'lucide-react';
+import OrderReturns from '@/components/admin/OrderReturns';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
@@ -71,11 +72,43 @@ export default function AdminOrders() {
   });
 
   const updateOrderMutation = useMutation({
-    mutationFn: ({ orderId, data }) => base44.entities.Order.update(orderId, data),
+    mutationFn: async ({ orderId, data, sendNotification }) => {
+      await base44.entities.Order.update(orderId, data);
+      
+      if (sendNotification && data.status) {
+        try {
+          await base44.functions.invoke('notifyOrderStatus', {
+            orderId,
+            status: data.status,
+            trackingNumber: data.tracking_number
+          });
+        } catch (error) {
+          console.error('Erreur notification:', error);
+        }
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['admin-orders']);
       toast.success('Commande mise à jour');
       setSelectedOrder(null);
+    }
+  });
+
+  const generateInvoiceMutation = useMutation({
+    mutationFn: async (orderId) => {
+      const { data } = await base44.functions.invoke('generateInvoice', { orderId });
+      const blob = new Blob([data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `facture-${orderId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    },
+    onSuccess: () => {
+      toast.success('Facture générée');
     }
   });
 
@@ -93,6 +126,14 @@ export default function AdminOrders() {
       <h1 className="text-4xl font-bold mb-8">
         Gestion des <span className="text-gradient">Commandes</span>
       </h1>
+
+      <Tabs defaultValue="orders" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="orders">Commandes</TabsTrigger>
+          <TabsTrigger value="returns">Retours</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="orders" className="space-y-6">
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -202,13 +243,23 @@ export default function AdminOrders() {
                       <p className="font-bold text-primary">Total: {order.total?.toFixed(2)}€</p>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => setSelectedOrder(order)}
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Détails
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => generateInvoiceMutation.mutate(order.id)}
+                      disabled={generateInvoiceMutation.isPending}
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setSelectedOrder(order)}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Détails
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -301,14 +352,31 @@ export default function AdminOrders() {
                         placeholder="Ex: FR123456789"
                       />
                       <Button
+                        variant="outline"
                         onClick={() => {
                           updateOrderMutation.mutate({
                             orderId: selectedOrder.id,
-                            data: { tracking_number: selectedOrder.tracking_number }
+                            data: { tracking_number: selectedOrder.tracking_number },
+                            sendNotification: false
                           });
                         }}
                       >
-                        <Truck className="w-4 h-4" />
+                        Enregistrer
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          updateOrderMutation.mutate({
+                            orderId: selectedOrder.id,
+                            data: { 
+                              status: selectedOrder.status,
+                              tracking_number: selectedOrder.tracking_number 
+                            },
+                            sendNotification: true
+                          });
+                        }}
+                      >
+                        <Bell className="w-4 h-4 mr-2" />
+                        Notifier
                       </Button>
                     </div>
                   </div>
@@ -388,6 +456,12 @@ export default function AdminOrders() {
           </DialogContent>
         </Dialog>
       )}
+        </TabsContent>
+
+        <TabsContent value="returns">
+          <OrderReturns />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
