@@ -74,10 +74,10 @@ export default function ChatWidget() {
           className="fixed bottom-6 right-6 z-50">
 
             <Button
-              onClick={() => setIsOpen(true)}
-              size="lg"
-              className="h-14 w-14 rounded-full shadow-2xl bg-primary hover:bg-primary/90 hover:shadow-primary/50 transition-all duration-300 hover:scale-110"
-            >
+            onClick={() => setIsOpen(true)}
+            size="lg" className="bg-[#e5b350] text-primary-foreground px-8 text-sm font-medium rounded-full inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-14 w-14 shadow-2xl hover:bg-primary/90 hover:shadow-primary/50 transition-all duration-300 hover:scale-110">
+
+
               <MessageCircle className="w-6 h-6" />
             </Button>
             <motion.div
@@ -111,11 +111,11 @@ export default function ChatWidget() {
                   </div>
                 </div>
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsOpen(false)}
-                  className="text-primary-foreground hover:bg-primary-foreground/20"
-                >
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                className="text-primary-foreground hover:bg-primary-foreground/20">
+
                   <X className="w-5 h-5" />
                 </Button>
               </div>
