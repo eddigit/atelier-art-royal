@@ -20,6 +20,25 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const queryClient = useQueryClient();
 
+  // SEO Meta Tags
+  React.useEffect(() => {
+    if (product) {
+      document.title = `${product.name} - Atelier Art Royal`;
+      
+      let metaDescription = document.querySelector('meta[name="description"]');
+      if (!metaDescription) {
+        metaDescription = document.createElement('meta');
+        metaDescription.name = 'description';
+        document.head.appendChild(metaDescription);
+      }
+      metaDescription.content = product.short_description || product.description?.substring(0, 155) || `${product.name} - Haute couture maçonnique`;
+    }
+    
+    return () => {
+      document.title = 'Atelier Art Royal';
+    };
+  }, [product]);
+
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', productId],
     queryFn: async () => {
@@ -236,10 +255,10 @@ export default function ProductDetail() {
               size="lg"
               className="flex-1 bg-primary hover:bg-primary/90"
               onClick={() => addToCartMutation.mutate()}
-              disabled={product.stock_quantity <= 0 || addToCartMutation.isPending}
+              disabled={(product.stock_quantity <= 0 && !product.allow_backorders) || addToCartMutation.isPending}
             >
               <ShoppingCart className="w-5 h-5 mr-2" />
-              Ajouter au panier
+              {product.stock_quantity <= 0 && product.allow_backorders ? 'Commander (en précommande)' : 'Ajouter au panier'}
             </Button>
           </div>
 

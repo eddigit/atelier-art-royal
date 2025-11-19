@@ -16,6 +16,7 @@ import AdminRites from './pages/AdminRites';
 import AdminStock from './pages/AdminStock';
 import Contact from './pages/Contact';
 import AdminReviews from './pages/AdminReviews';
+import Sitemap from './pages/Sitemap';
 import __Layout from './Layout.jsx';
 
 
@@ -38,6 +39,7 @@ export const PAGES = {
     "AdminStock": AdminStock,
     "Contact": Contact,
     "AdminReviews": AdminReviews,
+    "Sitemap": Sitemap,
 }
 
 export const pagesConfig = {

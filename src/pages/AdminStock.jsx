@@ -129,7 +129,25 @@ export default function AdminStock() {
   const filteredProducts = products.filter(p => 
     p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.sku?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ).sort((a, b) => {
+    // Priority: Out of stock first, then low stock, then normal
+    const aStock = a.stock_quantity || 0;
+    const bStock = b.stock_quantity || 0;
+    const aThreshold = a.low_stock_threshold || 5;
+    const bThreshold = b.low_stock_threshold || 5;
+    
+    const aIsOutOfStock = aStock === 0;
+    const bIsOutOfStock = bStock === 0;
+    const aIsLowStock = aStock > 0 && aStock <= aThreshold;
+    const bIsLowStock = bStock > 0 && bStock <= bThreshold;
+    
+    if (aIsOutOfStock && !bIsOutOfStock) return -1;
+    if (!aIsOutOfStock && bIsOutOfStock) return 1;
+    if (aIsLowStock && !bIsLowStock) return -1;
+    if (!aIsLowStock && bIsLowStock) return 1;
+    
+    return 0;
+  });
 
   const stats = {
     total: products.length,
@@ -328,34 +346,45 @@ export default function AdminStock() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <div className="w-32">
-                        <Label className="text-xs">Stock</Label>
-                        <Input
-                          type="number"
-                          value={stock}
-                          onChange={(e) => handleQuickStockUpdate(product.id, e.target.value)}
-                          className="mt-1"
-                          min="0"
-                        />
-                      </div>
-                      <div className="w-32">
-                        <Label className="text-xs">Si rupture</Label>
-                        <Select
-                          value={product.allow_backorders ? 'allow' : 'block'}
-                          onValueChange={(v) => updateProductMutation.mutate({
-                            id: product.id,
-                            data: { allow_backorders: v === 'allow' }
-                          })}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="allow">Autoriser</SelectItem>
-                            <SelectItem value="block">Bloquer</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                     <div className="w-32">
+                       <Label className="text-xs">Stock</Label>
+                       <Input
+                         type="number"
+                         value={stock}
+                         onChange={(e) => handleQuickStockUpdate(product.id, e.target.value)}
+                         className="mt-1"
+                         min="0"
+                       />
+                     </div>
+                     <div className="w-32">
+                       <Label className="text-xs">Si rupture</Label>
+                       <Select
+                         value={product.allow_backorders ? 'allow' : 'block'}
+                         onValueChange={(v) => updateProductMutation.mutate({
+                           id: product.id,
+                           data: { allow_backorders: v === 'allow' }
+                         })}
+                       >
+                         <SelectTrigger className="mt-1">
+                           <SelectValue />
+                         </SelectTrigger>
+                         <SelectContent>
+                           <SelectItem value="allow">Autoriser</SelectItem>
+                           <SelectItem value="block">Bloquer</SelectItem>
+                         </SelectContent>
+                       </Select>
+                     </div>
+                     <Button
+                       variant="outline"
+                       size="sm"
+                       onClick={() => updateProductMutation.mutate({
+                         id: product.id,
+                         data: { stock_quantity: (stock + 10) }
+                       })}
+                       className="mt-5"
+                     >
+                       +10
+                     </Button>
                     </div>
                   </div>
                 );

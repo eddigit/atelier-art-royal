@@ -21,6 +21,23 @@ export default function Catalog() {
   });
   const [sortBy, setSortBy] = useState('-created_date');
 
+  // SEO Meta Tags
+  React.useEffect(() => {
+    document.title = 'Catalogue - Atelier Art Royal | Haute Couture Maçonnique';
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = 'description';
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.content = 'Découvrez notre collection de produits maçonniques d\'exception : tabliers, sautoirs, bijoux et accessoires de haute qualité, fabriqués en France.';
+    
+    return () => {
+      document.title = 'Atelier Art Royal';
+    };
+  }, []);
+
   // Parse URL params on mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -40,6 +57,15 @@ export default function Catalog() {
     queryKey: ['products', filters, sortBy],
     queryFn: async () => {
       let allProducts = await base44.entities.Product.filter({ is_active: true }, sortBy, 500);
+      
+      // Filter out products that are out of stock and don't allow backorders
+      allProducts = allProducts.filter(product => {
+        const stock = product.stock_quantity || 0;
+        if (stock === 0 && !product.allow_backorders) {
+          return false;
+        }
+        return true;
+      });
       
       // Apply filters
       return allProducts.filter(product => {
