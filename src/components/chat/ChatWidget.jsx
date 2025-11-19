@@ -76,7 +76,7 @@ export default function ChatWidget() {
             <Button
               onClick={() => setIsOpen(true)}
               size="lg"
-              className="h-14 w-14 rounded-full shadow-2xl bg-gradient-to-r from-primary to-yellow-600 hover:shadow-primary/50 transition-all duration-300 hover:scale-110"
+              className="h-14 w-14 rounded-full shadow-2xl bg-primary hover:shadow-primary/50 transition-all duration-300 hover:scale-110"
             >
               <MessageCircle className="w-6 h-6" />
             </Button>
@@ -100,7 +100,7 @@ export default function ChatWidget() {
           >
             <Card className="shadow-2xl border-primary/20 overflow-hidden">
               {/* Header */}
-              <div className="bg-gradient-to-r from-primary to-yellow-600 p-4 flex items-center justify-between">
+              <div className="bg-primary p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                     <Sparkles className="w-5 h-5 text-white" />
