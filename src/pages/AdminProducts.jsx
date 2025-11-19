@@ -19,11 +19,18 @@ import {
   Download,
   Grid,
   List,
-  Search
+  Search,
+  CheckSquare,
+  Square,
+  Power,
+  PowerOff,
+  Award
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +59,12 @@ export default function AdminProducts() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingProduct, setEditingProduct] = useState(null);
   const [activeTab, setActiveTab] = useState('products');
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [filterRite, setFilterRite] = useState('all');
+  const [filterObedience, setFilterObedience] = useState('all');
+  const [filterDegreeOrder, setFilterDegreeOrder] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
 
 
   const { data: user } = useQuery({
@@ -62,6 +75,30 @@ export default function AdminProducts() {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['admin-products'],
     queryFn: () => base44.entities.Product.list('-created_date', 500),
+    initialData: []
+  });
+
+  const { data: rites = [] } = useQuery({
+    queryKey: ['rites'],
+    queryFn: () => base44.entities.Rite.list('order', 100),
+    initialData: []
+  });
+
+  const { data: obediences = [] } = useQuery({
+    queryKey: ['obediences'],
+    queryFn: () => base44.entities.Obedience.list('order', 100),
+    initialData: []
+  });
+
+  const { data: degreeOrders = [] } = useQuery({
+    queryKey: ['degreeOrders'],
+    queryFn: () => base44.entities.DegreeOrder.list('level', 200),
+    initialData: []
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => base44.entities.Category.list('order', 100),
     initialData: []
   });
 
@@ -86,10 +123,59 @@ export default function AdminProducts() {
     }
   });
 
-  const filteredProducts = products.filter(p => 
-    p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.sku?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ productIds, updates }) => {
+      await Promise.all(productIds.map(id => base44.entities.Product.update(id, updates)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin-products']);
+      setSelectedProducts([]);
+      toast.success('Produits mis à jour');
+    }
+  });
+
+  const filteredProducts = products.filter(p => {
+    if (searchQuery && !(p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.sku?.toLowerCase().includes(searchQuery.toLowerCase()))) {
+      return false;
+    }
+    if (filterRite !== 'all' && p.rite_id !== filterRite) return false;
+    if (filterObedience !== 'all' && p.obedience_id !== filterObedience) return false;
+    if (filterDegreeOrder !== 'all' && p.degree_order_id !== filterDegreeOrder) return false;
+    if (filterCategory !== 'all' && p.category_id !== filterCategory) return false;
+    if (filterStatus === 'active' && !p.is_active) return false;
+    if (filterStatus === 'inactive' && p.is_active !== false) return false;
+    return true;
+  });
+
+  const allSelected = filteredProducts.length > 0 && selectedProducts.length === filteredProducts.length;
+  const someSelected = selectedProducts.length > 0 && selectedProducts.length < filteredProducts.length;
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedProducts([]);
+    } else {
+      setSelectedProducts(filteredProducts.map(p => p.id));
+    }
+  };
+
+  const toggleSelectProduct = (id) => {
+    setSelectedProducts(prev => 
+      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkAction = (action, value) => {
+    if (selectedProducts.length === 0) return;
+
+    const updates = {};
+    if (action === 'activate') updates.is_active = true;
+    else if (action === 'deactivate') updates.is_active = false;
+    else if (action === 'rite') updates.rite_id = value;
+    else if (action === 'obedience') updates.obedience_id = value;
+    else if (action === 'degreeOrder') updates.degree_order_id = value;
+
+    bulkUpdateMutation.mutate({ productIds: selectedProducts, updates });
+  };
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -184,19 +270,153 @@ export default function AdminProducts() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="products">{/* Products List */}
+        <TabsContent value="products">
+      {/* Filters */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-base">Filtres avancés</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <Select value={filterRite} onValueChange={setFilterRite}>
+              <SelectTrigger>
+                <SelectValue placeholder="Rite" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les rites</SelectItem>
+                {rites.map(r => (
+                  <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterObedience} onValueChange={setFilterObedience}>
+              <SelectTrigger>
+                <SelectValue placeholder="Obédience" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes les obédiences</SelectItem>
+                {obediences.map(o => (
+                  <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterDegreeOrder} onValueChange={setFilterDegreeOrder}>
+              <SelectTrigger>
+                <SelectValue placeholder="Degré" />
+              </SelectTrigger>
+              <SelectContent className="max-h-80">
+                <SelectItem value="all">Tous les degrés</SelectItem>
+                {degreeOrders.map(d => (
+                  <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes les catégories</SelectItem>
+                {categories.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="active">Actifs</SelectItem>
+                <SelectItem value="inactive">Inactifs</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Bulk Actions */}
+      {selectedProducts.length > 0 && (
+        <Card className="mb-6 border-primary/50">
+          <CardContent className="pt-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant="outline" className="text-sm">
+                {selectedProducts.length} produit{selectedProducts.length > 1 ? 's' : ''} sélectionné{selectedProducts.length > 1 ? 's' : ''}
+              </Badge>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleBulkAction('activate')}
+                disabled={bulkUpdateMutation.isPending}
+              >
+                <Power className="w-4 h-4 mr-2" />
+                Activer
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleBulkAction('deactivate')}
+                disabled={bulkUpdateMutation.isPending}
+              >
+                <PowerOff className="w-4 h-4 mr-2" />
+                Désactiver
+              </Button>
+              <Select onValueChange={(v) => handleBulkAction('rite', v)} disabled={bulkUpdateMutation.isPending}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Assigner un rite" />
+                </SelectTrigger>
+                <SelectContent>
+                  {rites.map(r => (
+                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select onValueChange={(v) => handleBulkAction('obedience', v)} disabled={bulkUpdateMutation.isPending}>
+                <SelectTrigger className="w-52">
+                  <SelectValue placeholder="Assigner une obédience" />
+                </SelectTrigger>
+                <SelectContent>
+                  {obediences.map(o => (
+                    <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select onValueChange={(v) => handleBulkAction('degreeOrder', v)} disabled={bulkUpdateMutation.isPending}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Assigner un degré" />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {degreeOrders.map(d => (
+                    <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Products List */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher par nom ou SKU..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+            <div className="flex items-center gap-3 flex-1">
+              <Checkbox
+                checked={allSelected}
+                onCheckedChange={toggleSelectAll}
+                className={someSelected ? 'data-[state=checked]:bg-primary/50' : ''}
+              />
+              <div className="flex-1 max-w-md">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Rechercher par nom ou SKU..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -238,12 +458,16 @@ export default function AdminProducts() {
               products={filteredProducts}
               onEdit={setEditingProduct}
               onDelete={(id) => deleteProductMutation.mutate(id)}
+              selectedProducts={selectedProducts}
+              onToggleSelect={toggleSelectProduct}
             />
           ) : (
             <ProductGridView 
               products={filteredProducts}
               onEdit={setEditingProduct}
               onDelete={(id) => deleteProductMutation.mutate(id)}
+              selectedProducts={selectedProducts}
+              onToggleSelect={toggleSelectProduct}
             />
           )}
         </CardContent>
