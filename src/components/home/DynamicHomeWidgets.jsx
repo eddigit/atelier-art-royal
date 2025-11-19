@@ -14,9 +14,13 @@ function PromotionsWidget({ widget }) {
     queryFn: async () => {
       const allProducts = await base44.entities.Product.filter({ is_active: true }, '-created_date', 500);
       
-      // Filter products with active promotions
+      // Filter products with active promotions and available stock
       const now = new Date();
       const promoProducts = allProducts.filter(product => {
+        // Check stock availability
+        const stock = product.stock_quantity || 0;
+        if (stock === 0 && !product.allow_backorders) return false;
+        
         const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
         if (!hasDiscount) return false;
         
@@ -80,6 +84,10 @@ function NouveautesWidget({ widget }) {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
       const newProducts = allProducts.filter(product => {
+        // Check stock availability
+        const stock = product.stock_quantity || 0;
+        if (stock === 0 && !product.allow_backorders) return false;
+        
         const productDate = new Date(product.created_date);
         return productDate >= thirtyDaysAgo;
       });
@@ -137,7 +145,15 @@ function FeaturedProductsWidget({ widget }) {
       if (widget.config?.rite_id) query.rite_id = widget.config.rite_id;
       if (widget.config?.category_id) query.category_id = widget.config.category_id;
       
-      return base44.entities.Product.filter(query, '-created_date', widget.config?.limit || 8);
+      const allProducts = await base44.entities.Product.filter(query, '-created_date', widget.config?.limit || 50);
+      
+      // Filter by stock availability
+      const availableProducts = allProducts.filter(product => {
+        const stock = product.stock_quantity || 0;
+        return stock > 0 || product.allow_backorders;
+      });
+      
+      return availableProducts.slice(0, widget.config?.limit || 8);
     },
     initialData: []
   });
