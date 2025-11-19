@@ -19,11 +19,11 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const statusConfig = {
-  pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' },
-  processing: { label: 'En préparation', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400' },
-  shipped: { label: 'Expédiée', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400' },
-  delivered: { label: 'Livrée', color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' },
-  cancelled: { label: 'Annulée', color: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' }
+  pending: { label: 'En attente', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
+  processing: { label: 'En préparation', color: 'bg-blue-600/20 text-blue-400 border-blue-600/30' },
+  shipped: { label: 'Expédiée', color: 'bg-purple-600/20 text-purple-400 border-purple-600/30' },
+  delivered: { label: 'Livrée', color: 'bg-green-600/20 text-green-400 border-green-600/30' },
+  cancelled: { label: 'Annulée', color: 'bg-red-600/20 text-red-400 border-red-600/30' }
 };
 
 export default function AdminOrders() {
@@ -155,7 +155,7 @@ export default function AdminOrders() {
                         {status.label}
                       </Badge>
                       {order.payment_status === 'paid' && (
-                        <Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                        <Badge className="bg-green-600/20 text-green-400 border-green-600/30">
                           Payée
                         </Badge>
                       )}
