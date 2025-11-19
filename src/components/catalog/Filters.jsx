@@ -186,7 +186,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
                     </SelectItem>
                   ))}
                   <div className="px-2 py-1.5 text-xs font-semibold text-primary mt-2">Loge Hauts Grades</div>
-                  {degreeOrders.filter(d => d.loge_hauts_grades === 'Loge Hauts Grades').map((degree) => (
+                  {degreeOrders.filter(d => d.loge_type === 'Loge Hauts Grades').map((degree) => (
                     <SelectItem key={degree.id} value={degree.id}>
                       {degree.name}
                     </SelectItem>

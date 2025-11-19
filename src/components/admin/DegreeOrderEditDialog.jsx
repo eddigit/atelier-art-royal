@@ -82,7 +82,7 @@ export default function DegreeOrderEditDialog({ degreeOrder, rites, open, onClos
   });
 
   const handleSave = () => {
-    if (!formData.name || !formData.level) {
+    if (!formData.name || !formData.level || !formData.loge_type) {
       toast.error('Veuillez remplir les champs obligatoires');
       return;
     }

@@ -10,7 +10,9 @@ import { Package } from 'lucide-react';
 export default function Catalog() {
   const [filters, setFilters] = useState({
     rite: '',
-    grade: '',
+    obedience: '',
+    degreeOrder: '',
+    logeType: '',
     category: '',
     search: '',
     minPrice: '',
@@ -44,8 +46,10 @@ export default function Catalog() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const riteParam = urlParams.get('rite');
+    const obedienceParam = urlParams.get('obedience');
+    const degreeOrderParam = urlParams.get('degreeOrder');
+    const logeTypeParam = urlParams.get('logeType');
     const categoryParam = urlParams.get('category');
-    const gradeParam = urlParams.get('grade');
     const searchParam = urlParams.get('search');
     const minPriceParam = urlParams.get('minPrice');
     const maxPriceParam = urlParams.get('maxPrice');
@@ -55,8 +59,10 @@ export default function Catalog() {
     setFilters(prev => ({
       ...prev,
       ...(riteParam && { rite: riteParam }),
+      ...(obedienceParam && { obedience: obedienceParam }),
+      ...(degreeOrderParam && { degreeOrder: degreeOrderParam }),
+      ...(logeTypeParam && { logeType: logeTypeParam }),
       ...(categoryParam && { category: categoryParam }),
-      ...(gradeParam && { grade: gradeParam }),
       ...(searchParam && { search: searchParam }),
       ...(minPriceParam && { minPrice: minPriceParam }),
       ...(maxPriceParam && { maxPrice: maxPriceParam }),
@@ -82,7 +88,8 @@ export default function Catalog() {
       // Apply filters
       return allProducts.filter(product => {
         if (filters.rite && product.rite_id !== filters.rite) return false;
-        if (filters.grade && product.grade_id !== filters.grade) return false;
+        if (filters.obedience && product.obedience_id !== filters.obedience) return false;
+        if (filters.degreeOrder && product.degree_order_id !== filters.degreeOrder) return false;
         if (filters.category && product.category_id !== filters.category) return false;
         
         // Promotions filter
@@ -133,14 +140,16 @@ export default function Catalog() {
     setFilters(prev => ({
       ...prev,
       ...newFilters,
-      ...(newFilters.rite ? { grade: '' } : {}) // Reset grade when rite changes
+      ...(newFilters.logeType && newFilters.logeType !== prev.logeType ? { degreeOrder: '' } : {})
     }));
   };
 
   const handleResetFilters = () => {
     setFilters({
       rite: '',
-      grade: '',
+      obedience: '',
+      degreeOrder: '',
+      logeType: '',
       category: '',
       search: '',
       minPrice: '',
