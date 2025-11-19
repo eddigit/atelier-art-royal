@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { 
   Upload, 
   Trash2, 
@@ -13,7 +14,8 @@ import {
   CheckCircle2,
   Loader2,
   Eye,
-  Edit
+  Edit,
+  Download
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -38,6 +40,7 @@ export default function AdminProducts() {
   const [csvHeaders, setCsvHeaders] = useState(null);
   const [fieldMapping, setFieldMapping] = useState({});
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
+  const [importProgress, setImportProgress] = useState(null);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -97,26 +100,68 @@ export default function AdminProducts() {
 
     setIsImporting(true);
     setImportResults(null);
+    setImportProgress({ current: 0, total: 0, imported: 0, updated: 0, skipped: 0 });
 
     try {
-      const response = await base44.functions.invoke('importProducts', { 
-        file_url: uploadedFileUrl,
-        field_mapping: fieldMapping
+      // Call the streaming function
+      const response = await fetch(`https://base44.app/api/apps/${base44._appId}/functions/importProductsWithProgress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${base44._token}`
+        },
+        body: JSON.stringify({
+          file_url: uploadedFileUrl,
+          field_mapping: fieldMapping
+        })
       });
-      
-      setImportResults(response.data);
-      queryClient.invalidateQueries(['admin-products']);
-      
-      if (response.data.success) {
-        toast.success(`Import réussi: ${response.data.imported} produits importés`);
-      } else {
-        toast.error('Erreurs lors de l\'import');
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'import');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6));
+            
+            if (data.type === 'progress') {
+              setImportProgress({
+                current: data.current,
+                total: data.total,
+                imported: data.imported,
+                updated: data.updated,
+                skipped: data.skipped,
+                productName: data.productName
+              });
+            } else if (data.type === 'complete') {
+              setImportResults(data.results);
+              queryClient.invalidateQueries(['admin-products']);
+              
+              if (data.results.success) {
+                toast.success(`Import terminé: ${data.results.imported + data.results.updated} produits traités`);
+              } else {
+                toast.error('Import terminé avec des erreurs');
+              }
+            }
+          }
+        }
       }
     } catch (error) {
       toast.error('Erreur lors de l\'import: ' + error.message);
       setImportResults({ success: false, error: error.message });
     } finally {
       setIsImporting(false);
+      setImportProgress(null);
     }
   };
 
@@ -185,7 +230,7 @@ export default function AdminProducts() {
                   Étape 3 : Lancer l'import
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <Button
                   onClick={handleImport}
                   disabled={isImporting || !uploadedFileUrl}
@@ -199,11 +244,33 @@ export default function AdminProducts() {
                     </>
                   ) : (
                     <>
-                      <Upload className="w-4 h-4 mr-2" />
-                      Importer les produits
+                      <Download className="w-4 h-4 mr-2" />
+                      Importer et télécharger les images
                     </>
                   )}
                 </Button>
+
+                {importProgress && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        {importProgress.current} / {importProgress.total} produits traités
+                      </span>
+                      <span className="font-semibold text-primary">
+                        {Math.round((importProgress.current / importProgress.total) * 100)}%
+                      </span>
+                    </div>
+                    <Progress value={(importProgress.current / importProgress.total) * 100} />
+                    <div className="text-xs space-y-1 text-muted-foreground">
+                      <p>✅ Importés: {importProgress.imported}</p>
+                      <p>🔄 Mis à jour: {importProgress.updated}</p>
+                      <p>⏭️ Ignorés: {importProgress.skipped}</p>
+                      {importProgress.productName && (
+                        <p className="text-primary font-medium">En cours: {importProgress.productName}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </>
