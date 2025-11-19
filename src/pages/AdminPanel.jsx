@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home } from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCustomers from './AdminCustomers';
@@ -16,6 +16,7 @@ import AdminReviews from './AdminReviews';
 import AdminHome from './AdminHome';
 import AdminAI from './AdminAI';
 import AdminLeads from './AdminLeads';
+import AdminAnalytics from './AdminAnalytics';
 
 export default function AdminPanel() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -104,6 +105,10 @@ export default function AdminPanel() {
             <Sparkles className="w-5 h-5" />
             <span className="text-xs">IA</span>
           </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex flex-col gap-1 py-3">
+            <TrendingUp className="w-5 h-5" />
+            <span className="text-xs">Statistiques</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="dashboard" className="space-y-4">
@@ -156,6 +161,10 @@ export default function AdminPanel() {
 
         <TabsContent value="ai" className="space-y-4">
           <AdminAI />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-4">
+          <AdminAnalytics />
         </TabsContent>
       </Tabs>
     </div>

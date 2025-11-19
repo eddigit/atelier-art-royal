@@ -25,6 +25,7 @@ import AdminObediences from './pages/AdminObediences';
 import AdminDegreeOrders from './pages/AdminDegreeOrders';
 import AdminHome from './pages/AdminHome';
 import AdminLeads from './pages/AdminLeads';
+import AdminAnalytics from './pages/AdminAnalytics';
 import __Layout from './Layout.jsx';
 
 
@@ -56,6 +57,7 @@ export const PAGES = {
     "AdminDegreeOrders": AdminDegreeOrders,
     "AdminHome": AdminHome,
     "AdminLeads": AdminLeads,
+    "AdminAnalytics": AdminAnalytics,
 }
 
 export const pagesConfig = {

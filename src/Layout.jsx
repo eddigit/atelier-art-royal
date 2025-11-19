@@ -20,6 +20,8 @@ import {
   Heart
 } from 'lucide-react';
 import ChatWidget from '@/components/chat/ChatWidget';
+import VisitorTracker from '@/components/analytics/VisitorTracker';
+import VisitorNotifier from '@/components/analytics/VisitorNotifier';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -461,8 +463,14 @@ export default function Layout({ children, currentPageName }) {
         {children}
       </main>
 
+      {/* Analytics Tracking */}
+      <VisitorTracker pageName={currentPageName} />
+      
       {/* Chat Widget */}
       <ChatWidget />
+      
+      {/* Admin Visitor Notifications */}
+      {isAdmin && <VisitorNotifier />}
 
       {/* Footer */}
       <footer className="border-t border-border mt-20">
