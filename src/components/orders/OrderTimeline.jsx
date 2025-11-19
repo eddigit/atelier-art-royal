@@ -1,10 +1,13 @@
 import React from 'react';
-import { Check, Package, Truck, Home, Clock } from 'lucide-react';
+import { Check, Package, Truck, Home, Clock, Palette, Cog, CheckCircle, Box } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const timelineSteps = [
   { key: 'pending', label: 'Commande reçue', icon: Clock },
-  { key: 'processing', label: 'En préparation', icon: Package },
+  { key: 'design', label: 'En design', icon: Palette },
+  { key: 'production', label: 'En production', icon: Cog },
+  { key: 'quality_control', label: 'Contrôle qualité', icon: CheckCircle },
+  { key: 'packaging', label: 'Emballage', icon: Box },
   { key: 'shipped', label: 'Expédiée', icon: Truck },
   { key: 'delivered', label: 'Livrée', icon: Home }
 ];

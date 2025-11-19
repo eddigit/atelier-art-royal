@@ -88,6 +88,22 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Top Header Bar */}
+      <div className="bg-primary/10 border-b border-primary/20 py-2">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs sm:text-sm">
+            <a href="tel:+33646683610" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <span className="font-semibold">Service commercial & Support :</span>
+              <span>+33 6 46 68 36 10</span>
+            </a>
+            <span className="hidden sm:inline text-muted-foreground">•</span>
+            <a href="mailto:contact@artroyal.fr" className="hover:text-primary transition-colors">
+              contact@artroyal.fr
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border">
         <div className="container mx-auto px-4">

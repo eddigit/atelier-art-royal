@@ -10,8 +10,11 @@ import { fr } from 'date-fns/locale';
 import OrderTimeline from '@/components/orders/OrderTimeline';
 
 const statusConfig = {
-  pending: { label: 'En attente', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
-  processing: { label: 'En préparation', color: 'bg-blue-600/20 text-blue-400 border-blue-600/30' },
+  pending: { label: 'Commande reçue', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
+  design: { label: 'En design', color: 'bg-cyan-600/20 text-cyan-400 border-cyan-600/30' },
+  production: { label: 'En production', color: 'bg-blue-600/20 text-blue-400 border-blue-600/30' },
+  quality_control: { label: 'Contrôle qualité', color: 'bg-indigo-600/20 text-indigo-400 border-indigo-600/30' },
+  packaging: { label: 'Emballage', color: 'bg-orange-600/20 text-orange-400 border-orange-600/30' },
   shipped: { label: 'Expédiée', color: 'bg-purple-600/20 text-purple-400 border-purple-600/30' },
   delivered: { label: 'Livrée', color: 'bg-green-600/20 text-green-400 border-green-600/30' },
   cancelled: { label: 'Annulée', color: 'bg-red-600/20 text-red-400 border-red-600/30' }

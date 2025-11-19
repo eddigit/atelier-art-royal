@@ -19,8 +19,11 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const statusConfig = {
-  pending: { label: 'En attente', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
-  processing: { label: 'En préparation', color: 'bg-blue-600/20 text-blue-400 border-blue-600/30' },
+  pending: { label: 'Commande reçue', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
+  design: { label: 'En design', color: 'bg-cyan-600/20 text-cyan-400 border-cyan-600/30' },
+  production: { label: 'En production', color: 'bg-blue-600/20 text-blue-400 border-blue-600/30' },
+  quality_control: { label: 'Contrôle qualité', color: 'bg-indigo-600/20 text-indigo-400 border-indigo-600/30' },
+  packaging: { label: 'Emballage', color: 'bg-orange-600/20 text-orange-400 border-orange-600/30' },
   shipped: { label: 'Expédiée', color: 'bg-purple-600/20 text-purple-400 border-purple-600/30' },
   delivered: { label: 'Livrée', color: 'bg-green-600/20 text-green-400 border-green-600/30' },
   cancelled: { label: 'Annulée', color: 'bg-red-600/20 text-red-400 border-red-600/30' }
@@ -95,9 +98,9 @@ export default function AdminOrders() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold text-blue-600">
-                {orders.filter(o => o.status === 'processing').length}
+                {orders.filter(o => ['design', 'production', 'quality_control', 'packaging'].includes(o.status)).length}
               </p>
-              <p className="text-sm text-muted-foreground">En préparation</p>
+              <p className="text-sm text-muted-foreground">En fabrication</p>
             </div>
           </CardContent>
         </Card>
@@ -130,8 +133,11 @@ export default function AdminOrders() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les statuts</SelectItem>
-            <SelectItem value="pending">En attente</SelectItem>
-            <SelectItem value="processing">En préparation</SelectItem>
+            <SelectItem value="pending">Commande reçue</SelectItem>
+            <SelectItem value="design">En design</SelectItem>
+            <SelectItem value="production">En production</SelectItem>
+            <SelectItem value="quality_control">Contrôle qualité</SelectItem>
+            <SelectItem value="packaging">Emballage</SelectItem>
             <SelectItem value="shipped">Expédiée</SelectItem>
             <SelectItem value="delivered">Livrée</SelectItem>
             <SelectItem value="cancelled">Annulée</SelectItem>
@@ -217,8 +223,11 @@ export default function AdminOrders() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pending">En attente</SelectItem>
-                        <SelectItem value="processing">En préparation</SelectItem>
+                        <SelectItem value="pending">Commande reçue</SelectItem>
+                        <SelectItem value="design">En design</SelectItem>
+                        <SelectItem value="production">En production</SelectItem>
+                        <SelectItem value="quality_control">Contrôle qualité</SelectItem>
+                        <SelectItem value="packaging">Emballage</SelectItem>
                         <SelectItem value="shipped">Expédiée</SelectItem>
                         <SelectItem value="delivered">Livrée</SelectItem>
                         <SelectItem value="cancelled">Annulée</SelectItem>
