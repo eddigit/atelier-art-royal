@@ -5,7 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { X, Filter } from 'lucide-react';
+import { X, Filter, Tag, Sparkles } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Filters({ filters, onFilterChange, onReset }) {
@@ -54,7 +55,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
             <Filter className="w-4 h-4 text-primary" />
             Filtres
           </CardTitle>
-          {(filters.rite || filters.grade || filters.category || filters.search || filters.minPrice || filters.maxPrice) && (
+          {(filters.rite || filters.grade || filters.category || filters.search || filters.minPrice || filters.maxPrice || filters.showPromotions || filters.showNew) && (
             <Button variant="ghost" size="sm" onClick={onReset} className="h-8 px-2">
               <X className="w-4 h-4 mr-1" />
               Réinitialiser
@@ -72,6 +73,38 @@ export default function Filters({ filters, onFilterChange, onReset }) {
             onChange={(e) => handleChange('search', e.target.value)}
             className="w-full"
           />
+        </div>
+
+        {/* Quick Filters */}
+        <div className="space-y-3 pt-2 pb-2 border-t border-b border-border">
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="promotions" 
+              checked={filters.showPromotions || false}
+              onCheckedChange={(checked) => handleChange('showPromotions', checked)}
+            />
+            <label
+              htmlFor="promotions"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
+            >
+              <Tag className="w-4 h-4" style={{color: '#e5b350'}} />
+              Promotions uniquement
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="nouveautes" 
+              checked={filters.showNew || false}
+              onCheckedChange={(checked) => handleChange('showNew', checked)}
+            />
+            <label
+              htmlFor="nouveautes"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4" style={{color: '#e5b350'}} />
+              Nouveautés (30 jours)
+            </label>
+          </div>
         </div>
 
         {/* Rite */}

@@ -17,7 +17,9 @@ export default function Catalog() {
     maxPrice: '',
     size: 'all',
     color: 'all',
-    material: 'all'
+    material: 'all',
+    showPromotions: false,
+    showNew: false
   });
   const [sortBy, setSortBy] = useState('-created_date');
 
@@ -73,6 +75,24 @@ export default function Catalog() {
         if (filters.grade && product.grade_id !== filters.grade) return false;
         if (filters.category && product.category_id !== filters.category) return false;
         
+        // Promotions filter
+        if (filters.showPromotions) {
+          const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
+          if (!hasDiscount) return false;
+          
+          const now = new Date();
+          if (product.promo_start_date && new Date(product.promo_start_date) > now) return false;
+          if (product.promo_end_date && new Date(product.promo_end_date) < now) return false;
+        }
+        
+        // New products filter (last 30 days)
+        if (filters.showNew) {
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          const productDate = new Date(product.created_date);
+          if (productDate < thirtyDaysAgo) return false;
+        }
+        
         // Enhanced search
         if (filters.search) {
           const searchTerm = filters.search.toLowerCase();
@@ -117,7 +137,9 @@ export default function Catalog() {
       maxPrice: '',
       size: 'all',
       color: 'all',
-      material: 'all'
+      material: 'all',
+      showPromotions: false,
+      showNew: false
     });
   };
 
@@ -160,6 +182,7 @@ export default function Catalog() {
                 <SelectItem value="-price">Prix décroissant</SelectItem>
                 <SelectItem value="name">Nom A-Z</SelectItem>
                 <SelectItem value="-name">Nom Z-A</SelectItem>
+                <SelectItem value="-featured">Popularité</SelectItem>
               </SelectContent>
             </Select>
           </div>
