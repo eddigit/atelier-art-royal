@@ -3,7 +3,7 @@ import HeroSection from '@/components/home/HeroSection';
 import DynamicGallery from '@/components/home/DynamicGallery';
 import FeaturedRites from '@/components/home/FeaturedRites';
 import PersonalizedRecommendations from '@/components/home/PersonalizedRecommendations';
-import FeaturedProducts from '@/components/home/FeaturedProducts';
+import DynamicHomeWidgets from '@/components/home/DynamicHomeWidgets';
 
 export default function Home() {
   // SEO Meta Tags
@@ -52,8 +52,8 @@ export default function Home() {
       <HeroSection />
       <DynamicGallery />
       <FeaturedRites />
+      <DynamicHomeWidgets />
       <PersonalizedRecommendations />
-      <FeaturedProducts />
     </div>
   );
 }

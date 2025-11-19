@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap } from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCustomers from './AdminCustomers';
@@ -13,6 +13,7 @@ import AdminObediences from './AdminObediences';
 import AdminDegreeOrders from './AdminDegreeOrders';
 import AdminStock from './AdminStock';
 import AdminReviews from './AdminReviews';
+import AdminHome from './AdminHome';
 import AdminAI from './AdminAI';
 
 export default function AdminPanel() {
@@ -49,7 +50,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-3 lg:grid-cols-11 gap-2 h-auto p-2">
+        <TabsList className="grid grid-cols-3 lg:grid-cols-12 gap-2 h-auto p-2">
           <TabsTrigger value="dashboard" className="flex flex-col gap-1 py-3">
             <LayoutDashboard className="w-5 h-5" />
             <span className="text-xs">Dashboard</span>
@@ -89,6 +90,10 @@ export default function AdminPanel() {
           <TabsTrigger value="reviews" className="flex flex-col gap-1 py-3">
             <Star className="w-5 h-5" />
             <span className="text-xs">Avis</span>
+          </TabsTrigger>
+          <TabsTrigger value="home" className="flex flex-col gap-1 py-3">
+            <Home className="w-5 h-5" />
+            <span className="text-xs">Accueil</span>
           </TabsTrigger>
           <TabsTrigger value="ai" className="flex flex-col gap-1 py-3">
             <Sparkles className="w-5 h-5" />
@@ -134,6 +139,10 @@ export default function AdminPanel() {
 
         <TabsContent value="reviews" className="space-y-4">
           <AdminReviews />
+        </TabsContent>
+
+        <TabsContent value="home" className="space-y-4">
+          <AdminHome />
         </TabsContent>
 
         <TabsContent value="ai" className="space-y-4">
