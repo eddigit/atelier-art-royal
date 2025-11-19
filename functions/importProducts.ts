@@ -192,6 +192,8 @@ Deno.serve(async (req) => {
 
         // Parse and download images
         let downloadedImages = [];
+        const DEFAULT_IMAGE = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/3451ad164_GeneratedImageNovember192025-2_01AM1.png';
+        
         if (imagesStr) {
           const imageUrls = imagesStr.split(',').map(img => img.trim()).filter(img => img.startsWith('http'));
           
@@ -215,6 +217,11 @@ Deno.serve(async (req) => {
               results.errors.push(`Ligne ${i}: ${imgError.message}`);
             }
           }
+        }
+        
+        // Si aucune image n'a été téléchargée, utiliser l'image par défaut
+        if (downloadedImages.length === 0) {
+          downloadedImages.push(DEFAULT_IMAGE);
         }
 
         // Parse tags
