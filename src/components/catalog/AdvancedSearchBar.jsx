@@ -23,29 +23,41 @@ import { Label } from '@/components/ui/label';
 export default function AdvancedSearchBar({ filters, onFilterChange, onReset }) {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { data: rites = [] } = useQuery({
+  const { data: products = [] } = useQuery({
+    queryKey: ['products-filter-options'],
+    queryFn: () => base44.entities.Product.filter({ is_active: true }, '-created_date', 1000),
+    initialData: []
+  });
+
+  const { data: allRites = [] } = useQuery({
     queryKey: ['rites'],
     queryFn: () => base44.entities.Rite.list('order', 100),
     initialData: []
   });
 
-  const { data: obediences = [] } = useQuery({
+  const { data: allObediences = [] } = useQuery({
     queryKey: ['obediences'],
     queryFn: () => base44.entities.Obedience.list('order', 100),
     initialData: []
   });
 
-  const { data: degreeOrders = [] } = useQuery({
+  const { data: allDegreeOrders = [] } = useQuery({
     queryKey: ['degreeOrders'],
     queryFn: () => base44.entities.DegreeOrder.list('level', 200),
     initialData: []
   });
 
-  const { data: categories = [] } = useQuery({
+  const { data: allCategories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: () => base44.entities.Category.list('order', 100),
     initialData: []
   });
+
+  // Filter only options with available products
+  const rites = allRites.filter(r => products.some(p => p.rite_id === r.id));
+  const obediences = allObediences.filter(o => products.some(p => p.obedience_id === o.id));
+  const degreeOrders = allDegreeOrders.filter(d => products.some(p => p.degree_order_id === d.id));
+  const categories = allCategories.filter(c => products.some(p => p.category_id === c.id));
 
   const handleChange = (key, value) => {
     onFilterChange({ [key]: value });
