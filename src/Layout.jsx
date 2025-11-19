@@ -277,6 +277,12 @@ export default function Layout({ children, currentPageName }) {
                             Mes Créations
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('Wishlist')} className="cursor-pointer">
+                            <Heart className="w-4 h-4 mr-2" />
+                            Ma Liste de Souhaits
+                          </Link>
+                        </DropdownMenuItem>
                       </>
                     )}
                     {isAdmin && (

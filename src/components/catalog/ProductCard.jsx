@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Star, Eye } from 'lucide-react';
+import { ShoppingCart, Star, Eye, Heart } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -13,6 +13,24 @@ import QuickViewModal from './QuickViewModal';
 export default function ProductCard({ product }) {
   const [showQuickView, setShowQuickView] = useState(false);
   const queryClient = useQueryClient();
+
+  const { data: user } = useQuery({
+    queryKey: ['current-user'],
+    queryFn: () => base44.auth.me().catch(() => null),
+    initialData: null
+  });
+
+  const { data: wishlistItems = [] } = useQuery({
+    queryKey: ['wishlist', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      return await base44.entities.WishlistItem.filter({ user_id: user.id });
+    },
+    enabled: !!user,
+    initialData: []
+  });
+
+  const isInWishlist = wishlistItems.some(item => item.product_id === product.id);
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['reviews-count', product.id],
@@ -71,6 +89,31 @@ export default function ProductCard({ product }) {
     }
   });
 
+  const toggleWishlistMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) {
+        base44.auth.redirectToLogin(window.location.pathname);
+        return;
+      }
+
+      if (isInWishlist) {
+        const item = wishlistItems.find(w => w.product_id === product.id);
+        if (item) {
+          await base44.entities.WishlistItem.delete(item.id);
+        }
+      } else {
+        await base44.entities.WishlistItem.create({
+          user_id: user.id,
+          product_id: product.id
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['wishlist']);
+      toast.success(isInWishlist ? 'Retiré de la liste de souhaits' : 'Ajouté à la liste de souhaits');
+    }
+  });
+
   return (
     <>
       <Card className="group overflow-hidden h-full hover:shadow-2xl transition-all duration-300">
@@ -101,12 +144,27 @@ export default function ProductCard({ product }) {
                 -{discountPercent}%
               </Badge>
             )}
-            {product.featured && (
-              <Badge className="absolute top-3 left-3 bg-primary/90 text-primary-foreground">
-                <Star className="w-3 h-3 mr-1 fill-current" />
-                Coup de Cœur
-              </Badge>
-            )}
+            <div className="absolute top-3 left-3 flex flex-col gap-2">
+              {product.featured && (
+                <Badge className="bg-primary/90 text-primary-foreground">
+                  <Star className="w-3 h-3 mr-1 fill-current" />
+                  Coup de Cœur
+                </Badge>
+              )}
+            </div>
+
+            <Button
+              size="icon"
+              variant="secondary"
+              className="absolute top-3 right-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleWishlistMutation.mutate();
+              }}
+              disabled={toggleWishlistMutation.isPending}
+            >
+              <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current text-red-500' : ''}`} />
+            </Button>
             {product.stock_quantity <= 0 && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                 <Badge variant="secondary">Rupture de stock</Badge>

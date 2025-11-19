@@ -20,6 +20,7 @@ import Sitemap from './pages/Sitemap';
 import AdminPanel from './pages/AdminPanel';
 import Setup from './pages/Setup';
 import AdminAI from './pages/AdminAI';
+import Wishlist from './pages/Wishlist';
 import __Layout from './Layout.jsx';
 
 
@@ -46,6 +47,7 @@ export const PAGES = {
     "AdminPanel": AdminPanel,
     "Setup": Setup,
     "AdminAI": AdminAI,
+    "Wishlist": Wishlist,
 }
 
 export const pagesConfig = {
