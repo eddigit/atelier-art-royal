@@ -281,6 +281,12 @@ export default function Layout({ children, currentPageName }) {
                             Production
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('AdminRites')} className="cursor-pointer">
+                            <Award className="w-4 h-4 mr-2" />
+                            Gestion Rites
+                          </Link>
+                        </DropdownMenuItem>
                         </>
                         )}
                         <DropdownMenuSeparator />
