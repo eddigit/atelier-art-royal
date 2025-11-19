@@ -40,6 +40,7 @@ export default function AdminStock() {
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [bulkStock, setBulkStock] = useState('');
   const [bulkStockBehavior, setBulkStockBehavior] = useState('');
+  const [bulkIsActive, setBulkIsActive] = useState('');
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -72,6 +73,7 @@ export default function AdminStock() {
       setShowBulkDialog(false);
       setBulkStock('');
       setBulkStockBehavior('');
+      setBulkIsActive('');
     }
   });
 
@@ -94,6 +96,9 @@ export default function AdminStock() {
     }
     if (bulkStockBehavior !== '') {
       stockData.allow_backorders = bulkStockBehavior === 'allow';
+    }
+    if (bulkIsActive !== '') {
+      stockData.is_active = bulkIsActive === 'active';
     }
 
     bulkUpdateMutation.mutate({
@@ -372,6 +377,19 @@ export default function AdminStock() {
                   <SelectItem value={null}>Laisser inchangé</SelectItem>
                   <SelectItem value="allow">Autoriser la vente</SelectItem>
                   <SelectItem value="block">Bloquer la vente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Affichage sur le site</Label>
+              <Select value={bulkIsActive} onValueChange={setBulkIsActive}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Laisser inchangé" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>Laisser inchangé</SelectItem>
+                  <SelectItem value="active">Autoriser (Actif)</SelectItem>
+                  <SelectItem value="inactive">Masquer (Inactif)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
