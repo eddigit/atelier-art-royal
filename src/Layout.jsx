@@ -19,6 +19,7 @@ import {
   Settings,
   Heart
 } from 'lucide-react';
+import ChatWidget from '@/components/chat/ChatWidget';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -413,6 +414,9 @@ export default function Layout({ children, currentPageName }) {
       <main className="min-h-[calc(100vh-5rem)]">
         {children}
       </main>
+
+      {/* Chat Widget */}
+      <ChatWidget />
 
       {/* Footer */}
       <footer className="border-t border-border mt-20">

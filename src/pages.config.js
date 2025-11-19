@@ -19,6 +19,7 @@ import AdminReviews from './pages/AdminReviews';
 import Sitemap from './pages/Sitemap';
 import AdminPanel from './pages/AdminPanel';
 import Setup from './pages/Setup';
+import AdminAI from './pages/AdminAI';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +45,7 @@ export const PAGES = {
     "Sitemap": Sitemap,
     "AdminPanel": AdminPanel,
     "Setup": Setup,
+    "AdminAI": AdminAI,
 }
 
 export const pagesConfig = {
