@@ -275,9 +275,15 @@ export default function Layout({ children, currentPageName }) {
                             Gestion Clients
                           </Link>
                         </DropdownMenuItem>
-                      </>
-                    )}
-                    <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('AdminProduction')} className="cursor-pointer">
+                            <Package className="w-4 h-4 mr-2" />
+                            Production
+                          </Link>
+                        </DropdownMenuItem>
+                        </>
+                        )}
+                        <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => base44.auth.logout()} className="cursor-pointer text-destructive">
                       <LogOut className="w-4 h-4 mr-2" />
                       Déconnexion
