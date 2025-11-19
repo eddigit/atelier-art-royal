@@ -8,13 +8,15 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { getGuestCart, updateGuestCartItem, removeFromGuestCart } from '@/components/cart/guestCart';
 
 export default function Cart() {
   const queryClient = useQueryClient();
+  const [guestCartRefresh, setGuestCartRefresh] = React.useState(0);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => base44.auth.me().catch(() => null)
   });
 
   const { data: cartItems = [], isLoading } = useQuery({
@@ -27,48 +29,68 @@ export default function Cart() {
     initialData: []
   });
 
+  // Guest cart from localStorage
+  const { data: guestCartItems = [] } = useQuery({
+    queryKey: ['guest-cart', guestCartRefresh],
+    queryFn: () => getGuestCart(),
+    initialData: [],
+    enabled: !user
+  });
+
   const { data: products = [] } = useQuery({
-    queryKey: ['cart-products', cartItems],
+    queryKey: ['cart-products', cartItems, guestCartItems],
     queryFn: async () => {
-      if (cartItems.length === 0) return [];
-      const productPromises = cartItems.map(item =>
+      const items = user ? cartItems : guestCartItems;
+      if (items.length === 0) return [];
+      const productPromises = items.map(item =>
         base44.entities.Product.filter({ id: item.product_id }).then(p => p[0])
       );
       return Promise.all(productPromises);
     },
-    enabled: cartItems.length > 0,
+    enabled: (user && cartItems.length > 0) || (!user && guestCartItems.length > 0),
     initialData: []
   });
 
   const updateQuantityMutation = useMutation({
-    mutationFn: ({ itemId, newQuantity }) =>
-      base44.entities.CartItem.update(itemId, { quantity: newQuantity }),
+    mutationFn: ({ itemId, productId, newQuantity }) => {
+      if (user) {
+        return base44.entities.CartItem.update(itemId, { quantity: newQuantity });
+      } else {
+        updateGuestCartItem(productId, newQuantity);
+        return Promise.resolve();
+      }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries(['cart']);
+      if (user) {
+        queryClient.invalidateQueries(['cart']);
+      } else {
+        setGuestCartRefresh(prev => prev + 1);
+      }
     }
   });
 
   const removeItemMutation = useMutation({
-    mutationFn: (itemId) => base44.entities.CartItem.delete(itemId),
+    mutationFn: ({ itemId, productId }) => {
+      if (user) {
+        return base44.entities.CartItem.delete(itemId);
+      } else {
+        removeFromGuestCart(productId);
+        return Promise.resolve();
+      }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries(['cart']);
+      if (user) {
+        queryClient.invalidateQueries(['cart']);
+      } else {
+        setGuestCartRefresh(prev => prev + 1);
+      }
       toast.success('Produit retiré du panier');
     }
   });
 
-  if (!user) {
-    return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-        <h2 className="text-2xl font-bold mb-4">Connectez-vous pour voir votre panier</h2>
-        <Button onClick={() => base44.auth.redirectToLogin()}>
-          Se connecter
-        </Button>
-      </div>
-    );
-  }
+  const activeCartItems = user ? cartItems : guestCartItems;
 
-  const subtotal = cartItems.reduce((sum, item, idx) => {
+  const subtotal = activeCartItems.reduce((sum, item, idx) => {
     const product = products[idx];
     return sum + (product?.price || 0) * item.quantity;
   }, 0);
@@ -92,7 +114,7 @@ export default function Cart() {
     );
   }
 
-  if (cartItems.length === 0) {
+  if (activeCartItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
         <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
@@ -116,12 +138,12 @@ export default function Cart() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
-          {cartItems.map((item, idx) => {
+          {activeCartItems.map((item, idx) => {
             const product = products[idx];
             if (!product) return null;
 
             return (
-              <Card key={item.id}>
+              <Card key={item.id || item.product_id}>
                 <CardContent className="p-4">
                   <div className="flex gap-4">
                     <Link to={createPageUrl('ProductDetail') + `?id=${product.id}`}>
@@ -152,6 +174,7 @@ export default function Cart() {
                             className="h-8 w-8"
                             onClick={() => updateQuantityMutation.mutate({
                               itemId: item.id,
+                              productId: item.product_id,
                               newQuantity: Math.max(1, item.quantity - 1)
                             })}
                             disabled={item.quantity <= 1}
@@ -167,6 +190,7 @@ export default function Cart() {
                             className="h-8 w-8"
                             onClick={() => updateQuantityMutation.mutate({
                               itemId: item.id,
+                              productId: item.product_id,
                               newQuantity: item.quantity + 1
                             })}
                           >
@@ -181,7 +205,7 @@ export default function Cart() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => removeItemMutation.mutate(item.id)}
+                            onClick={() => removeItemMutation.mutate({ itemId: item.id, productId: item.product_id })}
                           >
                             <Trash2 className="w-4 h-4 text-destructive" />
                           </Button>

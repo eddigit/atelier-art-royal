@@ -11,6 +11,7 @@ import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import ProductCard from '@/components/catalog/ProductCard';
 import ProductReviews from '@/components/catalog/ProductReviews';
+import { addToGuestCart } from '@/components/cart/guestCart';
 
 export default function ProductDetail() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -62,32 +63,39 @@ export default function ProductDetail() {
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
-      const user = await base44.auth.me();
-      if (!user) {
-        base44.auth.redirectToLogin(window.location.pathname);
-        return;
-      }
+      try {
+        const user = await base44.auth.me();
+        
+        if (user) {
+          const existingItems = await base44.entities.CartItem.filter({
+            user_id: user.id,
+            product_id: product.id
+          });
 
-      const existingItems = await base44.entities.CartItem.filter({
-        user_id: user.id,
-        product_id: product.id
-      });
-
-      if (existingItems.length > 0) {
-        await base44.entities.CartItem.update(existingItems[0].id, {
-          quantity: existingItems[0].quantity + quantity
-        });
-      } else {
-        await base44.entities.CartItem.create({
-          user_id: user.id,
-          product_id: product.id,
-          quantity: quantity,
-          price: product.price
-        });
+          if (existingItems.length > 0) {
+            await base44.entities.CartItem.update(existingItems[0].id, {
+              quantity: existingItems[0].quantity + quantity
+            });
+          } else {
+            await base44.entities.CartItem.create({
+              user_id: user.id,
+              product_id: product.id,
+              quantity: quantity,
+              price: product.price
+            });
+          }
+        } else {
+          // Guest user - add to localStorage
+          addToGuestCart(product, quantity);
+        }
+      } catch (error) {
+        // User not logged in - add to guest cart
+        addToGuestCart(product, quantity);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['cart']);
+      queryClient.invalidateQueries(['guest-cart']);
       toast.success('Produit ajouté au panier');
     }
   });
