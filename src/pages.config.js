@@ -10,6 +10,7 @@ import AdminSettings from './pages/AdminSettings';
 import AdminDashboard from './pages/AdminDashboard';
 import SavedCustomizations from './pages/SavedCustomizations';
 import AdminProducts from './pages/AdminProducts';
+import AdminCustomers from './pages/AdminCustomers';
 import __Layout from './Layout.jsx';
 
 
@@ -26,6 +27,7 @@ export const PAGES = {
     "AdminDashboard": AdminDashboard,
     "SavedCustomizations": SavedCustomizations,
     "AdminProducts": AdminProducts,
+    "AdminCustomers": AdminCustomers,
 }
 
 export const pagesConfig = {

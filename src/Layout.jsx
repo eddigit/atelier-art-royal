@@ -269,6 +269,12 @@ export default function Layout({ children, currentPageName }) {
                             Gestion Produits
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('AdminCustomers')} className="cursor-pointer">
+                            <UserCircle className="w-4 h-4 mr-2" />
+                            Gestion Clients
+                          </Link>
+                        </DropdownMenuItem>
                       </>
                     )}
                     <DropdownMenuSeparator />
