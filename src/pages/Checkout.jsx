@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, Loader2, Banknote, Building2 } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -19,6 +20,7 @@ export default function Checkout() {
   const [createAccount, setCreateAccount] = useState(false);
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPassword, setGuestPassword] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
 
   const [shippingAddress, setShippingAddress] = useState({
     name: '',
@@ -128,7 +130,7 @@ export default function Checkout() {
         shipping_address: shippingAddress,
         billing_address: sameAddress ? shippingAddress : billingAddress,
         payment_status: 'pending',
-        payment_method: 'phone_validation'
+        payment_method: paymentMethod
       });
 
       // Clear cart
@@ -374,6 +376,64 @@ export default function Checkout() {
               </CardContent>
             </Card>
 
+            {/* Payment Method */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Mode de paiement</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="bank_transfer" id="bank_transfer" />
+                    <div className="flex-1">
+                      <Label htmlFor="bank_transfer" className="cursor-pointer font-semibold flex items-center gap-2">
+                        <Building2 className="w-5 h-5" />
+                        Virement bancaire
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Coordonnées bancaires communiquées par email après validation
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="cash" id="cash" />
+                    <div className="flex-1">
+                      <Label htmlFor="cash" className="cursor-pointer font-semibold flex items-center gap-2">
+                        <Banknote className="w-5 h-5" />
+                        Espèces sur place
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Paiement en espèces lors du retrait en atelier
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3 border rounded-lg p-4 opacity-50 cursor-not-allowed bg-muted">
+                    <RadioGroupItem value="card" id="card" disabled />
+                    <div className="flex-1">
+                      <Label htmlFor="card" className="font-semibold flex items-center gap-2">
+                        <CreditCard className="w-5 h-5" />
+                        Carte bancaire (bientôt disponible)
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Paiement sécurisé par CB - Prochainement
+                      </p>
+                    </div>
+                  </div>
+                </RadioGroup>
+
+                <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mt-4">
+                  <p className="text-sm font-medium mb-2">📦 Conditions d'expédition :</p>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• La marchandise sera expédiée dès réception du paiement</li>
+                    <li>• Délai d'expédition : 5-7 jours ouvrés après validation du paiement</li>
+                    <li>• Vous recevrez un email de confirmation avec les détails de paiement</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Billing Address */}
             <Card>
               <CardHeader>
@@ -491,12 +551,13 @@ export default function Checkout() {
                   ) : (
                     <>
                       <CreditCard className="mr-2 w-5 h-5" />
-                      Payer {total.toFixed(2)}€
+                      Valider la commande
                     </>
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  Validation de paiement par téléphone : +33 6 46 68 36 10
+                  {paymentMethod === 'bank_transfer' && 'Vous recevrez les coordonnées bancaires par email'}
+                  {paymentMethod === 'cash' && 'Retrait en atelier sur rendez-vous : +33 6 46 68 36 10'}
                 </p>
               </CardContent>
             </Card>

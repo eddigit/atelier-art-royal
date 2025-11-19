@@ -452,46 +452,24 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Footer */}
       <footer className="border-t border-border mt-20">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/d0a84d191_Logo-Atelier-Art-Royal.png" 
-                alt="Atelier Art Royal - Haute Couture Maçonnique" 
-                className="h-10 w-auto object-contain"
-              />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-muted-foreground text-xs font-bold">©</span>
+              <span>{new Date().getFullYear()} Atelier Art Royal</span>
             </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Service</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Franco de port dès 500€</li>
-                <li>Livraison sous 5-7 jours</li>
-                <li>Service client dédié</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Navigation</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link to={createPageUrl('Catalog')} className="text-muted-foreground hover:text-primary">Catalogue</Link></li>
-                <li><Link to={createPageUrl('Orders')} className="text-muted-foreground hover:text-primary">Commandes</Link></li>
-                <li><Link to={createPageUrl('Account')} className="text-muted-foreground hover:text-primary">Mon Compte</Link></li>
-                <li><Link to={createPageUrl('Contact')} className="text-muted-foreground hover:text-primary">Contact</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Contact</h3>
-              <p className="text-sm text-muted-foreground">
-                Support disponible 24/7<br />
-                via notre chatbot IA
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2025 Atelier Art Royal. Tous droits réservés.
+            <span className="hidden md:inline">•</span>
+            <span>
+              Design et E-commerce réalisé par{' '}
+              <a 
+                href="https://coachdigitalparis.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="font-semibold hover:text-primary transition-colors"
+              >
+                GILLES KORZEC
+              </a>
+            </span>
           </div>
         </div>
       </footer>
