@@ -93,12 +93,12 @@ export default function Layout({ children, currentPageName }) {
       <div className="bg-primary/10 border-b border-primary/20 py-2">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs sm:text-sm">
-            <a href="tel:+33646683610" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
+            <a href="tel:+33646683610" className="flex items-center gap-2 hover:opacity-80 transition-colors" style={{color: '#e5b350'}}>
               <span className="font-semibold">Service commercial & Support :</span>
               <span>+33 6 46 68 36 10</span>
             </a>
             <span className="hidden sm:inline text-muted-foreground">•</span>
-            <a href="mailto:contact@artroyal.fr" className="text-primary hover:text-primary/80 transition-colors">
+            <a href="mailto:contact@artroyal.fr" className="hover:opacity-80 transition-colors" style={{color: '#e5b350'}}>
               contact@artroyal.fr
             </a>
           </div>
