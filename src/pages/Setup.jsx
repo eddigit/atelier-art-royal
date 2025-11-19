@@ -13,7 +13,11 @@ import {
   ShoppingCart,
   AlertCircle,
   CheckCircle2,
-  Server
+  Server,
+  Eye,
+  EyeOff,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -42,6 +46,14 @@ export default function Setup() {
     enableReviews: true
   });
 
+  const [secrets, setSecrets] = useState([
+    { id: 1, name: 'STRIPE_API_KEY', value: '', description: 'Clé API Stripe pour les paiements', visible: false },
+    { id: 2, name: 'STRIPE_WEBHOOK_SECRET', value: '', description: 'Secret webhook Stripe', visible: false },
+    { id: 3, name: 'SMTP_API_KEY', value: '', description: 'Clé API pour service email externe (si nécessaire)', visible: false }
+  ]);
+
+  const [newSecret, setNewSecret] = useState({ name: '', value: '', description: '' });
+
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     if (password === SUPER_ADMIN_PASSWORD) {
@@ -61,6 +73,29 @@ export default function Setup() {
   const handleSaveEcommerceConfig = () => {
     // In production, this would save to a database or configuration file
     toast.success('Configuration e-commerce sauvegardée');
+  };
+
+  const toggleSecretVisibility = (id) => {
+    setSecrets(secrets.map(s => s.id === id ? {...s, visible: !s.visible} : s));
+  };
+
+  const handleSaveSecrets = () => {
+    toast.success('Secrets sauvegardés avec succès');
+  };
+
+  const handleAddSecret = () => {
+    if (!newSecret.name || !newSecret.value) {
+      toast.error('Veuillez remplir le nom et la valeur');
+      return;
+    }
+    setSecrets([...secrets, { ...newSecret, id: Date.now(), visible: false }]);
+    setNewSecret({ name: '', value: '', description: '' });
+    toast.success('Secret ajouté');
+  };
+
+  const handleDeleteSecret = (id) => {
+    setSecrets(secrets.filter(s => s.id !== id));
+    toast.success('Secret supprimé');
   };
 
   if (!isAuthenticated) {
@@ -114,7 +149,7 @@ export default function Setup() {
       </div>
 
       <Tabs defaultValue="email" className="space-y-6">
-        <TabsList className="grid grid-cols-3 w-full max-w-2xl">
+        <TabsList className="grid grid-cols-4 w-full max-w-3xl">
           <TabsTrigger value="email">
             <Mail className="w-4 h-4 mr-2" />
             Email & SMTP
@@ -122,6 +157,10 @@ export default function Setup() {
           <TabsTrigger value="ecommerce">
             <ShoppingCart className="w-4 h-4 mr-2" />
             E-commerce
+          </TabsTrigger>
+          <TabsTrigger value="secrets">
+            <Key className="w-4 h-4 mr-2" />
+            Secrets
           </TabsTrigger>
           <TabsTrigger value="technical">
             <Server className="w-4 h-4 mr-2" />
@@ -293,6 +332,126 @@ export default function Setup() {
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Sauvegarder la configuration e-commerce
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Secrets Configuration */}
+        <TabsContent value="secrets" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestion des Secrets</CardTitle>
+              <CardDescription>
+                Clés API, mots de passe et variables sensibles
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-yellow-600/10 border border-yellow-600/30 rounded-lg p-4 flex gap-3">
+                <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-yellow-400 mb-1">Important</p>
+                  <p className="text-muted-foreground">
+                    Ces secrets sont stockés localement dans cette session. Pour une configuration en production,
+                    utilisez les variables d'environnement du dashboard Base44.
+                  </p>
+                </div>
+              </div>
+
+              {/* Existing Secrets */}
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center gap-2">
+                  <Key className="w-4 h-4" />
+                  Secrets Configurés
+                </h4>
+                <div className="space-y-2">
+                  {secrets.map((secret) => (
+                    <div key={secret.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="font-mono font-semibold text-sm mb-1">{secret.name}</div>
+                          {secret.description && (
+                            <p className="text-xs text-muted-foreground">{secret.description}</p>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteSecret(secret.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="flex gap-2">
+                        <Input
+                          type={secret.visible ? 'text' : 'password'}
+                          value={secret.value}
+                          onChange={(e) => setSecrets(secrets.map(s => s.id === secret.id ? {...s, value: e.target.value} : s))}
+                          placeholder="Entrez la valeur..."
+                          className="flex-1 font-mono text-sm"
+                        />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => toggleSecretVisibility(secret.id)}
+                        >
+                          {secret.visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Add New Secret */}
+              <div className="border-t pt-6">
+                <h4 className="font-semibold flex items-center gap-2 mb-4">
+                  <Plus className="w-4 h-4" />
+                  Ajouter un Secret
+                </h4>
+                <div className="space-y-3">
+                  <div>
+                    <Label>Nom du Secret</Label>
+                    <Input
+                      value={newSecret.name}
+                      onChange={(e) => setNewSecret({...newSecret, name: e.target.value})}
+                      placeholder="Ex: PAYMENT_API_KEY"
+                      className="mt-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <Label>Valeur</Label>
+                    <Input
+                      type="password"
+                      value={newSecret.value}
+                      onChange={(e) => setNewSecret({...newSecret, value: e.target.value})}
+                      placeholder="Entrez la valeur secrète..."
+                      className="mt-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <Label>Description (optionnel)</Label>
+                    <Textarea
+                      value={newSecret.description}
+                      onChange={(e) => setNewSecret({...newSecret, description: e.target.value})}
+                      placeholder="Description du secret..."
+                      className="mt-2"
+                      rows={2}
+                    />
+                  </div>
+                  <Button onClick={handleAddSecret}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Ajouter le Secret
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button onClick={handleSaveSecrets} className="flex-1">
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                  Sauvegarder tous les secrets
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
