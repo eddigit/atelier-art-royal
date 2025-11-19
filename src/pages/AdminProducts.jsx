@@ -103,12 +103,19 @@ export default function AdminProducts() {
     setImportProgress({ current: 0, total: 0, imported: 0, updated: 0, skipped: 0 });
 
     try {
+      // Get app config
+      const appId = window.location.hostname.includes('localhost') 
+        ? localStorage.getItem('base44_app_id')
+        : window.location.pathname.split('/')[1];
+      
+      const token = localStorage.getItem('base44_token');
+      
       // Call the streaming function
-      const response = await fetch(`https://base44.app/api/apps/${base44._appId}/functions/importProductsWithProgress`, {
+      const response = await fetch(`https://base44.app/api/apps/${appId}/functions/importProductsWithProgress`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${base44._token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           file_url: uploadedFileUrl,
