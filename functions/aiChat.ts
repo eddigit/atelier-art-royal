@@ -3,7 +3,13 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { messages, user_context } = await req.json();
+    const body = await req.json();
+    console.log('Request body:', body);
+    const { messages, user_context } = body;
+    
+    if (!messages || !Array.isArray(messages)) {
+      throw new Error('Messages invalides');
+    }
 
     // Fetch AI configuration
     const aiConfigs = await base44.asServiceRole.entities.AIConfig.filter({ is_active: true });
@@ -90,12 +96,21 @@ INSTRUCTIONS CRITIQUES:
 
 Lorsque tu recommandes un produit, fournis son ID exact pour créer un lien.`;
 
+    // Check API key
+    const apiKey = Deno.env.get('GROQ_API_KEY');
+    console.log('API Key exists:', !!apiKey);
+    
+    if (!apiKey) {
+      throw new Error('GROQ_API_KEY non configurée');
+    }
+
     // Call Groq API
+    console.log('Calling Groq API...');
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('GROQ_API_KEY')}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: 'llama-3.1-70b-versatile',
@@ -108,9 +123,12 @@ Lorsque tu recommandes un produit, fournis son ID exact pour créer un lien.`;
       })
     });
 
+    console.log('Groq response status:', groqResponse.status);
+
     if (!groqResponse.ok) {
       const error = await groqResponse.text();
-      throw new Error(`Groq API error: ${error}`);
+      console.error('Groq API error:', error);
+      throw new Error(`Groq API error (${groqResponse.status}): ${error}`);
     }
 
     const groqData = await groqResponse.json();
