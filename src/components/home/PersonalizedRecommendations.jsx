@@ -25,10 +25,16 @@ export default function PersonalizedRecommendations() {
       
       if (purchasedProductIds.length === 0) {
         // Pas d'historique : recommander des produits populaires
-        return await base44.entities.Product.filter({ 
+        const featured = await base44.entities.Product.filter({ 
           is_active: true,
           featured: true 
-        }, '-created_date', 4);
+        }, '-created_date', 20);
+        
+        // Filter by stock availability
+        return featured.filter(p => {
+          const stock = p.stock_quantity || 0;
+          return stock > 0 || p.allow_backorders;
+        }).slice(0, 4);
       }
 
       // Récupérer les produits achetés pour connaître leurs rites/grades
@@ -45,6 +51,11 @@ export default function PersonalizedRecommendations() {
       return allProducts
         .filter(p => !purchasedProductIds.includes(p.id))
         .filter(p => riteIds.includes(p.rite_id) || gradeIds.includes(p.grade_id))
+        .filter(p => {
+          // Filter by stock availability
+          const stock = p.stock_quantity || 0;
+          return stock > 0 || p.allow_backorders;
+        })
         .slice(0, 4);
     },
     enabled: !!user,

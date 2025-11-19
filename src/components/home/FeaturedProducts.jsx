@@ -7,7 +7,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function FeaturedProducts() {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['featured-products'],
-    queryFn: () => base44.entities.Product.filter({ featured: true, is_active: true }, '-created_date', 8),
+    queryFn: async () => {
+      const allProducts = await base44.entities.Product.filter({ featured: true, is_active: true }, '-created_date', 50);
+      
+      // Filter by stock availability
+      const availableProducts = allProducts.filter(product => {
+        const stock = product.stock_quantity || 0;
+        return stock > 0 || product.allow_backorders;
+      });
+      
+      return availableProducts.slice(0, 8);
+    },
     initialData: []
   });
 
