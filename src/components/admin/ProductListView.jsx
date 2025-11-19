@@ -1,11 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
-export default function ProductListView({ products, onEdit, onDelete }) {
+export default function ProductListView({ products, onEdit, onDelete, selectedProducts = [], onToggleSelect }) {
   return (
     <div className="space-y-2">
       {products.map((product) => (
@@ -14,6 +15,12 @@ export default function ProductListView({ products, onEdit, onDelete }) {
           className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
         >
           <div className="flex items-center gap-4 flex-1">
+            {onToggleSelect && (
+              <Checkbox
+                checked={selectedProducts.includes(product.id)}
+                onCheckedChange={() => onToggleSelect(product.id)}
+              />
+            )}
             {product.images?.[0] ? (
               <img
                 src={product.images[0]}

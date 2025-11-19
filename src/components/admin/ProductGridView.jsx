@@ -2,15 +2,25 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, Edit, Trash2, ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
-export default function ProductGridView({ products, onEdit, onDelete }) {
+export default function ProductGridView({ products, onEdit, onDelete, selectedProducts = [], onToggleSelect }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((product) => (
         <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-shadow">
+          {onToggleSelect && (
+            <div className="absolute top-3 left-3 z-10">
+              <Checkbox
+                checked={selectedProducts.includes(product.id)}
+                onCheckedChange={() => onToggleSelect(product.id)}
+                className="bg-white border-2"
+              />
+            </div>
+          )}
           <div className="relative aspect-square overflow-hidden bg-muted">
             {product.images?.[0] ? (
               <>
