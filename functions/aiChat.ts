@@ -180,9 +180,54 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Check if AI suggests creating a lead (keywords detection)
+    const leadKeywords = ['recontacter', 'rappeler', 'contact', 'devis', 'fabrication spéciale', 'personnalisation', 'urgence'];
+    const shouldCreateLead = leadKeywords.some(keyword => 
+      messages[messages.length - 1]?.content?.toLowerCase().includes(keyword)
+    );
+
+    let leadCreated = false;
+
+    // Auto-create lead if user shows strong interest
+    if (shouldCreateLead && currentUser) {
+      try {
+        // Analyze priority from conversation
+        const conversationText = messages.map(m => m.content).join(' ').toLowerCase();
+        let priority = 'normale';
+
+        if (conversationText.includes('urgent') || conversationText.includes('rapidement') || conversationText.includes('immédiat')) {
+          priority = 'urgente';
+        } else if (conversationText.includes('bientôt') || conversationText.includes('prochain') || conversationText.includes('important')) {
+          priority = 'haute';
+        }
+
+        const leadData = {
+          user_id: currentUser.id,
+          contact_name: currentUser.full_name,
+          contact_email: currentUser.email,
+          request_details: messages[messages.length - 1].content,
+          priority: priority,
+          conversation_context: JSON.stringify(messages.slice(-5), null, 2),
+          source: 'chat_ia'
+        };
+
+        const newLead = await base44.asServiceRole.entities.LeadRequest.create(leadData);
+
+        // Send notification email
+        await base44.asServiceRole.functions.invoke('notifyLeadCreated', {
+          leadId: newLead.id
+        });
+
+        leadCreated = true;
+      } catch (error) {
+        console.error('Failed to create lead:', error);
+      }
+    }
+
     return Response.json({
       message: aiMessage,
       suggested_products: mentionedProducts,
+      lead_created: leadCreated,
       timestamp: new Date().toISOString()
     });
 

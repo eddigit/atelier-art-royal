@@ -24,6 +24,7 @@ import Wishlist from './pages/Wishlist';
 import AdminObediences from './pages/AdminObediences';
 import AdminDegreeOrders from './pages/AdminDegreeOrders';
 import AdminHome from './pages/AdminHome';
+import AdminLeads from './pages/AdminLeads';
 import __Layout from './Layout.jsx';
 
 
@@ -54,6 +55,7 @@ export const PAGES = {
     "AdminObediences": AdminObediences,
     "AdminDegreeOrders": AdminDegreeOrders,
     "AdminHome": AdminHome,
+    "AdminLeads": AdminLeads,
 }
 
 export const pagesConfig = {
