@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { X, Upload, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
@@ -60,7 +59,7 @@ export default function ProductEditDialog({ product, open, onClose, onSaved }) {
         <div className="space-y-6">
           {/* Images */}
           <div>
-            <Label>Images du produit</Label>
+            <label className="text-sm font-medium">Images du produit</label>
             <div className="grid grid-cols-4 gap-4 mt-2">
               {formData.images?.map((img, idx) => (
                 <div key={idx} className="relative group">
@@ -100,94 +99,102 @@ export default function ProductEditDialog({ product, open, onClose, onSaved }) {
           {/* Basic Info */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Nom du produit</Label>
+              <label className="text-sm font-medium">Nom du produit</label>
               <Input
                 value={formData.name || ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="mt-1"
               />
             </div>
             <div>
-              <Label>SKU</Label>
+              <label className="text-sm font-medium">SKU</label>
               <Input
                 value={formData.sku || ''}
                 onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                className="mt-1"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Prix (€)</Label>
+              <label className="text-sm font-medium">Prix (€)</label>
               <Input
                 type="number"
                 step="0.01"
                 value={formData.price || ''}
                 onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                className="mt-1"
               />
             </div>
             <div>
-              <Label>Prix comparaison (€)</Label>
+              <label className="text-sm font-medium">Prix comparaison (€)</label>
               <Input
                 type="number"
                 step="0.01"
                 value={formData.compare_at_price || ''}
                 onChange={(e) => setFormData({ ...formData, compare_at_price: parseFloat(e.target.value) })}
+                className="mt-1"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Stock</Label>
+              <label className="text-sm font-medium">Stock</label>
               <Input
                 type="number"
                 value={formData.stock_quantity || 0}
                 onChange={(e) => setFormData({ ...formData, stock_quantity: parseInt(e.target.value) })}
+                className="mt-1"
               />
             </div>
             <div>
-              <Label>Seuil stock faible</Label>
+              <label className="text-sm font-medium">Seuil stock faible</label>
               <Input
                 type="number"
                 value={formData.low_stock_threshold || 5}
                 onChange={(e) => setFormData({ ...formData, low_stock_threshold: parseInt(e.target.value) })}
+                className="mt-1"
               />
             </div>
           </div>
 
           <div>
-            <Label>Description courte</Label>
+            <label className="text-sm font-medium">Description courte</label>
             <Textarea
               value={formData.short_description || ''}
               onChange={(e) => setFormData({ ...formData, short_description: e.target.value })}
               rows={2}
+              className="mt-1"
             />
           </div>
 
           <div>
-            <Label>Description</Label>
+            <label className="text-sm font-medium">Description</label>
             <Textarea
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
+              className="mt-1"
             />
           </div>
 
           {/* Toggles */}
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <Switch
+              <Checkbox
                 checked={formData.is_active || false}
                 onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
               />
-              <Label>Actif</Label>
+              <label className="text-sm font-medium">Actif</label>
             </div>
             <div className="flex items-center gap-2">
-              <Switch
+              <Checkbox
                 checked={formData.featured || false}
                 onCheckedChange={(checked) => setFormData({ ...formData, featured: checked })}
               />
-              <Label>Mis en avant</Label>
+              <label className="text-sm font-medium">Mis en avant</label>
             </div>
           </div>
 
