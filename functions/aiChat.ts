@@ -140,8 +140,10 @@ Lorsque tu recommandes un produit, fournis son ID exact pour créer un lien.`;
     });
 
   } catch (error) {
+    console.error('AI Chat Error:', error);
     return Response.json({ 
       error: error.message,
+      details: error.stack,
       message: "Désolé, je rencontre un problème technique. Veuillez réessayer."
     }, { status: 500 });
   }
