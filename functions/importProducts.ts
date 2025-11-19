@@ -249,9 +249,18 @@ Deno.serve(async (req) => {
           ? crossSellStr.split(',').map(c => c.trim()).filter(c => c)
           : [];
 
-        // Try to match category
+        // Try to match category from product_type
         let category_id = null;
-        if (categoriesStr) {
+        if (productType) {
+          const matchedCat = categories.find(c => 
+            productType.toLowerCase().includes(c.name.toLowerCase()) ||
+            c.name.toLowerCase().includes(productType.toLowerCase())
+          );
+          if (matchedCat) category_id = matchedCat.id;
+        }
+        
+        // Fallback to categoriesStr if product_type didn't match
+        if (!category_id && categoriesStr) {
           const catName = categoriesStr.split('>').pop().trim();
           const matchedCat = categories.find(c => 
             c.name.toLowerCase() === catName.toLowerCase()
@@ -259,15 +268,17 @@ Deno.serve(async (req) => {
           if (matchedCat) category_id = matchedCat.id;
         }
 
-        // Try to match rite from tags or hint
+        // Try to match rite from hint column
         let rite_id = defaultRite.id;
-        const riteSource = riteHint || tagsStr;
-        const riteKeywords = ['REAA', 'RER', 'RF', 'GLDF', 'GODF', 'GLNF'];
-        for (const keyword of riteKeywords) {
-          if (riteSource.toUpperCase().includes(keyword)) {
+        if (riteHint) {
+          // Split by comma to handle multiple rites
+          const riteValues = riteHint.split(',').map(r => r.trim().toUpperCase());
+          
+          for (const riteValue of riteValues) {
             const matchedRite = rites.find(r => 
-              r.code.toUpperCase().includes(keyword) || 
-              r.name.toUpperCase().includes(keyword)
+              r.code.toUpperCase() === riteValue || 
+              r.name.toUpperCase().includes(riteValue) ||
+              riteValue.includes(r.code.toUpperCase())
             );
             if (matchedRite) {
               rite_id = matchedRite.id;
@@ -276,13 +287,33 @@ Deno.serve(async (req) => {
           }
         }
 
-        // Try to match grade from tags or hint
+        // Try to match grade from hint column
         let grade_id = defaultGrade.id;
-        const gradeSource = gradeHint || tagsStr;
-        const degreeMatch = gradeSource.match(/(\d+)(er|ème|eme)\s*(degré|ordre|degree)/i);
-        if (degreeMatch) {
-          const level = parseInt(degreeMatch[1]);
-          const matchedGrade = grades.find(g => g.level === level && g.rite_id === rite_id);
+        if (gradeHint) {
+          const gradeValue = gradeHint.trim();
+          
+          // Try exact match first
+          let matchedGrade = grades.find(g => 
+            g.name.toLowerCase() === gradeValue.toLowerCase()
+          );
+          
+          // If no exact match, try to extract degree number
+          if (!matchedGrade) {
+            const degreeMatch = gradeValue.match(/(\d+)(er|ème|eme|e)?\s*(degré|degree|°)?/i);
+            if (degreeMatch) {
+              const level = parseInt(degreeMatch[1]);
+              matchedGrade = grades.find(g => g.level === level && g.rite_id === rite_id);
+            }
+          }
+          
+          // If still no match, try partial name match
+          if (!matchedGrade) {
+            matchedGrade = grades.find(g => 
+              g.name.toLowerCase().includes(gradeValue.toLowerCase()) ||
+              gradeValue.toLowerCase().includes(g.name.toLowerCase())
+            );
+          }
+          
           if (matchedGrade) grade_id = matchedGrade.id;
         }
 
