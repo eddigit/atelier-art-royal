@@ -22,36 +22,51 @@ export default function HeroSection() {
     setIsSearching(true);
     
     try {
+      // Récupérer les données de référence pour le mapping
+      const [ritesData, obediencesData, degreeOrdersData, categoriesData] = await Promise.all([
+        base44.entities.Rite.list('order', 100),
+        base44.entities.Obedience.list('order', 100),
+        base44.entities.DegreeOrder.list('level', 200),
+        base44.entities.Category.list('order', 100)
+      ]);
+
       // Utiliser l'IA pour analyser la requête et extraire les critères de recherche
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: `Tu es un assistant de recherche expert pour l'Atelier Art Royal, spécialisé dans la haute couture maçonnique.
 
 HIÉRARCHIE DE RECHERCHE:
-1. Rite (REAA, RER, GLDF, etc.)
-2. Obédience (GLNF, GODF, GLAMF, etc.)
-3. Type de Loge (Symbolique ou Hauts Grades)
-4. Degré & Ordre (Apprenti, Compagnon, Maître, 4ème degré, 18ème, 30ème, 33ème, 1er Ordre, etc.)
-5. Catégorie (Tablier, Sautoir, Bijou, Gant, Décor)
+1. RITE → 2. OBÉDIENCE → 3. TYPE DE LOGE → 4. DEGRÉ & ORDRE → 5. CATÉGORIE
 
-Analyse cette requête utilisateur et extrais TOUS les critères pertinents:
+DONNÉES DISPONIBLES:
+
+RITES:
+${ritesData.map(r => `- ${r.name} (code: ${r.code})`).join('\n')}
+
+OBÉDIENCES:
+${obediencesData.map(o => `- ${o.name} (code: ${o.code})`).join('\n')}
+
+DEGRÉS & ORDRES:
+Loge Symbolique: ${degreeOrdersData.filter(d => d.loge_type === 'Loge Symbolique').map(d => d.name).join(', ')}
+Loge Hauts Grades: ${degreeOrdersData.filter(d => d.loge_type === 'Loge Hauts Grades').map(d => d.name).join(', ')}
+
+CATÉGORIES:
+${categoriesData.map(c => c.name).join(', ')}
+
+ANALYSE cette requête et extrais TOUS les critères (utilise les NOMS EXACTS):
 "${searchQuery}"
 
-Retourne un objet JSON avec les champs suivants (uniquement ceux identifiés):
-- search: terme de recherche général si aucun critère spécifique (string)
-- rite: nom du rite si mentionné (string)
-- obedience: nom de l'obédience si mentionnée (string)
-- logeType: "Loge Symbolique" ou "Loge Hauts Grades" si identifiable (string)
-- degreeOrder: nom du degré/ordre si mentionné (string)
-- category: catégorie de produit (string)
-- minPrice: prix minimum (number)
-- maxPrice: prix maximum (number)
-- showPromotions: true si recherche de promotions (boolean)
-- showNew: true si recherche de nouveautés (boolean)
+RÈGLES:
+- Utilise les noms EXACTS des rites, obédiences, degrés (majuscules/accents inclus)
+- Si un degré 1-3 est mentionné → logeType: "Loge Symbolique"
+- Si un degré 4+ ou ordre est mentionné → logeType: "Loge Hauts Grades"
+- "tablier" = Tabliers, "sautoir" = Sautoirs, "bijou" = Bijoux, "gant" = Gants, "décor" = Décors
+- "promo/promotion/réduction" → showPromotions: true
+- "nouveau/nouveauté" → showNew: true
 
 EXEMPLES:
-- "tablier REAA maître" → {rite: "REAA", degreeOrder: "Maître", category: "Tablier"}
-- "sautoir 18ème degré" → {degreeOrder: "18ème degré", category: "Sautoir", logeType: "Loge Hauts Grades"}
-- "bijoux apprenti RER" → {rite: "RER", degreeOrder: "Apprenti", category: "Bijoux", logeType: "Loge Symbolique"}`,
+- "tablier REAA maître" → {rite: "REAA", degreeOrder: "Maître", category: "Tabliers", logeType: "Loge Symbolique"}
+- "sautoir 18ème" → {degreeOrder: "18ème degré", category: "Sautoirs", logeType: "Loge Hauts Grades"}
+- "bijoux apprenti GLNF" → {obedience: "GLNF", degreeOrder: "Apprenti", category: "Bijoux", logeType: "Loge Symbolique"}`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -69,14 +84,47 @@ EXEMPLES:
         }
       });
 
-      // Construire l'URL avec les paramètres
+      // Mapper les noms aux IDs
       const params = new URLSearchParams();
       
-      Object.entries(response).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          params.append(key, value.toString());
-        }
-      });
+      if (response.rite) {
+        const rite = ritesData.find(r => 
+          r.name.toLowerCase() === response.rite.toLowerCase() || 
+          r.code.toLowerCase() === response.rite.toLowerCase()
+        );
+        if (rite) params.append('rite', rite.id);
+      }
+      
+      if (response.obedience) {
+        const obedience = obediencesData.find(o => 
+          o.name.toLowerCase() === response.obedience.toLowerCase() || 
+          o.code.toLowerCase() === response.obedience.toLowerCase()
+        );
+        if (obedience) params.append('obedience', obedience.id);
+      }
+      
+      if (response.degreeOrder) {
+        const degreeOrder = degreeOrdersData.find(d => 
+          d.name.toLowerCase().includes(response.degreeOrder.toLowerCase()) ||
+          response.degreeOrder.toLowerCase().includes(d.name.toLowerCase())
+        );
+        if (degreeOrder) params.append('degreeOrder', degreeOrder.id);
+      }
+      
+      if (response.category) {
+        const category = categoriesData.find(c => 
+          c.name.toLowerCase().includes(response.category.toLowerCase()) ||
+          response.category.toLowerCase().includes(c.name.toLowerCase())
+        );
+        if (category) params.append('category', category.id);
+      }
+      
+      if (response.logeType) params.append('logeType', response.logeType);
+      if (response.search) params.append('search', response.search);
+      if (response.minPrice) params.append('minPrice', response.minPrice.toString());
+      if (response.maxPrice) params.append('maxPrice', response.maxPrice.toString());
+      if (response.showPromotions) params.append('showPromotions', 'true');
+      if (response.showNew) params.append('showNew', 'true');
 
       // Rediriger vers le catalogue avec les paramètres
       window.location.href = createPageUrl('Catalog') + '?' + params.toString();

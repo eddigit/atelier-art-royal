@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Filters from '@/components/catalog/Filters';
+import Breadcrumb from '@/components/catalog/Breadcrumb';
 import ProductCard from '@/components/catalog/ProductCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -164,6 +165,8 @@ export default function Catalog() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <Breadcrumb filters={filters} />
+      
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           Notre <span className="text-primary">Catalogue</span>
