@@ -10,11 +10,15 @@ import { ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
+import { getGuestCart, clearGuestCart } from '@/components/cart/guestCart';
 
 export default function Checkout() {
   const queryClient = useQueryClient();
   const [sameAddress, setSameAddress] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [createAccount, setCreateAccount] = useState(false);
+  const [guestEmail, setGuestEmail] = useState('');
+  const [guestPassword, setGuestPassword] = useState('');
 
   const [shippingAddress, setShippingAddress] = useState({
     name: '',
@@ -37,7 +41,7 @@ export default function Checkout() {
 
   const { data: user } = useQuery({
     queryKey: ['user'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => base44.auth.me().catch(() => null)
   });
 
   const { data: cartItems = [] } = useQuery({
@@ -50,20 +54,25 @@ export default function Checkout() {
     initialData: []
   });
 
+  // Guest cart
+  const guestCartItems = !user ? getGuestCart() : [];
+
+  const activeCartItems = user ? cartItems : guestCartItems;
+
   const { data: products = [] } = useQuery({
-    queryKey: ['cart-products', cartItems],
+    queryKey: ['cart-products', activeCartItems],
     queryFn: async () => {
-      if (cartItems.length === 0) return [];
-      const productPromises = cartItems.map(item =>
+      if (activeCartItems.length === 0) return [];
+      const productPromises = activeCartItems.map(item =>
         base44.entities.Product.filter({ id: item.product_id }).then(p => p[0])
       );
       return Promise.all(productPromises);
     },
-    enabled: cartItems.length > 0,
+    enabled: activeCartItems.length > 0,
     initialData: []
   });
 
-  const subtotal = cartItems.reduce((sum, item, idx) => {
+  const subtotal = activeCartItems.reduce((sum, item, idx) => {
     const product = products[idx];
     return sum + (product?.price || 0) * item.quantity;
   }, 0);
@@ -73,8 +82,31 @@ export default function Checkout() {
 
   const createOrderMutation = useMutation({
     mutationFn: async () => {
+      let customerId;
+
+      // Create account if guest and createAccount is true
+      if (!user && createAccount) {
+        if (!guestEmail || !guestPassword) {
+          throw new Error('Email et mot de passe requis pour créer un compte');
+        }
+        
+        // Create account using email/password
+        // Note: This requires proper user creation setup
+        const newUser = await base44.auth.signUp({
+          email: guestEmail,
+          password: guestPassword,
+          full_name: shippingAddress.name
+        });
+        customerId = newUser.id;
+      } else if (user) {
+        customerId = user.id;
+      } else {
+        // Guest checkout - create temporary customer reference
+        customerId = `guest_${Date.now()}`;
+      }
+
       const orderNumber = `AR-${Date.now()}`;
-      const items = cartItems.map((item, idx) => {
+      const items = activeCartItems.map((item, idx) => {
         const product = products[idx];
         return {
           product_id: product.id,
@@ -87,7 +119,7 @@ export default function Checkout() {
 
       const order = await base44.entities.Order.create({
         order_number: orderNumber,
-        customer_id: user.id,
+        customer_id: customerId,
         status: 'pending',
         items: items,
         subtotal: subtotal,
@@ -96,22 +128,33 @@ export default function Checkout() {
         shipping_address: shippingAddress,
         billing_address: sameAddress ? shippingAddress : billingAddress,
         payment_status: 'pending',
-        payment_method: 'stripe'
+        payment_method: 'phone_validation'
       });
 
       // Clear cart
-      await Promise.all(cartItems.map(item => base44.entities.CartItem.delete(item.id)));
+      if (user) {
+        await Promise.all(cartItems.map(item => base44.entities.CartItem.delete(item.id)));
+      } else {
+        clearGuestCart();
+      }
 
       return order;
     },
     onSuccess: (order) => {
       queryClient.invalidateQueries(['cart']);
+      queryClient.invalidateQueries(['guest-cart']);
       queryClient.invalidateQueries(['orders']);
       toast.success('Commande créée avec succès !');
-      window.location.href = createPageUrl('Orders');
+      
+      if (user) {
+        window.location.href = createPageUrl('Orders');
+      } else {
+        toast.info('Commande enregistrée ! Connectez-vous pour suivre votre commande.');
+        window.location.href = createPageUrl('Home');
+      }
     },
-    onError: () => {
-      toast.error('Erreur lors de la création de la commande');
+    onError: (error) => {
+      toast.error(error.message || 'Erreur lors de la création de la commande');
       setIsProcessing(false);
     }
   });
@@ -146,6 +189,13 @@ export default function Checkout() {
       }
     });
 
+    if (!user && createAccount) {
+      if (!guestEmail || !guestPassword) {
+        toast.error('Email et mot de passe requis pour créer un compte');
+        return;
+      }
+    }
+
     if (hasErrors || Object.keys(validationErrors).length > 0) {
       toast.error('Veuillez corriger les erreurs du formulaire');
       return;
@@ -155,7 +205,7 @@ export default function Checkout() {
     createOrderMutation.mutate();
   };
 
-  if (!user || cartItems.length === 0) {
+  if (activeCartItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
         <h2 className="text-2xl font-bold mb-4">Votre panier est vide</h2>
@@ -179,6 +229,53 @@ export default function Checkout() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Forms */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Guest Account Creation */}
+            {!user && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Créer un compte (optionnel)</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Checkbox
+                      id="create-account"
+                      checked={createAccount}
+                      onCheckedChange={(checked) => setCreateAccount(checked)}
+                    />
+                    <Label htmlFor="create-account" className="cursor-pointer">
+                      Je souhaite créer un compte pour suivre ma commande
+                    </Label>
+                  </div>
+                  {createAccount && (
+                    <>
+                      <div>
+                        <Label htmlFor="guest-email">Email *</Label>
+                        <Input
+                          id="guest-email"
+                          type="email"
+                          value={guestEmail}
+                          onChange={(e) => setGuestEmail(e.target.value)}
+                          placeholder="votre@email.fr"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="guest-password">Mot de passe *</Label>
+                        <Input
+                          id="guest-password"
+                          type="password"
+                          value={guestPassword}
+                          onChange={(e) => setGuestPassword(e.target.value)}
+                          placeholder="Minimum 6 caractères"
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Shipping Address */}
             <Card>
               <CardHeader>
@@ -346,11 +443,11 @@ export default function Checkout() {
                 <CardTitle>Récapitulatif</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {cartItems.map((item, idx) => {
+                {activeCartItems.map((item, idx) => {
                   const product = products[idx];
                   if (!product) return null;
                   return (
-                    <div key={item.id} className="flex justify-between text-sm">
+                    <div key={item.id || item.product_id} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
                         {product.name} × {item.quantity}
                       </span>
@@ -399,7 +496,7 @@ export default function Checkout() {
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  Paiement sécurisé par Stripe
+                  Validation de paiement par téléphone : +33 6 46 68 36 10
                 </p>
               </CardContent>
             </Card>
