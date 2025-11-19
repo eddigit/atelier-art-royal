@@ -15,6 +15,7 @@ import AdminStock from './AdminStock';
 import AdminReviews from './AdminReviews';
 import AdminHome from './AdminHome';
 import AdminAI from './AdminAI';
+import AdminLeads from './AdminLeads';
 
 export default function AdminPanel() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -62,6 +63,10 @@ export default function AdminPanel() {
           <TabsTrigger value="customers" className="flex flex-col gap-1 py-3">
             <Users className="w-5 h-5" />
             <span className="text-xs">Clients</span>
+          </TabsTrigger>
+          <TabsTrigger value="leads" className="flex flex-col gap-1 py-3">
+            <Users className="w-5 h-5" />
+            <span className="text-xs">Leads</span>
           </TabsTrigger>
           <TabsTrigger value="production" className="flex flex-col gap-1 py-3">
             <Factory className="w-5 h-5" />
@@ -111,6 +116,10 @@ export default function AdminPanel() {
 
         <TabsContent value="customers" className="space-y-4">
           <AdminCustomers />
+        </TabsContent>
+
+        <TabsContent value="leads" className="space-y-4">
+          <AdminLeads />
         </TabsContent>
 
         <TabsContent value="production" className="space-y-4">
