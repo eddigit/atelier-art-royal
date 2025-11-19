@@ -107,7 +107,20 @@ export default function Filters({ filters, onFilterChange, onReset }) {
               Nouveautés (30 jours)
             </label>
           </div>
-        </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="stock" 
+              checked={filters.inStockOnly || false}
+              onCheckedChange={(checked) => handleChange('inStockOnly', checked)}
+            />
+            <label
+              htmlFor="stock"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            >
+              En stock uniquement
+            </label>
+          </div>
+          </div>
 
         {/* Rite */}
         <div className="space-y-2">

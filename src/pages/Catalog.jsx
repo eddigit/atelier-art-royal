@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Filters from '@/components/catalog/Filters';
 import Breadcrumb from '@/components/catalog/Breadcrumb';
+import AdvancedSearchBar from '@/components/catalog/AdvancedSearchBar';
 import ProductCard from '@/components/catalog/ProductCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,7 +23,8 @@ export default function Catalog() {
     color: 'all',
     material: 'all',
     showPromotions: false,
-    showNew: false
+    showNew: false,
+    inStockOnly: false
   });
   const [sortBy, setSortBy] = useState('-created_date');
 
@@ -56,7 +58,8 @@ export default function Catalog() {
     const maxPriceParam = urlParams.get('maxPrice');
     const showPromotionsParam = urlParams.get('showPromotions');
     const showNewParam = urlParams.get('showNew');
-    
+    const inStockOnlyParam = urlParams.get('inStockOnly');
+
     setFilters(prev => ({
       ...prev,
       ...(riteParam && { rite: riteParam }),
@@ -68,7 +71,8 @@ export default function Catalog() {
       ...(minPriceParam && { minPrice: minPriceParam }),
       ...(maxPriceParam && { maxPrice: maxPriceParam }),
       ...(showPromotionsParam && { showPromotions: showPromotionsParam === 'true' }),
-      ...(showNewParam && { showNew: showNewParam === 'true' })
+      ...(showNewParam && { showNew: showNewParam === 'true' }),
+      ...(inStockOnlyParam && { inStockOnly: inStockOnlyParam === 'true' })
     }));
   }, []);
 
@@ -77,14 +81,22 @@ export default function Catalog() {
     queryFn: async () => {
       let allProducts = await base44.entities.Product.filter({ is_active: true }, sortBy, 500);
       
-      // Filter out products that are out of stock and don't allow backorders
-      allProducts = allProducts.filter(product => {
-        const stock = product.stock_quantity || 0;
-        if (stock === 0 && !product.allow_backorders) {
-          return false;
-        }
-        return true;
-      });
+      // Filter by stock availability if requested
+      if (filters.inStockOnly) {
+        allProducts = allProducts.filter(product => {
+          const stock = product.stock_quantity || 0;
+          return stock > 0;
+        });
+      } else {
+        // Filter out products that are out of stock and don't allow backorders
+        allProducts = allProducts.filter(product => {
+          const stock = product.stock_quantity || 0;
+          if (stock === 0 && !product.allow_backorders) {
+            return false;
+          }
+          return true;
+        });
+      }
       
       // Apply filters
       return allProducts.filter(product => {
@@ -159,7 +171,8 @@ export default function Catalog() {
       color: 'all',
       material: 'all',
       showPromotions: false,
-      showNew: false
+      showNew: false,
+      inStockOnly: false
     });
   };
 
@@ -167,7 +180,7 @@ export default function Catalog() {
     <div className="container mx-auto px-4 py-12">
       <Breadcrumb filters={filters} />
       
-      <div className="mb-12">
+      <div className="mb-8">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           Notre <span className="text-primary">Catalogue</span>
         </h1>
@@ -175,6 +188,12 @@ export default function Catalog() {
           Découvrez l'excellence de nos créations maçonniques
         </p>
       </div>
+
+      <AdvancedSearchBar 
+        filters={filters} 
+        onFilterChange={handleFilterChange}
+        onReset={handleResetFilters}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Filters Sidebar */}
