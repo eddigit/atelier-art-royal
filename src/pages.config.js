@@ -14,6 +14,7 @@ import AdminCustomers from './pages/AdminCustomers';
 import AdminProduction from './pages/AdminProduction';
 import AdminRites from './pages/AdminRites';
 import AdminStock from './pages/AdminStock';
+import Contact from './pages/Contact';
 import __Layout from './Layout.jsx';
 
 
@@ -34,6 +35,7 @@ export const PAGES = {
     "AdminProduction": AdminProduction,
     "AdminRites": AdminRites,
     "AdminStock": AdminStock,
+    "Contact": Contact,
 }
 
 export const pagesConfig = {
