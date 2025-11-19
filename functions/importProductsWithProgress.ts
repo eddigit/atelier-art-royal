@@ -163,6 +163,8 @@ Deno.serve(async (req) => {
             const priceStr = getColumn('price');
             const sku = getColumn('sku');
             const imagesStr = getColumn('images');
+            const stockStatus = getColumn('stock_status');
+            const stockQuantityStr = getColumn('stock_quantity');
 
             if (!name || name.length === 0) {
               results.skipped++;
@@ -240,6 +242,9 @@ Deno.serve(async (req) => {
               if (matchedGrade) grade_id = matchedGrade.id;
             }
 
+            // Parse stock quantity
+            const stockQuantity = stockQuantityStr ? parseInt(stockQuantityStr) : (stockStatus === 'instock' || stockStatus === '1' ? 999 : 0);
+            
             const productData = {
               name,
               price,
@@ -250,11 +255,22 @@ Deno.serve(async (req) => {
               images: uploadedImages.length > 0 ? uploadedImages : undefined,
               tags: tags.length > 0 ? tags : undefined,
               sizes: sizes.length > 0 ? sizes : undefined,
-              stock_quantity: parseInt(getColumn('stock_quantity')) || 0,
+              stock_quantity: stockQuantity,
+              low_stock_threshold: parseInt(getColumn('low_stock_threshold')) || undefined,
               short_description: getColumn('short_description') || undefined,
               description: getColumn('description') || undefined,
               is_active: getColumn('is_active') === '1' || getColumn('is_active') === 'true',
-              featured: getColumn('featured') === '1' || getColumn('featured') === 'true'
+              featured: getColumn('featured') === '1' || getColumn('featured') === 'true',
+              allow_backorders: getColumn('allow_backorders') === '1' || getColumn('allow_backorders') === 'yes',
+              sold_individually: getColumn('sold_individually') === '1' || getColumn('sold_individually') === 'yes',
+              weight: parseFloat(getColumn('weight')) || undefined,
+              length: parseFloat(getColumn('length')) || undefined,
+              width: parseFloat(getColumn('width')) || undefined,
+              height: parseFloat(getColumn('height')) || undefined,
+              tax_status: getColumn('tax_status') || undefined,
+              tax_class: getColumn('tax_class') || undefined,
+              shipping_class: getColumn('shipping_class') || undefined,
+              enable_reviews: getColumn('enable_reviews') !== '0' && getColumn('enable_reviews') !== 'no'
             };
 
             // Check if product exists

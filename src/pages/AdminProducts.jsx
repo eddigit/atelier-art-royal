@@ -305,15 +305,17 @@ export default function AdminProducts() {
                         <p>⏭️ {importResults.skipped} produits ignorés</p>
                       )}
                       {importResults.errors && importResults.errors.length > 0 && (
-                        <details className="mt-2">
-                          <summary className="cursor-pointer font-medium text-red-400">
-                            ❌ {importResults.errors.length} erreur(s)
+                        <details className="mt-2" open>
+                          <summary className="cursor-pointer font-medium text-red-400 mb-2">
+                            ❌ {importResults.errors.length} erreur(s) détectée(s)
                           </summary>
-                          <ul className="mt-2 ml-4 space-y-1">
-                            {importResults.errors.slice(0, 10).map((err, i) => (
-                              <li key={i} className="text-xs">{err}</li>
+                          <div className="mt-2 ml-4 space-y-1 max-h-64 overflow-y-auto bg-red-950/30 p-3 rounded border border-red-600/30">
+                            {importResults.errors.map((err, i) => (
+                              <div key={i} className="text-xs font-mono border-b border-red-600/20 pb-1">
+                                {err}
+                              </div>
                             ))}
-                          </ul>
+                          </div>
                         </details>
                       )}
                     </div>
