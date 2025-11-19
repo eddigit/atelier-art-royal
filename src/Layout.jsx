@@ -95,7 +95,7 @@ export default function Layout({ children, currentPageName }) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs sm:text-sm">
             <a href="tel:+33646683610" className="flex items-center gap-2 hover:text-primary transition-colors">
               <span className="font-semibold">Service commercial & Support :</span>
-              <span className="text-[#D8AB4C]">+33 6 46 68 36 10</span>
+              <span>+33 6 46 68 36 10</span>
             </a>
             <span className="hidden sm:inline text-muted-foreground">•</span>
             <a href="mailto:contact@artroyal.fr" className="hover:text-primary transition-colors">
@@ -222,7 +222,7 @@ export default function Layout({ children, currentPageName }) {
               {/* Cart */}
               {!isAdminPage &&
               <Link to={createPageUrl('Cart')}>
-                  <Button variant="ghost" size="icon" className="rounded-full relative">
+                  <Button variant="ghost" size="icon" className="text-[#D8AB4C] text-sm font-medium rounded-full inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 w-9 relative">
                     <ShoppingCart className="w-5 h-5" />
                     {cartCount > 0 &&
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-bold">
@@ -237,8 +237,16 @@ export default function Layout({ children, currentPageName }) {
               {user ?
               <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full">
-                      <User className="w-5 h-5" />
+                    <Button variant="ghost" size="icon" className="rounded-full p-0 h-10 w-10">
+                      {user.avatar_url ?
+                    <img
+                      src={user.avatar_url}
+                      alt={user.full_name}
+                      className="w-10 h-10 rounded-full object-cover border-2 border-primary/20" /> :
+
+
+                    <User className="w-5 h-5" />
+                    }
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
