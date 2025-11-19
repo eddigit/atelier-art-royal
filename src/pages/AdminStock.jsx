@@ -14,7 +14,9 @@ import {
   Square,
   AlertTriangle,
   CheckCircle2,
-  XCircle
+  XCircle,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react';
 import {
   Dialog,
@@ -41,6 +43,7 @@ export default function AdminStock() {
   const [bulkStock, setBulkStock] = useState('');
   const [bulkStockBehavior, setBulkStockBehavior] = useState('');
   const [bulkIsActive, setBulkIsActive] = useState('');
+  const [stockManagementEnabled, setStockManagementEnabled] = useState(true);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -157,16 +160,30 @@ export default function AdminStock() {
             {products.length} produit{products.length > 1 ? 's' : ''} au catalogue
           </p>
         </div>
-        {selectedProducts.length > 0 && (
-          <Button onClick={() => setShowBulkDialog(true)}>
-            <CheckSquare className="w-4 h-4 mr-2" />
-            Mettre à jour ({selectedProducts.length})
+        <div className="flex items-center gap-3">
+          <Button
+            variant={stockManagementEnabled ? "default" : "outline"}
+            onClick={() => setStockManagementEnabled(!stockManagementEnabled)}
+          >
+            {stockManagementEnabled ? (
+              <ToggleRight className="w-4 h-4 mr-2" />
+            ) : (
+              <ToggleLeft className="w-4 h-4 mr-2" />
+            )}
+            Gestion Stock {stockManagementEnabled ? 'ON' : 'OFF'}
           </Button>
-        )}
+          {selectedProducts.length > 0 && (
+            <Button onClick={() => setShowBulkDialog(true)}>
+              <CheckSquare className="w-4 h-4 mr-2" />
+              Mettre à jour ({selectedProducts.length})
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {stockManagementEnabled && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
@@ -210,7 +227,8 @@ export default function AdminStock() {
             <p className="text-sm text-muted-foreground">Rupture</p>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
@@ -282,12 +300,12 @@ export default function AdminStock() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold">{product.name}</h3>
-                        {isOutOfStock && (
+                        {stockManagementEnabled && isOutOfStock && (
                           <Badge variant="outline" className="bg-red-600/20 text-red-400 border-red-600/30">
                             Rupture
                           </Badge>
                         )}
-                        {isLowStock && (
+                        {stockManagementEnabled && isLowStock && (
                           <Badge variant="outline" className="bg-yellow-600/20 text-yellow-400 border-yellow-600/30">
                             Stock Faible
                           </Badge>
@@ -300,7 +318,7 @@ export default function AdminStock() {
                         <span>SKU: {product.sku || '-'}</span>
                         <span>•</span>
                         <span>Prix: {product.price}€</span>
-                        {!product.allow_backorders && stock === 0 && (
+                        {stockManagementEnabled && !product.allow_backorders && stock === 0 && (
                           <>
                             <span>•</span>
                             <span className="text-red-400">Vente bloquée</span>
