@@ -237,8 +237,16 @@ export default function Layout({ children, currentPageName }) {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full">
-                      <User className="w-5 h-5" />
+                    <Button variant="ghost" size="icon" className="rounded-full p-0 h-10 w-10">
+                      {user.avatar_url ? (
+                        <img 
+                          src={user.avatar_url} 
+                          alt={user.full_name}
+                          className="w-10 h-10 rounded-full object-cover border-2 border-primary/20"
+                        />
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
