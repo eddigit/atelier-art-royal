@@ -46,7 +46,22 @@ export default function Catalog() {
         if (filters.rite && product.rite_id !== filters.rite) return false;
         if (filters.grade && product.grade_id !== filters.grade) return false;
         if (filters.category && product.category_id !== filters.category) return false;
-        if (filters.search && !product.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
+        
+        // Enhanced search
+        if (filters.search) {
+          const searchTerm = filters.search.toLowerCase();
+          const searchableText = [
+            product.name,
+            product.description,
+            product.short_description,
+            ...(product.materials || []),
+            ...(product.colors || []),
+            ...(product.tags || [])
+          ].filter(Boolean).join(' ').toLowerCase();
+          
+          if (!searchableText.includes(searchTerm)) return false;
+        }
+        
         if (filters.minPrice && product.price < parseFloat(filters.minPrice)) return false;
         if (filters.maxPrice && product.price > parseFloat(filters.maxPrice)) return false;
         if (filters.size !== 'all' && (!product.sizes || !product.sizes.includes(filters.size))) return false;

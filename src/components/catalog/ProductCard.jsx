@@ -6,13 +6,29 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Star, Eye } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import QuickViewModal from './QuickViewModal';
 
 export default function ProductCard({ product }) {
   const [showQuickView, setShowQuickView] = useState(false);
   const queryClient = useQueryClient();
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['reviews-count', product.id],
+    queryFn: async () => {
+      const productReviews = await base44.entities.ProductReview.filter({
+        product_id: product.id,
+        is_approved: true
+      });
+      return productReviews;
+    },
+    initialData: []
+  });
+
+  const averageRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : 0;
   const primaryImage = product.images?.[0] || 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=2105';
   
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
@@ -106,6 +122,16 @@ export default function ProductCard({ product }) {
           </h3>
         </Link>
         
+        {reviews.length > 0 && (
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 fill-primary text-primary" />
+              <span className="text-sm font-semibold">{averageRating}</span>
+            </div>
+            <span className="text-xs text-muted-foreground">({reviews.length})</span>
+          </div>
+        )}
+
         {product.short_description && (
           <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
             {product.short_description}
