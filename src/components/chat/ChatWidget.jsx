@@ -74,10 +74,10 @@ export default function ChatWidget() {
           className="fixed bottom-6 right-6 z-50">
 
             <Button
-            onClick={() => setIsOpen(true)}
-            size="lg" className="bg-[#D8AB4C] text-primary-foreground px-8 text-sm font-medium rounded-full inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-primary/90 h-14 w-14 shadow-2xl hover:shadow-primary/50 transition-all duration-300 hover:scale-110">
-
-
+              onClick={() => setIsOpen(true)}
+              size="lg"
+              className="h-14 w-14 rounded-full shadow-2xl bg-primary hover:bg-primary/90 hover:shadow-primary/50 transition-all duration-300 hover:scale-110"
+            >
               <MessageCircle className="w-6 h-6" />
             </Button>
             <motion.div
@@ -100,22 +100,22 @@ export default function ChatWidget() {
 
             <Card className="shadow-2xl border-primary/20 overflow-hidden">
               {/* Header */}
-              <div className="bg-[#D8AB4C] p-4 flex items-center justify-between">
+              <div className="bg-primary p-4 flex items-center justify-between text-primary-foreground">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">Assistant Art Royal</h3>
-                    <p className="text-xs text-white/80">En ligne</p>
+                    <h3 className="font-semibold text-primary-foreground">Assistant Art Royal</h3>
+                    <p className="text-xs text-primary-foreground/80">En ligne</p>
                   </div>
                 </div>
                 <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsOpen(false)}
-                className="text-white hover:bg-white/20">
-
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsOpen(false)}
+                  className="text-primary-foreground hover:bg-primary-foreground/20"
+                >
                   <X className="w-5 h-5" />
                 </Button>
               </div>

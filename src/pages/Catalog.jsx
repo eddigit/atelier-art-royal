@@ -125,7 +125,7 @@ export default function Catalog() {
     <div className="container mx-auto px-4 py-12">
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Notre <span className="text-gradient">Catalogue</span>
+          Notre <span className="text-primary">Catalogue</span>
         </h1>
         <p className="text-muted-foreground text-lg">
           Découvrez l'excellence de nos créations maçonniques
