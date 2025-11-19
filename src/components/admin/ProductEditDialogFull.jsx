@@ -43,9 +43,15 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
     initialData: []
   });
 
-  const { data: grades = [] } = useQuery({
-    queryKey: ['grades'],
-    queryFn: () => base44.entities.Grade.list('level', 200),
+  const { data: obediences = [] } = useQuery({
+    queryKey: ['obediences'],
+    queryFn: () => base44.entities.Obedience.list('order', 100),
+    initialData: []
+  });
+
+  const { data: degreeOrders = [] } = useQuery({
+    queryKey: ['degreeOrders'],
+    queryFn: () => base44.entities.DegreeOrder.list('level', 200),
     initialData: []
   });
 
@@ -105,7 +111,7 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.price || !formData.rite_id || !formData.grade_id) {
+    if (!formData.name || !formData.price || !formData.rite_id || !formData.degree_order_id) {
       toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -204,8 +210,8 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
             </div>
           </div>
 
-          {/* Rite, Grade, Category */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Rite, Obedience, Degree & Order, Category */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Rite *</label>
               <Select 
@@ -226,18 +232,45 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
             </div>
 
             <div>
-              <label className="text-sm font-medium">Grade *</label>
+              <label className="text-sm font-medium">Obédience</label>
               <Select 
-                value={formData.grade_id || ''} 
-                onValueChange={(v) => setFormData({ ...formData, grade_id: v })}
+                value={formData.obedience_id || ''} 
+                onValueChange={(v) => setFormData({ ...formData, obedience_id: v })}
               >
                 <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Sélectionner un grade" />
+                  <SelectValue placeholder="Sélectionner une obédience" />
                 </SelectTrigger>
                 <SelectContent>
-                  {grades.map(grade => (
-                    <SelectItem key={grade.id} value={grade.id}>
-                      {grade.name}
+                  <SelectItem value={null}>Aucune obédience</SelectItem>
+                  {obediences.map(obedience => (
+                    <SelectItem key={obedience.id} value={obedience.id}>
+                      {obedience.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Degré & Ordre *</label>
+              <Select 
+                value={formData.degree_order_id || ''} 
+                onValueChange={(v) => setFormData({ ...formData, degree_order_id: v })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Sélectionner un degré" />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  <div className="px-2 py-1.5 text-xs font-semibold text-primary">Loge Symbolique</div>
+                  {degreeOrders.filter(d => d.loge_type === 'Loge Symbolique').map(degree => (
+                    <SelectItem key={degree.id} value={degree.id}>
+                      {degree.name}
+                    </SelectItem>
+                  ))}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-primary mt-2">Loge Hauts Grades</div>
+                  {degreeOrders.filter(d => d.loge_type === 'Loge Hauts Grades').map(degree => (
+                    <SelectItem key={degree.id} value={degree.id}>
+                      {degree.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

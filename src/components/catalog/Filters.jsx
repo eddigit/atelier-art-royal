@@ -26,13 +26,15 @@ export default function Filters({ filters, onFilterChange, onReset }) {
     initialData: []
   });
 
-  const { data: grades = [] } = useQuery({
-    queryKey: ['grades', filters.rite],
-    queryFn: async () => {
-      if (!filters.rite) return [];
-      return await base44.entities.Grade.filter({ rite_id: filters.rite }, 'level', 50);
-    },
-    enabled: !!filters.rite,
+  const { data: obediences = [] } = useQuery({
+    queryKey: ['obediences'],
+    queryFn: () => base44.entities.Obedience.list('order', 100),
+    initialData: []
+  });
+
+  const { data: degreeOrders = [] } = useQuery({
+    queryKey: ['degreeOrders'],
+    queryFn: () => base44.entities.DegreeOrder.list('level', 200),
     initialData: []
   });
 
@@ -55,7 +57,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
             <Filter className="w-4 h-4 text-primary" />
             Filtres
           </CardTitle>
-          {(filters.rite || filters.grade || filters.category || filters.search || filters.minPrice || filters.maxPrice || filters.showPromotions || filters.showNew) && (
+          {(filters.rite || filters.obedience || filters.degreeOrder || filters.logeType || filters.category || filters.search || filters.minPrice || filters.maxPrice || filters.showPromotions || filters.showNew) && (
             <Button variant="ghost" size="sm" onClick={onReset} className="h-8 px-2">
               <X className="w-4 h-4 mr-1" />
               Réinitialiser
@@ -125,25 +127,75 @@ export default function Filters({ filters, onFilterChange, onReset }) {
           </Select>
         </div>
 
-        {/* Grade */}
-        {filters.rite && grades.length > 0 && (
-          <div className="space-y-2">
-            <Label>Grade</Label>
-            <Select value={filters.grade || 'all'} onValueChange={(v) => handleChange('grade', v === 'all' ? '' : v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Tous les Grades" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les Grades</SelectItem>
-                {grades.map((grade) => (
-                  <SelectItem key={grade.id} value={grade.id}>
-                    {grade.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        {/* Obedience */}
+        <div className="space-y-2">
+          <Label>Obédience</Label>
+          <Select value={filters.obedience || 'all'} onValueChange={(v) => handleChange('obedience', v === 'all' ? '' : v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Toutes les Obédiences" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les Obédiences</SelectItem>
+              {obediences.map((obedience) => (
+                <SelectItem key={obedience.id} value={obedience.id}>
+                  {obedience.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Type de Loge */}
+        <div className="space-y-2">
+          <Label>Type de Loge</Label>
+          <Select value={filters.logeType || 'all'} onValueChange={(v) => handleChange('logeType', v === 'all' ? '' : v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Tous les types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les types</SelectItem>
+              <SelectItem value="Loge Symbolique">Loge Symbolique</SelectItem>
+              <SelectItem value="Loge Hauts Grades">Loge Hauts Grades</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Degree & Order */}
+        <div className="space-y-2">
+          <Label>Degré & Ordre</Label>
+          <Select value={filters.degreeOrder || 'all'} onValueChange={(v) => handleChange('degreeOrder', v === 'all' ? '' : v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Tous les degrés" />
+            </SelectTrigger>
+            <SelectContent className="max-h-80">
+              <SelectItem value="all">Tous les degrés</SelectItem>
+              {filters.logeType && filters.logeType !== 'all' ? (
+                degreeOrders
+                  .filter(d => d.loge_type === filters.logeType)
+                  .map((degree) => (
+                    <SelectItem key={degree.id} value={degree.id}>
+                      {degree.name}
+                    </SelectItem>
+                  ))
+              ) : (
+                <>
+                  <div className="px-2 py-1.5 text-xs font-semibold text-primary">Loge Symbolique</div>
+                  {degreeOrders.filter(d => d.loge_type === 'Loge Symbolique').map((degree) => (
+                    <SelectItem key={degree.id} value={degree.id}>
+                      {degree.name}
+                    </SelectItem>
+                  ))}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-primary mt-2">Loge Hauts Grades</div>
+                  {degreeOrders.filter(d => d.loge_hauts_grades === 'Loge Hauts Grades').map((degree) => (
+                    <SelectItem key={degree.id} value={degree.id}>
+                      {degree.name}
+                    </SelectItem>
+                  ))}
+                </>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Category */}
         <div className="space-y-2">
