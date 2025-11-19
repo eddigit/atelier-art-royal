@@ -105,42 +105,42 @@ export default function AdminDashboard() {
       title: 'Gérer les Produits',
       description: 'Ajouter, modifier ou supprimer des produits',
       icon: Package,
-      link: createPageUrl('AdminProducts'),
+      link: createPageUrl('AdminPanel') + '?tab=products',
       color: 'border-blue-200 hover:border-blue-400'
     },
     {
       title: 'Voir les Commandes',
       description: 'Gérer et suivre les commandes clients',
       icon: FileText,
-      link: createPageUrl('AdminOrders'),
+      link: createPageUrl('AdminPanel') + '?tab=orders',
       color: 'border-green-200 hover:border-green-400'
     },
     {
       title: 'Gérer les Clients',
       description: 'Visualiser et gérer les informations clients',
       icon: Users,
-      link: createPageUrl('AdminCustomers'),
+      link: createPageUrl('AdminPanel') + '?tab=customers',
       color: 'border-red-200 hover:border-red-400'
     },
     {
       title: 'Gestion de Production',
       description: 'Suivre et gérer les articles en production',
       icon: TrendingUp,
-      link: createPageUrl('AdminProduction'),
+      link: createPageUrl('AdminPanel') + '?tab=production',
       color: 'border-orange-200 hover:border-orange-400'
     },
     {
       title: 'Gérer les Avis',
       description: 'Modérer et approuver les avis clients',
       icon: Award,
-      link: createPageUrl('AdminReviews'),
+      link: createPageUrl('AdminPanel') + '?tab=reviews',
       color: 'border-yellow-200 hover:border-yellow-400'
     },
     {
-      title: 'Paramètres',
-      description: 'Rites, Grades et Catégories',
+      title: 'Gestion des Stocks',
+      description: 'Gérer les stocks et réapprovisionnements',
       icon: Settings,
-      link: createPageUrl('AdminSettings'),
+      link: createPageUrl('AdminPanel') + '?tab=stock',
       color: 'border-purple-200 hover:border-purple-400'
     }
   ];

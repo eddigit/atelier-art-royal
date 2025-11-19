@@ -274,49 +274,13 @@ export default function Layout({ children, currentPageName }) {
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <Link to={createPageUrl('AdminDashboard')} className="cursor-pointer">
+                          <Link to={createPageUrl('AdminPanel')} className="cursor-pointer">
                             <Settings className="w-4 h-4 mr-2" />
                             Administration
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to={createPageUrl('AdminProducts')} className="cursor-pointer">
-                            <Package className="w-4 h-4 mr-2" />
-                            Gestion Produits
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to={createPageUrl('AdminCustomers')} className="cursor-pointer">
-                            <UserCircle className="w-4 h-4 mr-2" />
-                            Gestion Clients
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to={createPageUrl('AdminProduction')} className="cursor-pointer">
-                            <Package className="w-4 h-4 mr-2" />
-                            Production
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to={createPageUrl('AdminRites')} className="cursor-pointer">
-                            <Award className="w-4 h-4 mr-2" />
-                            Gestion Rites
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to={createPageUrl('AdminStock')} className="cursor-pointer">
-                            <Package className="w-4 h-4 mr-2" />
-                            Stocks
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to={createPageUrl('AdminReviews')} className="cursor-pointer">
-                            <Award className="w-4 h-4 mr-2" />
-                            Avis Clients
-                          </Link>
-                        </DropdownMenuItem>
-                        </>
-                        )}
+                      </>
+                    )}
                         <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => base44.auth.logout()} className="cursor-pointer text-destructive">
                       <LogOut className="w-4 h-4 mr-2" />
@@ -431,7 +395,7 @@ export default function Layout({ children, currentPageName }) {
                   <>
                     <div className="border-t border-border my-2" />
                     <Link 
-                      to={createPageUrl('AdminDashboard')} 
+                      to={createPageUrl('AdminPanel')} 
                       className="text-sm font-medium hover:text-primary transition-colors py-2"
                       onClick={() => setMobileMenuOpen(false)}
                     >
