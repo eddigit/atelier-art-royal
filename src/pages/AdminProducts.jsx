@@ -383,7 +383,7 @@ export default function AdminProducts() {
 
       {/* Edit Dialog */}
       {editingProduct && (
-        <ProductEditDialog
+        <ProductEditDialogFull
           product={editingProduct}
           open={!!editingProduct}
           onClose={() => setEditingProduct(null)}
