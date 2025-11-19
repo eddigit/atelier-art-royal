@@ -18,6 +18,7 @@ import Contact from './pages/Contact';
 import AdminReviews from './pages/AdminReviews';
 import Sitemap from './pages/Sitemap';
 import AdminPanel from './pages/AdminPanel';
+import Setup from './pages/Setup';
 import __Layout from './Layout.jsx';
 
 
@@ -42,6 +43,7 @@ export const PAGES = {
     "AdminReviews": AdminReviews,
     "Sitemap": Sitemap,
     "AdminPanel": AdminPanel,
+    "Setup": Setup,
 }
 
 export const pagesConfig = {
