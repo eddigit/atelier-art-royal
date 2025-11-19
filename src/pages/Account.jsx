@@ -6,7 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { User, Mail, Calendar, Save, Camera, Loader2 } from 'lucide-react';
+import { User, Mail, Calendar, Save, Camera, Loader2, Award } from 'lucide-react';
+import LoyaltyCard from '@/components/loyalty/LoyaltyCard';
+import PointsHistory from '@/components/loyalty/PointsHistory';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -36,6 +38,17 @@ export default function Account() {
     },
     enabled: !!user,
     initialData: []
+  });
+
+  const { data: loyaltyData } = useQuery({
+    queryKey: ['loyalty', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const loyalty = await base44.entities.LoyaltyPoints.filter({ user_id: user.id });
+      return loyalty[0] || null;
+    },
+    enabled: !!user,
+    initialData: null
   });
 
   const updateProfileMutation = useMutation({
@@ -216,6 +229,10 @@ export default function Account() {
 
         {/* Stats & Orders */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Loyalty Program */}
+          {loyaltyData && (
+            <LoyaltyCard loyaltyData={loyaltyData} />
+          )}
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
@@ -281,6 +298,11 @@ export default function Account() {
               )}
             </CardContent>
           </Card>
+
+          {/* Points History */}
+          {loyaltyData?.points_history && loyaltyData.points_history.length > 0 && (
+            <PointsHistory pointsHistory={loyaltyData.points_history} />
+          )}
         </div>
       </div>
     </div>
