@@ -29,6 +29,16 @@ export default function AdminRites() {
     initialData: []
   });
 
+  const { data: products = [] } = useQuery({
+    queryKey: ['admin-products-count'],
+    queryFn: () => base44.entities.Product.list('-created_date', 1000),
+    initialData: []
+  });
+
+  const getProductCount = (riteId) => {
+    return products.filter(p => p.rite_id === riteId).length;
+  };
+
   if (!user || user.role !== 'admin') {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
@@ -91,19 +101,23 @@ export default function AdminRites() {
                         {rite.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-3">
                       <Badge variant="outline">
                         Ordre: {rite.order || 0}
                       </Badge>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedRite(rite)}
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Modifier
-                      </Button>
+                      <Badge className="bg-primary/20 text-primary">
+                        {getProductCount(rite.id)} produit{getProductCount(rite.id) !== 1 ? 's' : ''}
+                      </Badge>
                     </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setSelectedRite(rite)}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Modifier
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
