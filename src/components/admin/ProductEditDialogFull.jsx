@@ -9,6 +9,7 @@ import { X, Upload, Loader2, Plus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import ProductAIAssistant from './ProductAIAssistant';
 import {
   Select,
   SelectContent,
@@ -138,6 +139,12 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* AI Assistant */}
+          <ProductAIAssistant 
+            product={formData}
+            onApply={(aiData) => setFormData({ ...formData, ...aiData })}
+          />
+
           {/* Images */}
           <div>
             <label className="text-sm font-medium">Images du produit</label>
