@@ -53,11 +53,17 @@ export default function AdvancedSearchBar({ filters, onFilterChange, onReset }) 
     initialData: []
   });
 
-  // Filter only options with available products
+  // Filter only options with available products and deduplicate by name
   const rites = allRites.filter(r => products.some(p => p.rite_id === r.id));
   const obediences = allObediences.filter(o => products.some(p => p.obedience_id === o.id));
-  const degreeOrders = allDegreeOrders.filter(d => products.some(p => p.degree_order_id === d.id));
-  const categories = allCategories.filter(c => products.some(p => p.category_id === c.id));
+  const degreeOrdersFiltered = allDegreeOrders.filter(d => products.some(p => p.degree_order_id === d.id));
+  const degreeOrders = degreeOrdersFiltered.filter((deg, index, self) => 
+    index === self.findIndex(d => d.name === deg.name)
+  );
+  const categoriesFiltered = allCategories.filter(c => products.some(p => p.category_id === c.id));
+  const categories = categoriesFiltered.filter((cat, index, self) => 
+    index === self.findIndex(c => c.name === cat.name)
+  );
 
   const handleChange = (key, value) => {
     onFilterChange({ [key]: value });
