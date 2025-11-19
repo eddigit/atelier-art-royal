@@ -67,7 +67,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
         <div className="space-y-2">
           <Label>Recherche</Label>
           <Input
-            placeholder="Nom du produit..."
+            placeholder="Nom, description, matière, couleur..."
             value={filters.search || ''}
             onChange={(e) => handleChange('search', e.target.value)}
             className="w-full"

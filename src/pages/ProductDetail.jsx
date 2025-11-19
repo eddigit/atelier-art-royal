@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import ProductCard from '@/components/catalog/ProductCard';
+import ProductReviews from '@/components/catalog/ProductReviews';
 
 export default function ProductDetail() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -258,6 +259,11 @@ export default function ProductDetail() {
             </Card>
           )}
         </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mb-20">
+        <ProductReviews productId={productId} />
       </div>
 
       {/* Related Products */}

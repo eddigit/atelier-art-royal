@@ -309,6 +309,12 @@ export default function Layout({ children, currentPageName }) {
                             Stocks
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('AdminReviews')} className="cursor-pointer">
+                            <Award className="w-4 h-4 mr-2" />
+                            Avis Clients
+                          </Link>
+                        </DropdownMenuItem>
                         </>
                         )}
                         <DropdownMenuSeparator />
@@ -471,6 +477,7 @@ export default function Layout({ children, currentPageName }) {
                 <li><Link to={createPageUrl('Catalog')} className="text-muted-foreground hover:text-primary">Catalogue</Link></li>
                 <li><Link to={createPageUrl('Orders')} className="text-muted-foreground hover:text-primary">Commandes</Link></li>
                 <li><Link to={createPageUrl('Account')} className="text-muted-foreground hover:text-primary">Mon Compte</Link></li>
+                <li><Link to={createPageUrl('Contact')} className="text-muted-foreground hover:text-primary">Contact</Link></li>
               </ul>
             </div>
 
