@@ -13,7 +13,8 @@ import {
   Settings,
   FileText,
   DollarSign,
-  AlertCircle
+  AlertCircle,
+  Award
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -115,6 +116,27 @@ export default function AdminDashboard() {
       color: 'border-green-200 hover:border-green-400'
     },
     {
+      title: 'Gérer les Clients',
+      description: 'Visualiser et gérer les informations clients',
+      icon: Users,
+      link: createPageUrl('AdminCustomers'),
+      color: 'border-red-200 hover:border-red-400'
+    },
+    {
+      title: 'Gestion de Production',
+      description: 'Suivre et gérer les articles en production',
+      icon: TrendingUp,
+      link: createPageUrl('AdminProduction'),
+      color: 'border-orange-200 hover:border-orange-400'
+    },
+    {
+      title: 'Gérer les Avis',
+      description: 'Modérer et approuver les avis clients',
+      icon: Award,
+      link: createPageUrl('AdminReviews'),
+      color: 'border-yellow-200 hover:border-yellow-400'
+    },
+    {
       title: 'Paramètres',
       description: 'Rites, Grades et Catégories',
       icon: Settings,
@@ -194,7 +216,7 @@ export default function AdminDashboard() {
       {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-6">Actions Rapides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {quickActions.map((action, idx) => {
             const Icon = action.icon;
             return (

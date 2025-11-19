@@ -13,10 +13,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Package, Search, Eye, Truck } from 'lucide-react';
+import { Package, Search, Eye, Truck, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 const statusConfig = {
   pending: { label: 'Commande reçue', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
@@ -55,6 +57,18 @@ export default function AdminOrders() {
     initialData: []
   });
 
+  const { data: customers = [] } = useQuery({
+    queryKey: ['admin-customers-all'],
+    queryFn: () => base44.entities.User.list(),
+    initialData: []
+  });
+
+  const { data: productionItems = [] } = useQuery({
+    queryKey: ['admin-production-all'],
+    queryFn: () => base44.entities.ProductionItem.list(),
+    initialData: []
+  });
+
   const updateOrderMutation = useMutation({
     mutationFn: ({ orderId, data }) => base44.entities.Order.update(orderId, data),
     onSuccess: () => {
@@ -63,6 +77,11 @@ export default function AdminOrders() {
       setSelectedOrder(null);
     }
   });
+
+  const getCustomerFullName = (customerId) => {
+    const customer = customers.find(c => c.id === customerId);
+    return customer ? customer.full_name : 'Client Invité';
+  };
 
   const totalRevenue = orders
     .filter(o => o.payment_status === 'paid')
@@ -169,7 +188,16 @@ export default function AdminOrders() {
                     <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                       <p>Date: {format(new Date(order.created_date), 'dd/MM/yyyy', { locale: fr })}</p>
                       <p>Articles: {order.items?.length || 0}</p>
-                      <p>Client: {order.shipping_address?.name}</p>
+                      <p>
+                        Client:{' '}
+                        {order.customer_id && !order.customer_id.startsWith('guest_') ? (
+                          <Link to={createPageUrl('AdminCustomers') + `?customer_id=${order.customer_id}`} className="text-primary hover:underline">
+                            {getCustomerFullName(order.customer_id)}
+                          </Link>
+                        ) : (
+                          <span>{order.shipping_address?.name || 'Client Invité'}</span>
+                        )}
+                      </p>
                       <p className="font-bold text-primary">Total: {order.total?.toFixed(2)}€</p>
                     </div>
                   </div>
@@ -202,6 +230,30 @@ export default function AdminOrders() {
               <DialogTitle>Commande {selectedOrder.order_number}</DialogTitle>
             </DialogHeader>
             <div className="space-y-6">
+              {/* Customer Info */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Informations Client</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-3">
+                    <User className="w-10 h-10 p-2 bg-muted rounded-full" />
+                    <div>
+                      {selectedOrder.customer_id && !selectedOrder.customer_id.startsWith('guest_') ? (
+                        <Link to={createPageUrl('AdminCustomers') + `?customer_id=${selectedOrder.customer_id}`} className="font-semibold text-primary hover:underline">
+                          {getCustomerFullName(selectedOrder.customer_id)}
+                        </Link>
+                      ) : (
+                        <p className="font-semibold">{selectedOrder.shipping_address?.name || 'Client Invité'}</p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        {selectedOrder.shipping_address?.phone}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Status Update */}
               <Card>
                 <CardHeader>
@@ -268,6 +320,23 @@ export default function AdminOrders() {
                   <CardTitle className="text-base">Produits</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {productionItems.filter(p => p.order_id === selectedOrder.id).length > 0 && (
+                    <div className="mb-4 p-3 bg-blue-600/10 border border-blue-600/30 rounded-lg">
+                      <h4 className="font-semibold text-blue-400 mb-2 flex items-center gap-2">
+                        <Package className="w-4 h-4" /> Articles en production
+                      </h4>
+                      <ul className="text-sm space-y-1">
+                        {productionItems.filter(p => p.order_id === selectedOrder.id).map(prod => (
+                          <li key={prod.id} className="flex justify-between items-center">
+                            <span>{prod.product_name} - <span className="capitalize">{prod.status.replace('en_', 'en ').replace('_', ' ')}</span></span>
+                            <Link to={createPageUrl('AdminProduction')} className="text-primary hover:underline text-xs">
+                              Voir détails
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <div className="space-y-3">
                     {selectedOrder.items?.map((item, idx) => (
                       <div key={idx} className="flex justify-between text-sm">
