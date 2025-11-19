@@ -13,19 +13,19 @@ css
     --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 10%;
-    --primary: 40 64% 57%;
+    --primary: 40 73% 61%;
     --primary-foreground: 0 0% 10%;
     --secondary: 30 25% 55%;
     --secondary-foreground: 0 0% 10%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-    --accent: 40 64% 57%;
+    --accent: 40 73% 61%;
     --accent-foreground: 0 0% 10%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 40 64% 57%;
+    --ring: 40 73% 61%;
     --radius: 0.5rem;
   }
 
@@ -36,19 +36,19 @@ css
     --card-foreground: 0 0% 90%;
     --popover: 0 0% 14%;
     --popover-foreground: 0 0% 90%;
-    --primary: 40 64% 57%;
+    --primary: 40 73% 61%;
     --primary-foreground: 0 0% 10%;
     --secondary: 0 0% 25%;
     --secondary-foreground: 0 0% 90%;
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 65%;
-    --accent: 40 64% 57%;
+    --accent: 40 73% 61%;
     --accent-foreground: 0 0% 10%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 25%;
     --input: 0 0% 25%;
-    --ring: 40 64% 57%;
+    --ring: 40 73% 61%;
   }
 }
 
@@ -105,7 +105,7 @@ css
 
 /* Gradient text effect for luxury */
 .text-gradient {
-  background: linear-gradient(135deg, #D8AB4C 0%, #F4D03F 100%);
+  background: linear-gradient(135deg, #e5b350 0%, #F4D03F 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
