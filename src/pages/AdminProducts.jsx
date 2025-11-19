@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Upload, 
   Trash2, 
@@ -15,7 +16,10 @@ import {
   Loader2,
   Eye,
   Edit,
-  Download
+  Download,
+  Grid,
+  List,
+  Search
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -31,6 +35,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import CsvFieldMapper from '@/components/admin/CsvFieldMapper';
+import ProductStatsCards from '@/components/admin/ProductStatsCards';
+import ProductEditDialog from '@/components/admin/ProductEditDialog';
+import ProductListView from '@/components/admin/ProductListView';
+import ProductGridView from '@/components/admin/ProductGridView';
 
 export default function AdminProducts() {
   const queryClient = useQueryClient();
@@ -40,6 +48,10 @@ export default function AdminProducts() {
   const [csvHeaders, setCsvHeaders] = useState(null);
   const [fieldMapping, setFieldMapping] = useState({});
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
+  const [viewMode, setViewMode] = useState('grid');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [activeTab, setActiveTab] = useState('products');
 
 
   const { data: user } = useQuery({
@@ -65,6 +77,19 @@ export default function AdminProducts() {
       setShowDeleteDialog(false);
     }
   });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: (id) => base44.entities.Product.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin-products']);
+      toast.success('Produit supprimé');
+    }
+  });
+
+  const filteredProducts = products.filter(p => 
+    p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.sku?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -144,6 +169,88 @@ export default function AdminProducts() {
           </p>
         </div>
       </div>
+
+      <ProductStatsCards products={products} />
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-6">
+          <TabsTrigger value="products">
+            <Package className="w-4 h-4 mr-2" />
+            Produits
+          </TabsTrigger>
+          <TabsTrigger value="import">
+            <Upload className="w-4 h-4 mr-2" />
+            Importer CSV
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="products">{/* Products List */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher par nom ou SKU..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="icon"
+                onClick={() => setViewMode('list')}
+              >
+                <List className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="icon"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setShowDeleteDialog(true)}
+                disabled={products.length === 0}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Tout supprimer
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-center text-muted-foreground py-8">Chargement...</p>
+          ) : filteredProducts.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              {searchQuery ? 'Aucun produit trouvé' : 'Aucun produit. Importez un fichier CSV pour commencer.'}
+            </p>
+          ) : viewMode === 'list' ? (
+            <ProductListView 
+              products={filteredProducts}
+              onEdit={setEditingProduct}
+              onDelete={(id) => deleteProductMutation.mutate(id)}
+            />
+          ) : (
+            <ProductGridView 
+              products={filteredProducts}
+              onEdit={setEditingProduct}
+              onDelete={(id) => deleteProductMutation.mutate(id)}
+            />
+          )}
+        </CardContent>
+      </Card>
+        </TabsContent>
+
+        <TabsContent value="import">
 
       {/* Import Section */}
       <div className="space-y-6 mb-8">
@@ -271,82 +378,18 @@ export default function AdminProducts() {
         )}
       </div>
 
-      {/* Products List */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Produits existants</CardTitle>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setShowDeleteDialog(true)}
-              disabled={products.length === 0}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Tout supprimer
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p className="text-center text-muted-foreground py-8">Chargement...</p>
-          ) : products.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              Aucun produit. Importez un fichier CSV pour commencer.
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {products.slice(0, 50).map((product) => (
-                <div
-                  key={product.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    {product.images?.[0] && (
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-12 h-12 object-cover rounded"
-                      />
-                    )}
-                    <div>
-                      <p className="font-medium">{product.name}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        {product.sku && <span>SKU: {product.sku}</span>}
-                        <span>•</span>
-                        <span className="font-semibold text-primary">
-                          {product.price?.toFixed(2)}€
-                        </span>
-                        {product.stock_quantity !== undefined && (
-                          <>
-                            <span>•</span>
-                            <span>Stock: {product.stock_quantity}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {!product.is_active && (
-                      <Badge variant="secondary">Inactif</Badge>
-                    )}
-                    <Link to={createPageUrl('ProductDetail') + `?id=${product.id}`}>
-                      <Button variant="ghost" size="icon">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
-              {products.length > 50 && (
-                <p className="text-center text-sm text-muted-foreground pt-4">
-                  ... et {products.length - 50} autres produits
-                </p>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Edit Dialog */}
+      {editingProduct && (
+        <ProductEditDialog
+          product={editingProduct}
+          open={!!editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onSaved={() => queryClient.invalidateQueries(['admin-products'])}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
