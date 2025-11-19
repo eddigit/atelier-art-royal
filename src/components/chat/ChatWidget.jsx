@@ -45,6 +45,17 @@ export default function ChatWidget() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // If a lead was created, notify in chat
+      if (data.lead_created) {
+        const notificationMessage = {
+          role: 'assistant',
+          content: '✅ Votre demande a été enregistrée. Nous vous recontacterons très bientôt !'
+        };
+        setTimeout(() => {
+          setMessages((prev) => [...prev, notificationMessage]);
+        }, 500);
+      }
     } catch (error) {
       setMessages((prev) => [...prev, {
         role: 'assistant',
