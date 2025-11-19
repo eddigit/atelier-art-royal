@@ -13,23 +13,33 @@ Deno.serve(async (req) => {
     // Fetch products with stock information
     const products = await base44.asServiceRole.entities.Product.filter({ is_active: true }, '-created_date', 200);
     
-    // Fetch rites, grades, categories
+    // Fetch rites, obediences, degreeOrders, categories
     const rites = await base44.asServiceRole.entities.Rite.list('order', 50);
-    const grades = await base44.asServiceRole.entities.Grade.list('level', 100);
+    const obediences = await base44.asServiceRole.entities.Obedience.list('order', 100);
+    const degreeOrders = await base44.asServiceRole.entities.DegreeOrder.list('level', 200);
     const categories = await base44.asServiceRole.entities.Category.list('order', 50);
 
     // Build context for AI
-    const productsContext = products.map(p => ({
-      id: p.id,
-      name: p.name,
-      price: p.price,
-      stock: p.stock_quantity || 0,
-      in_stock: (p.stock_quantity > 0) || p.allow_backorders,
-      rite: rites.find(r => r.id === p.rite_id)?.name,
-      grade: grades.find(g => g.id === p.grade_id)?.name,
-      category: categories.find(c => c.id === p.category_id)?.name,
-      description: p.short_description || p.description?.substring(0, 200)
-    }));
+    const productsContext = products.map(p => {
+      const rite = rites.find(r => r.id === p.rite_id);
+      const obedience = obediences.find(o => o.id === p.obedience_id);
+      const degreeOrder = degreeOrders.find(d => d.id === p.degree_order_id);
+      const category = categories.find(c => c.id === p.category_id);
+      
+      return {
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        stock: p.stock_quantity || 0,
+        in_stock: (p.stock_quantity > 0) || p.allow_backorders,
+        rite: rite?.name,
+        obedience: obedience?.name,
+        degree_order: degreeOrder?.name,
+        loge_type: degreeOrder?.loge_type,
+        category: category?.name,
+        description: p.short_description || p.description?.substring(0, 200)
+      };
+    });
 
     // Build system message
     const systemMessage = `Tu es l'assistant virtuel de l'Atelier Art Royal, spécialisé dans la haute couture maçonnique française.
@@ -39,29 +49,46 @@ ${systemInstructions}
 BASE DE CONNAISSANCES:
 ${knowledgeBase}
 
+COMPRENDRE LA HIÉRARCHIE DES PRODUITS:
+La navigation des produits maçonniques suit une hiérarchie précise:
+1. RITE (ex: REAA, RER, GLDF) - Le système rituel pratiqué
+2. OBÉDIENCE (ex: GLNF, GODF, GLAMF) - L'organisation maçonnique (optionnel)
+3. TYPE DE LOGE:
+   - Loge Symbolique: Degrés 1-3 (Apprenti, Compagnon, Maître)
+   - Loge Hauts Grades: Degrés 4+ et Ordres supérieurs
+4. DEGRÉ & ORDRE - Le niveau hiérarchique spécifique
+5. CATÉGORIE - Type de produit (Tablier, Sautoir, Bijou, Gant, Décor)
+
 CATALOGUE DISPONIBLE:
 ${JSON.stringify(productsContext, null, 2)}
 
 RITES DISPONIBLES:
-${rites.map(r => `- ${r.name} (${r.code})`).join('\n')}
+${rites.map(r => `- ${r.name} (${r.code}): ${r.description || ''}`).join('\n')}
 
-GRADES DISPONIBLES:
-${grades.map(g => `- ${g.name} (niveau ${g.level})`).join('\n')}
+OBÉDIENCES DISPONIBLES:
+${obediences.map(o => `- ${o.name} (${o.code}): ${o.description || ''}`).join('\n')}
+
+DEGRÉS & ORDRES DISPONIBLES:
+Loges Symboliques:
+${degreeOrders.filter(d => d.loge_type === 'Loge Symbolique').map(d => `- ${d.name} (niveau ${d.level})`).join('\n')}
+Loges Hauts Grades:
+${degreeOrders.filter(d => d.loge_type === 'Loge Hauts Grades').map(d => `- ${d.name} (niveau ${d.level})`).join('\n')}
 
 CATÉGORIES:
 ${categories.map(c => `- ${c.name}`).join('\n')}
 
-INSTRUCTIONS:
-- Sois professionnel, courtois et précis
-- Utilise les informations du catalogue pour répondre
+INSTRUCTIONS CRITIQUES:
+- TOUJOURS comprendre la hiérarchie: Rite → Obédience → Type de Loge → Degré
+- Quand un utilisateur demande un produit, identifie TOUS les critères pertinents
+- Guide les utilisateurs qui ne connaissent pas tous leurs critères
+- Exemple: "Pour vous aider, pouvez-vous me dire quel rite vous pratiquez? Et quel est votre degré?"
+- Propose des produits uniquement correspondant aux critères de l'utilisateur
 - Indique toujours le stock disponible
 - Si un produit est en rupture mais autorise les pré-commandes, mentionne-le
-- Propose des produits pertinents selon la demande
-- Guide l'utilisateur vers les pages appropriées
 - Utilise un ton élégant et respectueux de la tradition maçonnique
 - Réponds en français
 
-Lorsque tu recommandes un produit, fournis son ID pour créer un lien.`;
+Lorsque tu recommandes un produit, fournis son ID exact pour créer un lien.`;
 
     // Call Groq API
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {

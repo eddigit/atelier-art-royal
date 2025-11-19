@@ -62,9 +62,15 @@ export default function Layout({ children, currentPageName }) {
     initialData: []
   });
 
-  const { data: grades = [] } = useQuery({
-    queryKey: ['grades'],
-    queryFn: () => base44.entities.Grade.list('level', 100),
+  const { data: obediences = [] } = useQuery({
+    queryKey: ['obediences'],
+    queryFn: () => base44.entities.Obedience.list('order', 100),
+    initialData: []
+  });
+
+  const { data: degreeOrders = [] } = useQuery({
+    queryKey: ['degreeOrders'],
+    queryFn: () => base44.entities.DegreeOrder.list('level', 200),
     initialData: []
   });
 
@@ -140,7 +146,7 @@ export default function Layout({ children, currentPageName }) {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
-                        Par Rite
+                        Rites
                         <ChevronDown className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -157,16 +163,41 @@ export default function Layout({ children, currentPageName }) {
                     </DropdownMenuContent>
                   </DropdownMenu>
 
+                  {/* Menu Type de Loge */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
+                        Type de Loge
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-64">
+                      <DropdownMenuLabel>Sélectionner le Type</DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('Catalog') + `?logeType=Loge Symbolique`} className="cursor-pointer">
+                          <Award className="w-4 h-4 mr-2" />
+                          Loge Symbolique (1er - 3ème degré)
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('Catalog') + `?logeType=Loge Hauts Grades`} className="cursor-pointer">
+                          <Award className="w-4 h-4 mr-2" />
+                          Loge Hauts Grades (4ème+ & Ordres)
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
                   {/* Menu Catégories */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
-                        Par Catégorie
+                        Produits
                         <ChevronDown className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56">
-                      <DropdownMenuLabel>Sélectionner une Catégorie</DropdownMenuLabel>
+                      <DropdownMenuLabel>Type de Produit</DropdownMenuLabel>
                       {categories.map(category => (
                         <DropdownMenuItem key={category.id} asChild>
                           <Link to={createPageUrl('Catalog') + `?category=${category.id}`} className="cursor-pointer">
@@ -178,30 +209,9 @@ export default function Layout({ children, currentPageName }) {
                     </DropdownMenuContent>
                   </DropdownMenu>
 
-                  {/* Menu Grades */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
-                        Par Grade
-                        <ChevronDown className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56 max-h-96 overflow-y-auto">
-                      <DropdownMenuLabel>Sélectionner un Grade</DropdownMenuLabel>
-                      {grades.map(grade => (
-                        <DropdownMenuItem key={grade.id} asChild>
-                          <Link to={createPageUrl('Catalog') + `?grade=${grade.id}`} className="cursor-pointer">
-                            <Award className="w-4 h-4 mr-2" />
-                            {grade.name}
-                          </Link>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
                   {/* Lien Catalogue complet */}
                   <Link to={createPageUrl('Catalog')} className="text-sm font-medium hover:text-primary transition-colors">
-                    Catalogue
+                    Catalogue Complet
                   </Link>
                 </>
               )}
@@ -340,7 +350,7 @@ export default function Layout({ children, currentPageName }) {
 
                 {!isAdminPage && (
                   <>
-                    <div className="text-xs text-muted-foreground font-semibold mt-2">Par Rite</div>
+                    <div className="text-xs text-muted-foreground font-semibold mt-2">Rites</div>
                     {rites.map(rite => (
                       <Link 
                         key={rite.id}
@@ -352,7 +362,23 @@ export default function Layout({ children, currentPageName }) {
                       </Link>
                     ))}
 
-                    <div className="text-xs text-muted-foreground font-semibold mt-4">Par Catégorie</div>
+                    <div className="text-xs text-muted-foreground font-semibold mt-4">Type de Loge</div>
+                    <Link 
+                      to={createPageUrl('Catalog') + `?logeType=Loge Symbolique`}
+                      className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Loge Symbolique
+                    </Link>
+                    <Link 
+                      to={createPageUrl('Catalog') + `?logeType=Loge Hauts Grades`}
+                      className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Loge Hauts Grades
+                    </Link>
+
+                    <div className="text-xs text-muted-foreground font-semibold mt-4">Catégories de Produits</div>
                     {categories.map(category => (
                       <Link 
                         key={category.id}
@@ -361,18 +387,6 @@ export default function Layout({ children, currentPageName }) {
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {category.name}
-                      </Link>
-                    ))}
-
-                    <div className="text-xs text-muted-foreground font-semibold mt-4">Par Grade</div>
-                    {grades.slice(0, 10).map(grade => (
-                      <Link 
-                        key={grade.id}
-                        to={createPageUrl('Catalog') + `?grade=${grade.id}`}
-                        className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {grade.name}
                       </Link>
                     ))}
 

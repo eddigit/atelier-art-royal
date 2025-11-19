@@ -24,29 +24,43 @@ export default function HeroSection() {
     try {
       // Utiliser l'IA pour analyser la requête et extraire les critères de recherche
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Tu es un assistant de recherche pour une boutique de produits maçonniques (tabliers, sautoirs, bijoux, décors).
-        
-Analyse cette requête utilisateur et extrais les critères de recherche pertinents :
+        prompt: `Tu es un assistant de recherche expert pour l'Atelier Art Royal, spécialisé dans la haute couture maçonnique.
+
+HIÉRARCHIE DE RECHERCHE:
+1. Rite (REAA, RER, GLDF, etc.)
+2. Obédience (GLNF, GODF, GLAMF, etc.)
+3. Type de Loge (Symbolique ou Hauts Grades)
+4. Degré & Ordre (Apprenti, Compagnon, Maître, 4ème degré, 18ème, 30ème, 33ème, 1er Ordre, etc.)
+5. Catégorie (Tablier, Sautoir, Bijou, Gant, Décor)
+
+Analyse cette requête utilisateur et extrais TOUS les critères pertinents:
 "${searchQuery}"
 
-Retourne un objet JSON avec les champs suivants (uniquement ceux qui sont pertinents) :
-- search: terme de recherche général (string)
-- rite: ID ou nom du rite maçonnique mentionné (REAA, RER, GLDF, etc.) (string)
-- category: catégorie de produit (Tabliers, Sautoirs, Bijoux, Gants, Décors) (string)
-- grade: grade maçonnique mentionné (Apprenti, Compagnon, Maître, etc.) (string)
-- minPrice: prix minimum si mentionné (number)
-- maxPrice: prix maximum si mentionné (number)
-- showPromotions: true si l'utilisateur recherche des promotions/réductions (boolean)
-- showNew: true si l'utilisateur recherche des nouveautés (boolean)
+Retourne un objet JSON avec les champs suivants (uniquement ceux identifiés):
+- search: terme de recherche général si aucun critère spécifique (string)
+- rite: nom du rite si mentionné (string)
+- obedience: nom de l'obédience si mentionnée (string)
+- logeType: "Loge Symbolique" ou "Loge Hauts Grades" si identifiable (string)
+- degreeOrder: nom du degré/ordre si mentionné (string)
+- category: catégorie de produit (string)
+- minPrice: prix minimum (number)
+- maxPrice: prix maximum (number)
+- showPromotions: true si recherche de promotions (boolean)
+- showNew: true si recherche de nouveautés (boolean)
 
-Si aucun critère spécifique n'est identifié, retourne juste { "search": "requête originale" }`,
+EXEMPLES:
+- "tablier REAA maître" → {rite: "REAA", degreeOrder: "Maître", category: "Tablier"}
+- "sautoir 18ème degré" → {degreeOrder: "18ème degré", category: "Sautoir", logeType: "Loge Hauts Grades"}
+- "bijoux apprenti RER" → {rite: "RER", degreeOrder: "Apprenti", category: "Bijoux", logeType: "Loge Symbolique"}`,
         response_json_schema: {
           type: "object",
           properties: {
             search: { type: "string" },
             rite: { type: "string" },
+            obedience: { type: "string" },
+            logeType: { type: "string" },
+            degreeOrder: { type: "string" },
             category: { type: "string" },
-            grade: { type: "string" },
             minPrice: { type: "number" },
             maxPrice: { type: "number" },
             showPromotions: { type: "boolean" },
@@ -128,7 +142,7 @@ Si aucun critère spécifique n'est identifié, retourne juste { "search": "requ
             <Input
               type="text"
               name="search"
-              placeholder="Ex: tablier REAA en promotion, sautoir maître, nouveautés RER..."
+              placeholder="Ex: tablier REAA maître, sautoir 18ème degré GLNF, bijoux apprenti..."
               disabled={isSearching}
               className="h-16 pl-16 pr-32 text-lg bg-black/60 hover:bg-black/80 focus:bg-black/90 text-white placeholder:text-gray-300 border-2 border-white/20 hover:border-primary/50 focus:border-primary transition-all rounded-full backdrop-blur-sm disabled:opacity-70"
             />
