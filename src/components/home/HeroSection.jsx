@@ -140,7 +140,7 @@ Si aucun critère spécifique n'est identifié, retourne juste { "search": "requ
             </div>
           </div>
           <p className="text-sm text-white mt-3 text-center drop-shadow-lg">
-            Recherche intelligente propulsée par Groq AI - Décrivez ce que vous cherchez en langage naturel
+            Décrivez ce que vous cherchez en langage naturel
           </p>
         </form>
 
