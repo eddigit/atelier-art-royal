@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import CsvFieldMapper from '@/components/admin/CsvFieldMapper';
 import ProductStatsCards from '@/components/admin/ProductStatsCards';
-import ProductEditDialog from '@/components/admin/ProductEditDialog';
+import ProductEditDialogFull from '@/components/admin/ProductEditDialogFull';
 import ProductListView from '@/components/admin/ProductListView';
 import ProductGridView from '@/components/admin/ProductGridView';
 

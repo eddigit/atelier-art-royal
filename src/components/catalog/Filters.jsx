@@ -35,6 +35,17 @@ export default function Filters({ filters, onFilterChange, onReset }) {
     initialData: []
   });
 
+  const { data: products = [] } = useQuery({
+    queryKey: ['products-for-filters'],
+    queryFn: () => base44.entities.Product.filter({ is_active: true }, '-created_date', 1000),
+    initialData: []
+  });
+
+  // Extract unique values from products
+  const availableSizes = [...new Set(products.flatMap(p => p.sizes || []))].sort();
+  const availableColors = [...new Set(products.flatMap(p => p.colors || []))].sort();
+  const availableMaterials = [...new Set(products.flatMap(p => p.materials || []))].sort();
+
   return (
     <Card className="glass sticky top-24">
       <CardHeader className="pb-3">
@@ -120,65 +131,64 @@ export default function Filters({ filters, onFilterChange, onReset }) {
         </div>
 
         {/* Size */}
-        <div className="space-y-2">
-          <Label>Taille</Label>
-          <Select value={filters.size || 'all'} onValueChange={(v) => handleChange('size', v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Toutes tailles" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes tailles</SelectItem>
-              <SelectItem value="S">S</SelectItem>
-              <SelectItem value="M">M</SelectItem>
-              <SelectItem value="L">L</SelectItem>
-              <SelectItem value="XL">XL</SelectItem>
-              <SelectItem value="XXL">XXL</SelectItem>
-              <SelectItem value="Unique">Taille unique</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {availableSizes.length > 0 && (
+          <div className="space-y-2">
+            <Label>Taille</Label>
+            <Select value={filters.size || 'all'} onValueChange={(v) => handleChange('size', v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Toutes tailles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes tailles</SelectItem>
+                {availableSizes.map((size) => (
+                  <SelectItem key={size} value={size}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Color */}
-        <div className="space-y-2">
-          <Label>Couleur</Label>
-          <Select value={filters.color || 'all'} onValueChange={(v) => handleChange('color', v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Toutes couleurs" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes couleurs</SelectItem>
-              <SelectItem value="Or">Or</SelectItem>
-              <SelectItem value="Argent">Argent</SelectItem>
-              <SelectItem value="Noir">Noir</SelectItem>
-              <SelectItem value="Blanc">Blanc</SelectItem>
-              <SelectItem value="Rouge">Rouge</SelectItem>
-              <SelectItem value="Bleu">Bleu</SelectItem>
-              <SelectItem value="Vert">Vert</SelectItem>
-              <SelectItem value="Violet">Violet</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {availableColors.length > 0 && (
+          <div className="space-y-2">
+            <Label>Couleur</Label>
+            <Select value={filters.color || 'all'} onValueChange={(v) => handleChange('color', v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Toutes couleurs" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes couleurs</SelectItem>
+                {availableColors.map((color) => (
+                  <SelectItem key={color} value={color}>
+                    {color}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Material */}
-        <div className="space-y-2">
-          <Label>Matière</Label>
-          <Select value={filters.material || 'all'} onValueChange={(v) => handleChange('material', v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Toutes matières" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes matières</SelectItem>
-              <SelectItem value="Soie">Soie</SelectItem>
-              <SelectItem value="Velours">Velours</SelectItem>
-              <SelectItem value="Satin">Satin</SelectItem>
-              <SelectItem value="Coton">Coton</SelectItem>
-              <SelectItem value="Lin">Lin</SelectItem>
-              <SelectItem value="Cuir">Cuir</SelectItem>
-              <SelectItem value="Or massif">Or massif</SelectItem>
-              <SelectItem value="Argent massif">Argent massif</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {availableMaterials.length > 0 && (
+          <div className="space-y-2">
+            <Label>Matière</Label>
+            <Select value={filters.material || 'all'} onValueChange={(v) => handleChange('material', v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Toutes matières" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes matières</SelectItem>
+                {availableMaterials.map((material) => (
+                  <SelectItem key={material} value={material}>
+                    {material}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Price Range */}
         <div className="space-y-2">
