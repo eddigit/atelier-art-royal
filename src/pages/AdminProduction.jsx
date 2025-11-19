@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/select';
 import ProductionDetailDialog from '@/components/admin/ProductionDetailDialog';
 import ProductionStatsCards from '@/components/admin/ProductionStatsCards';
+import ProductionToStockDialog from '@/components/admin/ProductionToStockDialog';
 
 export default function AdminProduction() {
   const queryClient = useQueryClient();
@@ -33,6 +34,7 @@ export default function AdminProduction() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedProduction, setSelectedProduction] = useState(null);
   const [showNewDialog, setShowNewDialog] = useState(false);
+  const [stockProduction, setStockProduction] = useState(null);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -219,14 +221,26 @@ export default function AdminProduction() {
                             </div>
                           </div>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedProduction(production)}
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          Détails
-                        </Button>
+                        <div className="flex gap-2">
+                          {production.status === 'terminee' && (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => setStockProduction(production)}
+                            >
+                              <Package className="w-4 h-4 mr-2" />
+                              Stock
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedProduction(production)}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            Détails
+                          </Button>
+                        </div>
                       </div>
                     );
                   })}
@@ -317,6 +331,15 @@ export default function AdminProduction() {
             setSelectedProduction(null);
             setShowNewDialog(false);
           }}
+        />
+      )}
+
+      {/* Stock Dialog */}
+      {stockProduction && (
+        <ProductionToStockDialog
+          production={stockProduction}
+          open={!!stockProduction}
+          onClose={() => setStockProduction(null)}
         />
       )}
     </div>
