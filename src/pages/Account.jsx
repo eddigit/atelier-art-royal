@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { User, Mail, Calendar, Save } from 'lucide-react';
+import { User, Mail, Calendar, Save, Camera, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -14,6 +14,7 @@ import { fr } from 'date-fns/locale';
 export default function Account() {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [formData, setFormData] = useState({
     full_name: ''
   });
@@ -52,6 +53,23 @@ export default function Account() {
   const handleSubmit = (e) => {
     e.preventDefault();
     updateProfileMutation.mutate(formData);
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingAvatar(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      await base44.auth.updateMe({ avatar_url: file_url });
+      queryClient.invalidateQueries(['user']);
+      toast.success('Photo de profil mise à jour');
+    } catch (error) {
+      toast.error('Erreur lors de l\'upload');
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   if (isLoading) {
@@ -95,8 +113,36 @@ export default function Account() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-center">
-                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="w-12 h-12 text-primary" />
+                <div className="relative group">
+                  {user.avatar_url ? (
+                    <img 
+                      src={user.avatar_url} 
+                      alt={user.full_name}
+                      className="w-24 h-24 rounded-full object-cover border-2 border-primary/20"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="w-12 h-12 text-primary" />
+                    </div>
+                  )}
+                  <label 
+                    htmlFor="avatar-upload" 
+                    className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center"
+                  >
+                    {uploadingAvatar ? (
+                      <Loader2 className="w-6 h-6 text-white animate-spin" />
+                    ) : (
+                      <Camera className="w-6 h-6 text-white" />
+                    )}
+                  </label>
+                  <input 
+                    id="avatar-upload" 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={handleAvatarUpload}
+                    disabled={uploadingAvatar}
+                  />
                 </div>
               </div>
 
