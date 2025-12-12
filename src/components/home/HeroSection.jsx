@@ -155,7 +155,6 @@ EXEMPLES:
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="flex flex-col items-center gap-3 mb-6">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
             <span className="text-white text-sm font-medium uppercase tracking-wider" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.5)' }}>
               HAUTE COUTURE MAÇONNIQUE
             </span>
