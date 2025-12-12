@@ -101,7 +101,10 @@ export default function Catalog() {
       // Apply filters
       return allProducts.filter(product => {
         if (filters.rite && product.rite_id !== filters.rite) return false;
-        if (filters.obedience && product.obedience_id !== filters.obedience) return false;
+        if (filters.obedience) {
+          const obedienceIds = Array.isArray(product.obedience_ids) ? product.obedience_ids : (product.obedience_id ? [product.obedience_id] : []);
+          if (!obedienceIds.includes(filters.obedience)) return false;
+        }
         if (filters.degreeOrder && product.degree_order_id !== filters.degreeOrder) return false;
         if (filters.category && product.category_id !== filters.category) return false;
         
