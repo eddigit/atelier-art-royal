@@ -156,8 +156,8 @@ EXEMPLES:
         <div className="flex flex-col items-center gap-3 mb-6">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
-            <span className="text-slate-200 text-sm font-medium uppercase tracking-wider">HAUTE COUTURE MAÇONNIQUE
-
+            <span className="text-white text-sm font-medium uppercase tracking-wider" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.5)' }}>
+              HAUTE COUTURE MAÇONNIQUE
             </span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 backdrop-blur-sm shadow-lg">
@@ -170,11 +170,11 @@ EXEMPLES:
           </div>
         </div>
         
-        <h1 className="text-slate-200 mb-6 drop-shadow-lg">Atelier Art Royal
-
+        <h1 className="text-hero text-white mb-6" style={{ textShadow: '0 3px 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6)' }}>
+          Atelier Art Royal
         </h1>
         
-        <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow-lg">
+        <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-10 leading-relaxed" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.5)' }}>
           Création d'exception pour tous les Rites et Grades.<br />
           L'élégance au service de la Tradition.
         </p>
@@ -201,13 +201,13 @@ EXEMPLES:
               </div>
             </div>
           </div>
-          <p className="text-sm text-white mt-3 text-center drop-shadow-lg">
+          <p className="text-sm text-white mt-3 text-center" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
             Décrivez ce que vous cherchez en langage naturel
           </p>
         </form>
 
         {/* Trust Indicators */}
-        <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-white drop-shadow-lg">
+        <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-white" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-primary" />
             Livraison 5-7 jours
