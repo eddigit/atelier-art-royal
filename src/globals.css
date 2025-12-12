@@ -30,24 +30,24 @@ css
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 90%;
-    --card: 0 0% 14%;
-    --card-foreground: 0 0% 90%;
-    --popover: 0 0% 14%;
-    --popover-foreground: 0 0% 90%;
+    --background: 0 0% 13%;
+    --foreground: 0 0% 92%;
+    --card: 0 0% 17%;
+    --card-foreground: 0 0% 92%;
+    --popover: 0 0% 17%;
+    --popover-foreground: 0 0% 92%;
     --primary: 40 73% 61%;
     --primary-foreground: 0 0% 10%;
-    --secondary: 0 0% 25%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 65%;
+    --secondary: 0 0% 28%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 0 0% 22%;
+    --muted-foreground: 0 0% 70%;
     --accent: 40 73% 61%;
     --accent-foreground: 0 0% 10%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 65%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
+    --border: 0 0% 32%;
+    --input: 0 0% 28%;
     --ring: 40 73% 61%;
   }
 }
