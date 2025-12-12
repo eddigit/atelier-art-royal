@@ -28,8 +28,10 @@ Deno.serve(async (req) => {
     // Build context for AI
     const productsContext = products.map(p => {
       const rite = rites.find(r => r.id === p.rite_id);
-      const obedience = obediences.find(o => o.id === p.obedience_id);
-      const degreeOrder = degreeOrders.find(d => d.id === p.degree_order_id);
+            const productObediences = Array.isArray(p.obedience_ids) 
+              ? obediences.filter(o => p.obedience_ids.includes(o.id)).map(o => o.name)
+              : (p.obedience_id ? [obediences.find(o => o.id === p.obedience_id)?.name].filter(Boolean) : []);
+            const degreeOrder = degreeOrders.find(d => d.id === p.degree_order_id);
       const category = categories.find(c => c.id === p.category_id);
       
       return {
@@ -39,7 +41,7 @@ Deno.serve(async (req) => {
         stock: p.stock_quantity || 0,
         in_stock: (p.stock_quantity > 0) || p.allow_backorders,
         rite: rite?.name,
-        obedience: obedience?.name,
+        obediences: productObediences.length > 0 ? productObediences : 'Toutes obédiences',
         degree_order: degreeOrder?.name,
         loge_type: degreeOrder?.loge_type,
         category: category?.name,

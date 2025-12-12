@@ -232,23 +232,45 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
             </div>
 
             <div>
-              <label className="text-sm font-medium">Obédience</label>
-              <Select 
-                value={formData.obedience_id || ''} 
-                onValueChange={(v) => setFormData({ ...formData, obedience_id: v })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Sélectionner une obédience" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={null}>Aucune obédience</SelectItem>
-                  {obediences.map(obedience => (
-                    <SelectItem key={obedience.id} value={obedience.id}>
-                      {obedience.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Obédiences (plusieurs possibles)</label>
+              <div className="mt-1 border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
+                {obediences.map(obedience => (
+                  <div key={obedience.id} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={(formData.obedience_ids || []).includes(obedience.id)}
+                      onCheckedChange={(checked) => {
+                        const currentIds = formData.obedience_ids || [];
+                        const newIds = checked
+                          ? [...currentIds, obedience.id]
+                          : currentIds.filter(id => id !== obedience.id);
+                        setFormData({ ...formData, obedience_ids: newIds });
+                      }}
+                    />
+                    <label className="text-sm cursor-pointer">{obedience.name}</label>
+                  </div>
+                ))}
+              </div>
+              {(formData.obedience_ids || []).length > 0 && (
+                <div className="flex gap-1 mt-2 flex-wrap">
+                  {formData.obedience_ids.map(id => {
+                    const obedience = obediences.find(o => o.id === id);
+                    return obedience ? (
+                      <Badge key={id} variant="secondary" className="gap-1">
+                        {obedience.name}
+                        <X 
+                          className="w-3 h-3 cursor-pointer" 
+                          onClick={() => {
+                            setFormData({ 
+                              ...formData, 
+                              obedience_ids: formData.obedience_ids.filter(oid => oid !== id) 
+                            });
+                          }}
+                        />
+                      </Badge>
+                    ) : null;
+                  })}
+                </div>
+              )}
             </div>
 
             <div>
