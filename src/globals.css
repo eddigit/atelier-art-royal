@@ -30,24 +30,24 @@ css
   }
 
   .dark {
-    --background: 220 15% 16%;
-    --foreground: 0 0% 98%;
-    --card: 220 15% 22%;
-    --card-foreground: 0 0% 98%;
-    --popover: 220 15% 20%;
-    --popover-foreground: 0 0% 98%;
+    --background: 0 0% 10%;
+    --foreground: 0 0% 90%;
+    --card: 0 0% 14%;
+    --card-foreground: 0 0% 90%;
+    --popover: 0 0% 14%;
+    --popover-foreground: 0 0% 90%;
     --primary: 40 73% 61%;
     --primary-foreground: 0 0% 10%;
-    --secondary: 220 13% 30%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 220 13% 25%;
-    --muted-foreground: 0 0% 75%;
+    --secondary: 0 0% 25%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 65%;
     --accent: 40 73% 61%;
     --accent-foreground: 0 0% 10%;
-    --destructive: 0 60% 65%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 40%;
-    --input: 220 13% 28%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
     --ring: 40 73% 61%;
   }
 }
@@ -78,16 +78,16 @@ css
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #1a1a1a;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
+  background: #3a3a3a;
   border-radius: 5px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a3a;
+  background: #4a4a4a;
 }
 
 /* Smooth animations */
