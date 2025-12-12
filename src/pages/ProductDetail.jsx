@@ -20,6 +20,15 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const queryClient = useQueryClient();
 
+  const { data: product, isLoading } = useQuery({
+    queryKey: ['product', productId],
+    queryFn: async () => {
+      const products = await base44.entities.Product.filter({ id: productId });
+      return products[0];
+    },
+    enabled: !!productId
+  });
+
   // SEO Meta Tags
   React.useEffect(() => {
     if (product) {
@@ -38,15 +47,6 @@ export default function ProductDetail() {
       document.title = 'Atelier Art Royal';
     };
   }, [product]);
-
-  const { data: product, isLoading } = useQuery({
-    queryKey: ['product', productId],
-    queryFn: async () => {
-      const products = await base44.entities.Product.filter({ id: productId });
-      return products[0];
-    },
-    enabled: !!productId
-  });
 
   const { data: rite } = useQuery({
     queryKey: ['rite', product?.rite_id],
