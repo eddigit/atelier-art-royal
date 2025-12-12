@@ -56,11 +56,38 @@ export default function AdminCustomers() {
     initialData: []
   });
 
+  const { data: rites = [] } = useQuery({
+    queryKey: ['rites'],
+    queryFn: () => base44.entities.Rite.list('order', 100),
+    initialData: []
+  });
+
+  const { data: obediences = [] } = useQuery({
+    queryKey: ['obediences'],
+    queryFn: () => base44.entities.Obedience.list('order', 100),
+    initialData: []
+  });
+
+  const { data: degreeOrders = [] } = useQuery({
+    queryKey: ['degreeOrders'],
+    queryFn: () => base44.entities.DegreeOrder.list('level', 200),
+    initialData: []
+  });
+
   // Calculate customer segments and statistics
   const customersWithStats = useMemo(() => {
     return customers.map(customer => {
       const customerOrders = orders.filter(o => o.customer_id === customer.id);
+      
+      // Calculate total spent and separate by channel
       const totalSpent = customerOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+      const websiteRevenue = customerOrders
+        .filter(o => o.sales_channel === 'website')
+        .reduce((sum, o) => sum + (o.total || 0), 0);
+      const directRevenue = customerOrders
+        .filter(o => o.sales_channel === 'direct')
+        .reduce((sum, o) => sum + (o.total || 0), 0);
+      
       const orderCount = customerOrders.length;
       const avgOrderValue = orderCount > 0 ? totalSpent / orderCount : 0;
       const lastOrder = customerOrders[0]; // Already sorted by -created_date
@@ -77,6 +104,8 @@ export default function AdminCustomers() {
         ...customer,
         stats: {
           totalSpent,
+          websiteRevenue,
+          directRevenue,
           orderCount,
           avgOrderValue,
           lastOrderDate: lastOrder?.created_date,
@@ -105,8 +134,12 @@ export default function AdminCustomers() {
   // Calculate global stats
   const stats = useMemo(() => {
     const totalCustomers = customers.length;
+    const websiteCustomers = customers.filter(c => c.source_origin === 'website').length;
+    const backendCustomers = customers.filter(c => c.source_origin === 'backend').length;
     const customersWithOrders = customersWithStats.filter(c => c.stats.orderCount > 0).length;
     const totalRevenue = customersWithStats.reduce((sum, c) => sum + c.stats.totalSpent, 0);
+    const websiteRevenue = customersWithStats.reduce((sum, c) => sum + c.stats.websiteRevenue, 0);
+    const directRevenue = customersWithStats.reduce((sum, c) => sum + c.stats.directRevenue, 0);
     const avgLifetimeValue = totalCustomers > 0 ? totalRevenue / totalCustomers : 0;
 
     const segments = {
@@ -117,7 +150,17 @@ export default function AdminCustomers() {
       noPurchase: customersWithStats.filter(c => c.stats.segment === 'no-purchase').length
     };
 
-    return { totalCustomers, customersWithOrders, totalRevenue, avgLifetimeValue, segments };
+    return { 
+      totalCustomers, 
+      websiteCustomers,
+      backendCustomers,
+      customersWithOrders, 
+      totalRevenue,
+      websiteRevenue,
+      directRevenue,
+      avgLifetimeValue, 
+      segments 
+    };
   }, [customers, customersWithStats]);
 
   const segmentColors = {
@@ -157,7 +200,7 @@ export default function AdminCustomers() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
@@ -166,6 +209,10 @@ export default function AdminCustomers() {
             </div>
             <h3 className="text-2xl font-bold">{stats.totalCustomers}</h3>
             <p className="text-sm text-muted-foreground">Total Clients</p>
+            <div className="flex gap-2 mt-2 text-xs">
+              <Badge variant="outline" className="bg-blue-600/10">En ligne: {stats.websiteCustomers}</Badge>
+              <Badge variant="outline" className="bg-purple-600/10">Backend: {stats.backendCustomers}</Badge>
+            </div>
           </CardContent>
         </Card>
 
@@ -190,6 +237,10 @@ export default function AdminCustomers() {
             </div>
             <h3 className="text-2xl font-bold">{stats.totalRevenue.toFixed(0)}€</h3>
             <p className="text-sm text-muted-foreground">Revenu Total</p>
+            <div className="flex gap-2 mt-2 text-xs">
+              <Badge variant="outline" className="bg-green-600/10">Web: {stats.websiteRevenue.toFixed(0)}€</Badge>
+              <Badge variant="outline" className="bg-orange-600/10">Direct: {stats.directRevenue.toFixed(0)}€</Badge>
+            </div>
           </CardContent>
         </Card>
 
@@ -269,6 +320,9 @@ export default function AdminCustomers() {
                             <Badge className={segmentColors[customer.stats.segment]}>
                               {segmentLabels[customer.stats.segment]}
                             </Badge>
+                            <Badge variant="outline" className={customer.source_origin === 'website' ? 'bg-blue-600/10' : 'bg-purple-600/10'}>
+                              {customer.source_origin === 'website' ? 'En ligne' : 'Backend'}
+                            </Badge>
                             {customer.stats.notesCount > 0 && (
                               <Badge variant="outline" className="gap-1">
                                 <MessageSquare className="w-3 h-3" />
@@ -280,7 +334,13 @@ export default function AdminCustomers() {
                           <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <span>{customer.stats.orderCount} commande{customer.stats.orderCount > 1 ? 's' : ''}</span>
                             <span>•</span>
-                            <span>{customer.stats.totalSpent.toFixed(2)}€ dépensés</span>
+                            <span>{customer.stats.totalSpent.toFixed(2)}€ total</span>
+                            {(customer.stats.websiteRevenue > 0 || customer.stats.directRevenue > 0) && (
+                              <>
+                                <span>•</span>
+                                <span>Web: {customer.stats.websiteRevenue.toFixed(0)}€ / Direct: {customer.stats.directRevenue.toFixed(0)}€</span>
+                              </>
+                            )}
                             {customer.stats.lastOrderDate && (
                               <>
                                 <span>•</span>
@@ -368,9 +428,13 @@ export default function AdminCustomers() {
           customer={selectedCustomer}
           orders={orders.filter(o => o.customer_id === selectedCustomer.id)}
           notes={notes.filter(n => n.customer_id === selectedCustomer.id)}
+          rites={rites}
+          obediences={obediences}
+          degreeOrders={degreeOrders}
           open={!!selectedCustomer}
           onClose={() => setSelectedCustomer(null)}
           onNoteSaved={() => queryClient.invalidateQueries(['customer-notes'])}
+          onCustomerUpdated={() => queryClient.invalidateQueries(['all-customers'])}
         />
       )}
     </div>
