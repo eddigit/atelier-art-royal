@@ -140,6 +140,14 @@ export default function Checkout() {
         clearGuestCart();
       }
 
+      // Send confirmation emails
+      try {
+        await base44.asServiceRole.functions.invoke('sendOrderConfirmation', { orderId: order.id });
+      } catch (emailError) {
+        console.error('Email error:', emailError);
+        // Continue even if email fails
+      }
+
       return order;
     },
     onSuccess: (order) => {

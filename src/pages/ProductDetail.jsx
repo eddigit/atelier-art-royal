@@ -115,7 +115,12 @@ export default function ProductDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries(['cart']);
       queryClient.invalidateQueries(['guest-cart']);
-      toast.success('Produit ajouté au panier');
+      toast.success('✅ Produit ajouté au panier !');
+      setQuantity(1); // Reset quantity after adding
+    },
+    onError: (error) => {
+      console.error('Cart error:', error);
+      toast.error('Erreur lors de l\'ajout au panier');
     }
   });
 

@@ -103,10 +103,27 @@ Deno.serve(async (req) => {
       </div>
     `;
     
-    // Envoyer l'email
-    await base44.integrations.Core.SendEmail({
+    // Envoyer l'email au client
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      from_name: 'Atelier Art Royal',
       to: customer.email,
       subject: `${statusInfo.subject} - Commande ${order.order_number}`,
+      body: emailBody
+    });
+
+    // Copie à l'admin
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      from_name: 'Atelier Art Royal',
+      to: 'contact@artroyal.fr',
+      subject: `[STATUT] ${statusInfo.subject} - ${order.order_number}`,
+      body: emailBody
+    });
+
+    // Copie au support
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      from_name: 'Atelier Art Royal',
+      to: 'coachdigitalparis@gmail.com',
+      subject: `[COPIE] ${statusInfo.subject} - ${order.order_number}`,
       body: emailBody
     });
     
