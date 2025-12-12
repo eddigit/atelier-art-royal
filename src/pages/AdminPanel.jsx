@@ -29,6 +29,14 @@ export default function AdminPanel() {
   });
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, []);
+
+  useEffect(() => {
     const newUrl = new URL(window.location);
     newUrl.searchParams.set('tab', activeTab);
     window.history.replaceState({}, '', newUrl);
