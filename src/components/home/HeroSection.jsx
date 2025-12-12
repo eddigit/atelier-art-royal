@@ -148,7 +148,7 @@ EXEMPLES:
           alt="Haute Couture Maçonnique"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        <div className="absolute inset-0 dark:bg-gradient-to-t dark:from-background dark:via-background/50 dark:to-transparent" />
       </div>
 
       {/* Content */}
