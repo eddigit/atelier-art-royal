@@ -1,8 +1,6 @@
 import React from 'react';
 import HeroSection from '@/components/home/HeroSection';
 import ValuePropositions from '@/components/home/ValuePropositions';
-import CategoryShowcase from '@/components/home/CategoryShowcase';
-import BestSellers from '@/components/home/BestSellers';
 import FeaturedRites from '@/components/home/FeaturedRites';
 import SocialProof from '@/components/home/SocialProof';
 import PersonalizedRecommendations from '@/components/home/PersonalizedRecommendations';
@@ -55,8 +53,6 @@ export default function Home() {
     <div>
       <HeroSection />
       <ValuePropositions />
-      <CategoryShowcase />
-      <BestSellers />
       <FeaturedRites />
       <SocialProof />
       <DynamicHomeWidgets />
