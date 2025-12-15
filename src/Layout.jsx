@@ -22,6 +22,8 @@ import {
 import ChatWidget from '@/components/chat/ChatWidget';
 import VisitorTracker from '@/components/analytics/VisitorTracker';
 import VisitorNotifier from '@/components/analytics/VisitorNotifier';
+import WelcomeOnboarding from '@/components/onboarding/WelcomeOnboarding';
+import SignUpBanner from '@/components/onboarding/SignUpBanner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -474,10 +476,14 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Analytics Tracking */}
       <VisitorTracker pageName={currentPageName} />
-      
+
       {/* Chat Widget */}
       <ChatWidget />
-      
+
+      {/* Onboarding */}
+      <WelcomeOnboarding />
+      <SignUpBanner />
+
       {/* Admin Visitor Notifications */}
       {isAdmin && <VisitorNotifier />}
 
