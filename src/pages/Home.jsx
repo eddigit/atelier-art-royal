@@ -1,8 +1,12 @@
 import React from 'react';
 import HeroSection from '@/components/home/HeroSection';
-import DynamicGallery from '@/components/home/DynamicGallery';
+import ValuePropositions from '@/components/home/ValuePropositions';
+import CategoryShowcase from '@/components/home/CategoryShowcase';
+import BestSellers from '@/components/home/BestSellers';
 import FeaturedRites from '@/components/home/FeaturedRites';
+import SocialProof from '@/components/home/SocialProof';
 import PersonalizedRecommendations from '@/components/home/PersonalizedRecommendations';
+import CTASection from '@/components/home/CTASection';
 import DynamicHomeWidgets from '@/components/home/DynamicHomeWidgets';
 
 export default function Home() {
@@ -50,10 +54,14 @@ export default function Home() {
   return (
     <div>
       <HeroSection />
-      <DynamicGallery />
+      <ValuePropositions />
+      <CategoryShowcase />
+      <BestSellers />
       <FeaturedRites />
+      <SocialProof />
       <DynamicHomeWidgets />
       <PersonalizedRecommendations />
+      <CTASection />
     </div>
   );
 }
