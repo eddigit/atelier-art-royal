@@ -15,20 +15,20 @@ export default function FeaturedRites() {
   });
 
   return (
-    <section className="py-24 container mx-auto px-4">
-      <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold mb-4">
+    <section className="py-12 container mx-auto px-4">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold mb-2">
           Parcourir par <span className="text-gradient">Rite</span>
         </h2>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-muted-foreground text-sm">
           Sélectionnez votre Rite pour découvrir nos créations
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-w-5xl mx-auto">
         {isLoading ? (
           Array(6).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-lg" />
+            <Skeleton key={i} className="h-12 w-full rounded-lg" />
           ))
         ) : (
           rites.map((rite) => (
@@ -38,22 +38,10 @@ export default function FeaturedRites() {
             >
               <Button
                 variant="outline"
-                className="w-full h-auto py-6 px-8 justify-between group hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300"
+                className="w-full h-12 px-4 justify-start group hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary-foreground/20 flex items-center justify-center transition-colors">
-                    <Award className="w-6 h-6 text-primary group-hover:text-primary-foreground" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-bold text-lg">{rite.name}</div>
-                    {rite.description && (
-                      <div className="text-sm text-muted-foreground group-hover:text-primary-foreground/80 line-clamp-1">
-                        {rite.description}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <Award className="w-4 h-4 mr-2 text-primary group-hover:text-primary-foreground" />
+                <span className="font-semibold text-sm truncate">{rite.name}</span>
               </Button>
             </Link>
           ))
