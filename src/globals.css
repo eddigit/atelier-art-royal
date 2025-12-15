@@ -7,24 +7,24 @@ css
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 10%;
+    --background: 0 0% 96%;
+    --foreground: 0 0% 5%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 0 0% 5%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 0 0% 5%;
     --primary: 40 73% 61%;
-    --primary-foreground: 0 0% 10%;
+    --primary-foreground: 0 0% 5%;
     --secondary: 30 25% 55%;
-    --secondary-foreground: 0 0% 10%;
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 40%;
+    --secondary-foreground: 0 0% 5%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 35%;
     --accent: 40 73% 61%;
-    --accent-foreground: 0 0% 10%;
+    --accent-foreground: 0 0% 5%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 85%;
-    --input: 0 0% 92%;
+    --border: 0 0% 75%;
+    --input: 0 0% 88%;
     --ring: 40 73% 61%;
     --radius: 0.5rem;
   }
@@ -62,6 +62,36 @@ css
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Renforcement des bordures et contours */
+  input, textarea, select, button {
+    @apply border-2 !important;
+  }
+
+  /* Ombres pour tous les éléments interactifs */
+  .shadow, [class*="shadow-"] {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  /* Cartes avec bordures épaisses */
+  [class*="card"], [class*="Card"] {
+    @apply border-2 shadow-md;
+  }
+
+  /* Inputs et boutons plus visibles */
+  input:not([type="checkbox"]):not([type="radio"]), 
+  textarea, 
+  select {
+    @apply border-2 bg-white shadow-sm;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    @apply ring-2 ring-primary/50 border-primary;
+  }
+
+  button {
+    @apply border-2 shadow-sm;
   }
   
   h1, h2, h3, h4, h5, h6 {
