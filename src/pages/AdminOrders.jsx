@@ -36,11 +36,12 @@ const statusConfig = {
 export default function AdminOrders() {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterChannel, setFilterChannel] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ['admin-orders', search, filterStatus],
+    queryKey: ['admin-orders', search, filterStatus, filterChannel],
     queryFn: async () => {
       let allOrders = await base44.entities.Order.list('-created_date', 500);
       
@@ -52,6 +53,10 @@ export default function AdminOrders() {
       
       if (filterStatus !== 'all') {
         allOrders = allOrders.filter(o => o.status === filterStatus);
+      }
+
+      if (filterChannel !== 'all') {
+        allOrders = allOrders.filter(o => o.sales_channel === filterChannel);
       }
       
       return allOrders;
@@ -121,6 +126,14 @@ export default function AdminOrders() {
     .filter(o => o.payment_status === 'paid')
     .reduce((sum, o) => sum + (o.total || 0), 0);
 
+  const webRevenue = orders
+    .filter(o => o.payment_status === 'paid' && o.sales_channel === 'website')
+    .reduce((sum, o) => sum + (o.total || 0), 0);
+
+  const directRevenue = orders
+    .filter(o => o.payment_status === 'paid' && o.sales_channel === 'direct')
+    .reduce((sum, o) => sum + (o.total || 0), 0);
+
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-8">
@@ -172,13 +185,17 @@ export default function AdminOrders() {
                 {totalRevenue.toFixed(0)}€
               </p>
               <p className="text-sm text-muted-foreground">Chiffre d'affaires</p>
+              <div className="flex gap-2 mt-2 justify-center text-xs">
+                <Badge variant="outline" className="bg-blue-600/10">Web: {webRevenue.toFixed(0)}€</Badge>
+                <Badge variant="outline" className="bg-orange-600/10">Direct: {directRevenue.toFixed(0)}€</Badge>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -204,6 +221,16 @@ export default function AdminOrders() {
             <SelectItem value="cancelled">Annulée</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={filterChannel} onValueChange={setFilterChannel}>
+          <SelectTrigger>
+            <SelectValue placeholder="Filtrer par canal" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les canaux</SelectItem>
+            <SelectItem value="website">Web</SelectItem>
+            <SelectItem value="direct">Direct (Usine/Téléphone)</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Orders List */}
@@ -226,6 +253,9 @@ export default function AdminOrders() {
                           Payée
                         </Badge>
                       )}
+                      <Badge variant="outline" className={order.sales_channel === 'website' ? 'bg-blue-600/10' : 'bg-orange-600/10'}>
+                        {order.sales_channel === 'website' ? 'Web' : 'Direct'}
+                      </Badge>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                       <p>Date: {format(new Date(order.created_date), 'dd/MM/yyyy', { locale: fr })}</p>

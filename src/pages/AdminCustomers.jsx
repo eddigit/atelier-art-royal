@@ -31,6 +31,7 @@ export default function AdminCustomers() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [segmentFilter, setSegmentFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const { data: user } = useQuery({
@@ -127,15 +128,20 @@ export default function AdminCustomers() {
         segmentFilter === 'all' || 
         customer.stats.segment === segmentFilter;
 
-      return matchesSearch && matchesSegment;
+      const matchesSource = 
+        sourceFilter === 'all' || 
+        customer.customer_source === sourceFilter;
+
+      return matchesSearch && matchesSegment && matchesSource;
     });
-  }, [customersWithStats, searchQuery, segmentFilter]);
+  }, [customersWithStats, searchQuery, segmentFilter, sourceFilter]);
 
   // Calculate global stats
   const stats = useMemo(() => {
     const totalCustomers = customers.length;
-    const websiteCustomers = customers.filter(c => c.source_origin === 'website').length;
-    const backendCustomers = customers.filter(c => c.source_origin === 'backend').length;
+    const webCustomers = customers.filter(c => c.customer_source === 'web').length;
+    const usineCustomers = customers.filter(c => c.customer_source === 'usine_directe').length;
+    const telCustomers = customers.filter(c => c.customer_source === 'vente_telephone').length;
     const customersWithOrders = customersWithStats.filter(c => c.stats.orderCount > 0).length;
     const totalRevenue = customersWithStats.reduce((sum, c) => sum + c.stats.totalSpent, 0);
     const websiteRevenue = customersWithStats.reduce((sum, c) => sum + c.stats.websiteRevenue, 0);
@@ -152,8 +158,9 @@ export default function AdminCustomers() {
 
     return { 
       totalCustomers, 
-      websiteCustomers,
-      backendCustomers,
+      webCustomers,
+      usineCustomers,
+      telCustomers,
       customersWithOrders, 
       totalRevenue,
       websiteRevenue,
@@ -209,9 +216,10 @@ export default function AdminCustomers() {
             </div>
             <h3 className="text-2xl font-bold">{stats.totalCustomers}</h3>
             <p className="text-sm text-muted-foreground">Total Clients</p>
-            <div className="flex gap-2 mt-2 text-xs">
-              <Badge variant="outline" className="bg-blue-600/10">En ligne: {stats.websiteCustomers}</Badge>
-              <Badge variant="outline" className="bg-purple-600/10">Backend: {stats.backendCustomers}</Badge>
+            <div className="flex gap-1 mt-2 text-xs flex-wrap">
+              <Badge variant="outline" className="bg-blue-600/10">Web: {stats.webCustomers}</Badge>
+              <Badge variant="outline" className="bg-purple-600/10">Usine: {stats.usineCustomers}</Badge>
+              <Badge variant="outline" className="bg-orange-600/10">Tél: {stats.telCustomers}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -283,19 +291,32 @@ export default function AdminCustomers() {
                     />
                   </div>
                 </div>
-                <Select value={segmentFilter} onValueChange={setSegmentFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Tous les segments" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous les segments</SelectItem>
-                    <SelectItem value="vip">VIP</SelectItem>
-                    <SelectItem value="loyal">Fidèles</SelectItem>
-                    <SelectItem value="regular">Réguliers</SelectItem>
-                    <SelectItem value="new">Nouveaux</SelectItem>
-                    <SelectItem value="no-purchase">Sans achat</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <Select value={segmentFilter} onValueChange={setSegmentFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Tous les segments" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous les segments</SelectItem>
+                      <SelectItem value="vip">VIP</SelectItem>
+                      <SelectItem value="loyal">Fidèles</SelectItem>
+                      <SelectItem value="regular">Réguliers</SelectItem>
+                      <SelectItem value="new">Nouveaux</SelectItem>
+                      <SelectItem value="no-purchase">Sans achat</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={sourceFilter} onValueChange={setSourceFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Toutes les sources" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes les sources</SelectItem>
+                      <SelectItem value="web">Web</SelectItem>
+                      <SelectItem value="usine_directe">Usine directe</SelectItem>
+                      <SelectItem value="vente_telephone">Vente téléphone</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -320,8 +341,14 @@ export default function AdminCustomers() {
                             <Badge className={segmentColors[customer.stats.segment]}>
                               {segmentLabels[customer.stats.segment]}
                             </Badge>
-                            <Badge variant="outline" className={customer.source_origin === 'website' ? 'bg-blue-600/10' : 'bg-purple-600/10'}>
-                              {customer.source_origin === 'website' ? 'En ligne' : 'Backend'}
+                            <Badge variant="outline" className={
+                              customer.customer_source === 'web' ? 'bg-blue-600/10' : 
+                              customer.customer_source === 'usine_directe' ? 'bg-purple-600/10' : 
+                              'bg-orange-600/10'
+                            }>
+                              {customer.customer_source === 'web' ? 'Web' : 
+                               customer.customer_source === 'usine_directe' ? 'Usine' : 
+                               'Téléphone'}
                             </Badge>
                             {customer.stats.notesCount > 0 && (
                               <Badge variant="outline" className="gap-1">
