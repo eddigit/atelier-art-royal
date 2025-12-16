@@ -6,24 +6,24 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96%;
-    --foreground: 0 0% 5%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 5%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 5%;
+    --popover-foreground: 0 0% 0%;
     --primary: 40 73% 61%;
-    --primary-foreground: 0 0% 5%;
-    --secondary: 30 25% 55%;
-    --secondary-foreground: 0 0% 5%;
-    --muted: 0 0% 92%;
-    --muted-foreground: 0 0% 35%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 85%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 25%;
     --accent: 40 73% 61%;
-    --accent-foreground: 0 0% 5%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 70%;
-    --input: 0 0% 85%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 40%;
+    --input: 0 0% 40%;
     --ring: 40 73% 61%;
     --radius: 0.5rem;
   }
@@ -67,39 +67,55 @@
   input:not([type="checkbox"]):not([type="radio"]), 
   textarea, 
   select {
-    @apply border-[3px] bg-white shadow-md !important;
-    border-color: hsl(var(--border)) !important;
+    @apply border-[3px] bg-white shadow-lg !important;
+    border-color: hsl(0 0% 30%) !important;
   }
-  
+
   input:focus:not([type="checkbox"]):not([type="radio"]), 
   textarea:focus, 
   select:focus {
-    @apply ring-[3px] ring-primary/60 border-primary !important;
-    box-shadow: 0 0 0 3px hsla(var(--primary), 0.2) !important;
+    @apply ring-[4px] ring-primary/70 !important;
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 0 0 0 4px hsla(var(--primary), 0.3) !important;
   }
-  
+
   button {
-    @apply border-[2px] shadow-md !important;
+    @apply border-[3px] shadow-lg !important;
+    border-color: hsl(0 0% 30%) !important;
   }
-  
+
   button:hover {
-    @apply shadow-lg !important;
-    transform: translateY(-1px);
+    @apply shadow-xl !important;
+    transform: translateY(-2px);
   }
-  
+
   /* Cartes avec bordures très épaisses */
   [class*="card"], [class*="Card"], .card {
-    @apply border-[3px] shadow-xl !important;
+    @apply border-[4px] shadow-2xl !important;
+    border-color: hsl(0 0% 25%) !important;
   }
-  
+
   /* Badges et éléments UI avec bordures */
   [class*="badge"], [class*="Badge"], .badge {
-    @apply border-[2px] shadow-sm !important;
+    @apply border-[3px] shadow-md !important;
+    border-color: hsl(0 0% 30%) !important;
   }
-  
+
   /* Amélioration des dropdowns et selects */
   [role="combobox"], [role="listbox"] {
-    @apply border-[3px] shadow-lg !important;
+    @apply border-[4px] shadow-xl !important;
+    border-color: hsl(0 0% 25%) !important;
+  }
+
+  /* Tables avec bordures visibles */
+  table {
+    @apply border-[3px] !important;
+    border-color: hsl(0 0% 30%) !important;
+  }
+
+  th, td {
+    @apply border-[2px] !important;
+    border-color: hsl(0 0% 35%) !important;
   }
   
   h1, h2, h3, h4, h5, h6 {
