@@ -120,6 +120,12 @@ export default function Layout({ children, currentPageName }) {
 
   const isAdmin = user?.role === 'admin';
   const isAdminPage = currentPageName?.startsWith('Admin');
+  const isPOSPage = currentPageName === 'POS';
+
+  // Si c'est la page POS, on affiche uniquement le contenu sans layout
+  if (isPOSPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-background">
