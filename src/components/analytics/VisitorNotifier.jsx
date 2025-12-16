@@ -6,7 +6,7 @@ import { createPageUrl } from '@/utils';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Eye, TrendingUp } from 'lucide-react';
+import { Users, Eye, TrendingUp, MessageCircle } from 'lucide-react';
 
 export default function VisitorNotifier() {
   const [lastNotified, setLastNotified] = useState(Date.now());
@@ -59,8 +59,13 @@ export default function VisitorNotifier() {
           <Users className="w-4 h-4 text-green-500" />
           <span className="font-semibold">Visiteurs en ligne</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Badge variant="secondary">{activeVisitors.length}</Badge>
+          <Link to={createPageUrl('AdminPanel') + '?tab=chat'}>
+            <Button size="icon" variant="ghost" className="h-7 w-7">
+              <MessageCircle className="w-4 h-4" />
+            </Button>
+          </Link>
           <Link to={createPageUrl('AdminPanel') + '?tab=analytics'}>
             <Button size="icon" variant="ghost" className="h-7 w-7">
               <TrendingUp className="w-4 h-4" />
