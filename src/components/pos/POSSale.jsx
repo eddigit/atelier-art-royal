@@ -133,193 +133,165 @@ export default function POSSale() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
       {/* Catalogue Produits */}
       <div className="lg:col-span-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Catalogue Produits</CardTitle>
-            <div className="relative mt-4">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher un produit..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto">
-              {filteredProducts.map(product => (
-                <Card
-                  key={product.id}
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => addToCart(product)}
-                >
-                  <CardContent className="p-4">
-                    {product.images?.[0] && (
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.name}
-                        className="w-full h-32 object-cover rounded-lg mb-3"
-                      />
-                    )}
-                    <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
-                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                      {product.short_description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">
-                        {product.price.toFixed(2)}€
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Stock: {product.stock_quantity || 0}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative mb-6">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Rechercher un produit..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-16 h-16 text-xl border-2"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {filteredProducts.map(product => (
+            <button
+              key={product.id}
+              onClick={() => addToCart(product)}
+              className="bg-card border-2 border-border rounded-2xl p-4 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-left"
+            >
+              {product.images?.[0] && (
+                <img 
+                  src={product.images[0]} 
+                  alt={product.name}
+                  className="w-full h-32 object-cover rounded-xl mb-3"
+                />
+              )}
+              <h3 className="font-bold text-base mb-1 line-clamp-2">{product.name}</h3>
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-2xl font-bold text-primary">
+                  {product.price.toFixed(0)}€
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  Stock: {product.stock_quantity || 0}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Panier & Paiement */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Sélection Client */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Client
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Input
-              placeholder="Rechercher un client..."
-              value={customerSearch}
-              onChange={(e) => setCustomerSearch(e.target.value)}
-            />
-            <div className="max-h-32 overflow-y-auto space-y-2">
-              {filteredCustomers.slice(0, 5).map(customer => (
-                <Button
-                  key={customer.id}
-                  variant={selectedCustomer?.id === customer.id ? 'default' : 'outline'}
-                  className="w-full justify-start text-left"
-                  onClick={() => setSelectedCustomer(customer)}
-                >
-                  <div className="truncate">
-                    <div className="font-semibold">{customer.full_name}</div>
-                    <div className="text-xs opacity-70">{customer.email}</div>
-                  </div>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-card border-2 border-border rounded-2xl p-5">
+          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <User className="w-6 h-6" />
+            Client
+          </h3>
+          <Input
+            placeholder="Rechercher..."
+            value={customerSearch}
+            onChange={(e) => setCustomerSearch(e.target.value)}
+            className="h-14 text-lg mb-3 border-2"
+          />
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {filteredCustomers.slice(0, 4).map(customer => (
+              <button
+                key={customer.id}
+                onClick={() => setSelectedCustomer(customer)}
+                className={`w-full p-3 rounded-xl text-left transition-all border-2 ${
+                  selectedCustomer?.id === customer.id 
+                    ? 'bg-primary text-primary-foreground border-primary' 
+                    : 'bg-background border-border hover:bg-muted'
+                }`}
+              >
+                <div className="font-bold">{customer.full_name}</div>
+                <div className="text-sm opacity-80 truncate">{customer.email}</div>
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Panier */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5" />
-              Panier ({cart.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="max-h-64 overflow-y-auto space-y-3">
-              {cart.map(item => (
-                <div key={item.id} className="flex items-center gap-2 p-2 border rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate">{item.name}</p>
-                    <p className="text-xs text-primary">{item.price.toFixed(2)}€</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="h-7 w-7"
-                      onClick={() => updateQuantity(item.id, -1)}
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                    <span className="w-8 text-center font-semibold">{item.quantity}</span>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="h-7 w-7"
-                      onClick={() => updateQuantity(item.id, 1)}
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-7 w-7 text-destructive"
-                      onClick={() => removeFromCart(item.id)}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
+        <div className="bg-card border-2 border-border rounded-2xl p-5">
+          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <ShoppingCart className="w-6 h-6" />
+            Panier ({cart.length})
+          </h3>
+          
+          <div className="space-y-3 mb-4 max-h-60 overflow-y-auto">
+            {cart.map(item => (
+              <div key={item.id} className="flex items-center gap-2 p-3 border-2 rounded-xl bg-background">
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold truncate">{item.name}</p>
+                  <p className="text-sm text-primary">{item.price.toFixed(2)}€</p>
                 </div>
-              ))}
-            </div>
-
-            {cart.length > 0 && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Total</span>
-                    <span className="text-primary">{calculateTotal().toFixed(2)}€</span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Mode de paiement</Label>
-                    <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cash">
-                          <div className="flex items-center gap-2">
-                            <Banknote className="w-4 h-4" />
-                            Espèces
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="card">
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="w-4 h-4" />
-                            Carte bancaire
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="bank_transfer">
-                          Virement bancaire
-                        </SelectItem>
-                        <SelectItem value="phone_validation">
-                          <div className="flex items-center gap-2">
-                            <Phone className="w-4 h-4" />
-                            Validation téléphonique
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <Button
-                    className="w-full"
-                    size="lg"
-                    onClick={handleCheckout}
-                    disabled={!selectedCustomer || createOrderMutation.isPending}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => updateQuantity(item.id, -1)}
+                    className="w-12 h-12 bg-background border-2 rounded-xl font-bold hover:bg-muted active:scale-90 transition-all"
                   >
-                    {createOrderMutation.isPending ? 'Traitement...' : 'Valider la vente'}
-                  </Button>
+                    <Minus className="w-5 h-5 mx-auto" />
+                  </button>
+                  <span className="w-10 text-center font-bold text-xl">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(item.id, 1)}
+                    className="w-12 h-12 bg-background border-2 rounded-xl font-bold hover:bg-muted active:scale-90 transition-all"
+                  >
+                    <Plus className="w-5 h-5 mx-auto" />
+                  </button>
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="w-12 h-12 bg-destructive/10 border-2 border-destructive rounded-xl text-destructive hover:bg-destructive hover:text-destructive-foreground active:scale-90 transition-all"
+                  >
+                    <Trash2 className="w-5 h-5 mx-auto" />
+                  </button>
                 </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+              </div>
+            ))}
+          </div>
+
+          {cart.length > 0 && (
+            <>
+              <div className="border-t-2 pt-4 mb-4">
+                <div className="flex justify-between text-3xl font-bold">
+                  <span>Total</span>
+                  <span className="text-primary">{calculateTotal().toFixed(2)}€</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-lg">Mode de paiement</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: 'cash', label: 'Espèces', icon: Banknote },
+                    { value: 'card', label: 'Carte', icon: CreditCard },
+                    { value: 'bank_transfer', label: 'Virement', icon: CreditCard },
+                    { value: 'phone_validation', label: 'Tél', icon: Phone }
+                  ].map(method => {
+                    const Icon = method.icon;
+                    return (
+                      <button
+                        key={method.value}
+                        onClick={() => setPaymentMethod(method.value)}
+                        className={`h-16 rounded-xl font-bold transition-all border-2 flex items-center justify-center gap-2 ${
+                          paymentMethod === method.value
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background border-border hover:bg-muted'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                        {method.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <Button
+                className="w-full h-16 text-xl font-bold mt-4"
+                onClick={handleCheckout}
+                disabled={!selectedCustomer || createOrderMutation.isPending}
+              >
+                {createOrderMutation.isPending ? 'Traitement...' : 'Valider la vente'}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
