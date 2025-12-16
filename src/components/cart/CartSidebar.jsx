@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CartSidebar({ open, onClose }) {
   const queryClient = useQueryClient();
@@ -101,15 +102,23 @@ export default function CartSidebar({ open, onClose }) {
         ) : (
           <>
             <ScrollArea className="flex-1 px-6 py-4">
-              <div className="space-y-4">
-                {cartItems.map((item) => {
+              <AnimatePresence>
+                <div className="space-y-4">
+                  {cartItems.map((item, index) => {
                   const product = getProductForItem(item);
                   if (!product) return null;
 
                   const primaryImage = product.images?.[0] || 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=2105';
 
                   return (
-                    <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
+                    <motion.div 
+                      key={item.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex gap-4 pb-4 border-b last:border-0"
+                    >
                       <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                         <img
                           src={primaryImage}
@@ -165,10 +174,11 @@ export default function CartSidebar({ open, onClose }) {
                           </Button>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
-              </div>
+                </div>
+              </AnimatePresence>
             </ScrollArea>
 
             <div className="border-t p-6 space-y-4 bg-muted/30">
@@ -184,9 +194,16 @@ export default function CartSidebar({ open, onClose }) {
                   </span>
                 </div>
                 {subtotal < 100 && subtotal > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Plus que {(100 - subtotal).toFixed(2)}€ pour la livraison gratuite
-                  </p>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg"
+                  >
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <p className="text-xs font-medium text-primary">
+                      Plus que {(100 - subtotal).toFixed(2)}€ pour la livraison gratuite !
+                    </p>
+                  </motion.div>
                 )}
                 <Separator className="my-2" />
                 <div className="flex items-center justify-between text-lg font-bold">

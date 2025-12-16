@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { User, Mail, Calendar, Save, Camera, Loader2, Award } from 'lucide-react';
 import LoyaltyCard from '@/components/loyalty/LoyaltyCard';
+import LoyaltyProgress from '@/components/loyalty/LoyaltyProgress';
 import PointsHistory from '@/components/loyalty/PointsHistory';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -231,7 +232,10 @@ export default function Account() {
         <div className="lg:col-span-2 space-y-6">
           {/* Loyalty Program */}
           {loyaltyData && (
-            <LoyaltyCard loyaltyData={loyaltyData} />
+            <>
+              <LoyaltyCard loyaltyData={loyaltyData} />
+              <LoyaltyProgress currentPoints={loyaltyData.lifetime_points || 0} />
+            </>
           )}
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
