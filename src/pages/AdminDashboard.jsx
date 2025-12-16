@@ -220,23 +220,25 @@ export default function AdminDashboard() {
           {quickActions.map((action, idx) => {
             const Icon = action.icon;
             return (
-              <Link key={idx} to={action.link} className="block">
-                <Card className={`border-2 ${action.color} transition-all hover:shadow-lg cursor-pointer h-full`}>
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-muted">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <CardTitle className="text-lg">{action.title}</CardTitle>
+              <Card 
+                key={idx}
+                className={`border-2 ${action.color} transition-all hover:shadow-lg cursor-pointer h-full`}
+                onClick={() => window.location.href = action.link}
+              >
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-muted">
+                      <Icon className="w-5 h-5" />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {action.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
+                    <CardTitle className="text-lg">{action.title}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    {action.description}
+                  </p>
+                </CardContent>
+              </Card>
             );
           })}
         </div>
