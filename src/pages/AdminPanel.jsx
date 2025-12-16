@@ -29,24 +29,15 @@ export default function AdminPanel() {
   });
 
   useEffect(() => {
-    const handleUrlChange = () => {
+    const handlePopstate = () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const tabParam = urlParams.get('tab');
-      if (tabParam && tabParam !== activeTab) {
-        setActiveTab(tabParam);
-      }
+      const tabParam = urlParams.get('tab') || 'dashboard';
+      setActiveTab(tabParam);
     };
 
-    // Check on mount
-    handleUrlChange();
-
-    // Listen for popstate (back/forward buttons)
-    window.addEventListener('popstate', handleUrlChange);
-
-    return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-    };
-  }, [activeTab]);
+    window.addEventListener('popstate', handlePopstate);
+    return () => window.removeEventListener('popstate', handlePopstate);
+  }, []);
 
   useEffect(() => {
     const newUrl = new URL(window.location);
