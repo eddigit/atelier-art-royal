@@ -30,6 +30,7 @@ import POS from './pages/POS';
 import AdminInventory from './pages/AdminInventory';
 import AdminCategories from './pages/AdminCategories';
 import AdminChat from './pages/AdminChat';
+import AdminBusinessPipeline from './pages/AdminBusinessPipeline';
 import __Layout from './Layout.jsx';
 
 
@@ -66,6 +67,7 @@ export const PAGES = {
     "AdminInventory": AdminInventory,
     "AdminCategories": AdminCategories,
     "AdminChat": AdminChat,
+    "AdminBusinessPipeline": AdminBusinessPipeline,
 }
 
 export const pagesConfig = {
