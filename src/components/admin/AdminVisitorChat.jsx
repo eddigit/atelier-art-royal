@@ -457,6 +457,16 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
                 </div>
               )}
 
+              {existingQualification?.visitor_city && (
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Ville d'Origine</div>
+                  <div className="flex items-center gap-1 text-sm">
+                    <MapPin className="w-3 h-3" />
+                    {existingQualification.visitor_city}, {existingQualification.visitor_country}
+                  </div>
+                </div>
+              )}
+
               {(visitor.visitor_city || visitor.visitor_country) && (
                 <div>
                   <div className="text-xs text-muted-foreground mb-1">Localisation</div>

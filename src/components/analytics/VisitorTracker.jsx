@@ -104,13 +104,19 @@ export default function VisitorTracker({ pageName }) {
             await base44.entities.VisitorQualification.update(qual.id, {
               visit_count: (qual.visit_count || 1) + 1,
               last_visit_date: new Date().toISOString(),
-              visitor_id: visitorId // Update to latest visitor_id
+              visitor_id: visitorId,
+              visitor_city: geoData.city || qual.visitor_city,
+              visitor_country: geoData.country_name || qual.visitor_country,
+              visitor_region: geoData.region || qual.visitor_region
             });
           } else if (isNewVisitor) {
             // First time visitor - create record
             await base44.entities.VisitorQualification.create({
               visitor_id: visitorId,
               visitor_ip: geoData.ip,
+              visitor_city: geoData.city || null,
+              visitor_country: geoData.country_name || null,
+              visitor_region: geoData.region || null,
               visit_count: 1,
               first_visit_date: new Date().toISOString(),
               last_visit_date: new Date().toISOString()
