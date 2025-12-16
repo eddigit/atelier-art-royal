@@ -130,7 +130,7 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Header Bar */}
-      <div className="bg-primary/10 border-b border-primary/20 py-2">
+      <div className="bg-slate-800 py-2 border-b border-primary/20">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs sm:text-sm">
             <a href="tel:+33646683610" className="flex items-center gap-2 hover:opacity-80 transition-colors" style={{ color: '#e5b350' }}>
@@ -476,7 +476,7 @@ export default function Layout({ children, currentPageName }) {
       </header>
 
       {/* Main Content */}
-      <main className="bg-slate-200 min-h-[calc(100vh-5rem)]">
+      <main className="min-h-[calc(100vh-5rem)]">
         {children}
       </main>
 
