@@ -182,13 +182,6 @@ export default function Layout({ children, currentPageName }) {
                 Accueil
               </Link>
 
-              {isAdmin && (
-                <Link to={createPageUrl('AdminPanel')} className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-2">
-                  <Settings className="w-4 h-4" />
-                  Administration
-                </Link>
-              )}
-
               {!isAdminPage && (
                 <>
                   {/* Menu Rites */}
@@ -316,6 +309,17 @@ export default function Layout({ children, currentPageName }) {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to={createPageUrl('AdminPanel')} className="cursor-pointer">
+                            <Settings className="w-4 h-4 mr-2" />
+                            Administration
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
                     <DropdownMenuItem asChild>
                       <Link to={createPageUrl('Account')} className="cursor-pointer">
                         <UserCircle className="w-4 h-4 mr-2" />
@@ -383,22 +387,11 @@ export default function Layout({ children, currentPageName }) {
                   to={createPageUrl('Home')} 
                   className="text-sm font-medium hover:text-primary transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
-                >
-                  Accueil
-                </Link>
-
-                {isAdmin && (
-                  <Link 
-                    to={createPageUrl('AdminPanel')} 
-                    className="text-sm font-semibold hover:text-primary transition-colors py-2 flex items-center gap-2"
-                    onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Settings className="w-4 h-4" />
-                    Administration
+                  Accueil
                   </Link>
-                )}
 
-                {!isAdminPage && (
+                  {!isAdminPage && (
                   <>
                     <div className="text-xs text-muted-foreground font-semibold mt-2">Rites</div>
                     {rites.map(rite => (
@@ -450,9 +443,21 @@ export default function Layout({ children, currentPageName }) {
                   </>
                 )}
 
-                {user && !isAdminPage && (
+                {user && (
+                <>
+                <div className="border-t border-border my-2" />
+                {isAdmin && (
+                  <Link 
+                    to={createPageUrl('AdminPanel')} 
+                    className="text-sm font-semibold hover:text-primary transition-colors py-2 flex items-center gap-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Settings className="w-4 h-4" />
+                    Administration
+                  </Link>
+                )}
+                {!isAdminPage && (
                   <>
-                    <div className="border-t border-border my-2" />
                     <Link 
                       to={createPageUrl('Account')} 
                       className="text-sm font-medium hover:text-primary transition-colors py-2"
@@ -469,18 +474,7 @@ export default function Layout({ children, currentPageName }) {
                     </Link>
                   </>
                 )}
-
-                {isAdmin && (
-                  <>
-                    <div className="border-t border-border my-2" />
-                    <Link 
-                      to={createPageUrl('AdminPanel')} 
-                      className="text-sm font-medium hover:text-primary transition-colors py-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Administration
-                    </Link>
-                  </>
+                </>
                 )}
               </nav>
             </div>
