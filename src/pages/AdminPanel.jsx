@@ -64,68 +64,70 @@ export default function AdminPanel() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-3 lg:grid-cols-13 gap-2 h-auto p-2">
-          <TabsTrigger value="dashboard" className="flex flex-col gap-1 py-3">
-            <LayoutDashboard className="w-5 h-5" />
-            <span className="text-xs">Dashboard</span>
-          </TabsTrigger>
-          <TabsTrigger value="products" className="flex flex-col gap-1 py-3">
-            <Package className="w-5 h-5" />
-            <span className="text-xs">Produits</span>
-          </TabsTrigger>
-          <TabsTrigger value="customers" className="flex flex-col gap-1 py-3">
-            <Users className="w-5 h-5" />
-            <span className="text-xs">Clients</span>
-          </TabsTrigger>
-          <TabsTrigger value="leads" className="flex flex-col gap-1 py-3">
-            <Users className="w-5 h-5" />
-            <span className="text-xs">Leads</span>
-          </TabsTrigger>
-          <TabsTrigger value="production" className="flex flex-col gap-1 py-3">
-            <Factory className="w-5 h-5" />
-            <span className="text-xs">Production</span>
-          </TabsTrigger>
-          <TabsTrigger value="orders" className="flex flex-col gap-1 py-3">
-            <ShoppingCart className="w-5 h-5" />
-            <span className="text-xs">Commandes</span>
-          </TabsTrigger>
-          <TabsTrigger value="rites" className="flex flex-col gap-1 py-3">
-            <Award className="w-5 h-5" />
-            <span className="text-xs">Rites</span>
-          </TabsTrigger>
-          <TabsTrigger value="obediences" className="flex flex-col gap-1 py-3">
-            <Building2 className="w-5 h-5" />
-            <span className="text-xs">Obédiences</span>
-          </TabsTrigger>
-          <TabsTrigger value="degrees" className="flex flex-col gap-1 py-3">
-            <GraduationCap className="w-5 h-5" />
-            <span className="text-xs">Degrés</span>
-          </TabsTrigger>
-          <TabsTrigger value="stock" className="flex flex-col gap-1 py-3">
-            <Warehouse className="w-5 h-5" />
-            <span className="text-xs">Stocks</span>
-          </TabsTrigger>
-          <TabsTrigger value="inventory" className="flex flex-col gap-1 py-3">
-            <ClipboardList className="w-5 h-5" />
-            <span className="text-xs">Inventaire</span>
-          </TabsTrigger>
-          <TabsTrigger value="reviews" className="flex flex-col gap-1 py-3">
-            <Star className="w-5 h-5" />
-            <span className="text-xs">Avis</span>
-          </TabsTrigger>
-          <TabsTrigger value="home" className="flex flex-col gap-1 py-3">
-            <Home className="w-5 h-5" />
-            <span className="text-xs">Accueil</span>
-          </TabsTrigger>
-          <TabsTrigger value="ai" className="flex flex-col gap-1 py-3">
-            <Sparkles className="w-5 h-5" />
-            <span className="text-xs">IA</span>
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex flex-col gap-1 py-3">
-            <TrendingUp className="w-5 h-5" />
-            <span className="text-xs">Statistiques</span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-auto h-auto p-1 gap-1">
+            <TabsTrigger value="dashboard" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <LayoutDashboard className="w-4 h-4" />
+              Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="products" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Package className="w-4 h-4" />
+              Produits
+            </TabsTrigger>
+            <TabsTrigger value="customers" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Users className="w-4 h-4" />
+              Clients
+            </TabsTrigger>
+            <TabsTrigger value="leads" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Users className="w-4 h-4" />
+              Leads
+            </TabsTrigger>
+            <TabsTrigger value="production" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Factory className="w-4 h-4" />
+              Production
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <ShoppingCart className="w-4 h-4" />
+              Commandes
+            </TabsTrigger>
+            <TabsTrigger value="rites" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Award className="w-4 h-4" />
+              Rites
+            </TabsTrigger>
+            <TabsTrigger value="obediences" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Building2 className="w-4 h-4" />
+              Obédiences
+            </TabsTrigger>
+            <TabsTrigger value="degrees" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <GraduationCap className="w-4 h-4" />
+              Degrés
+            </TabsTrigger>
+            <TabsTrigger value="stock" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Warehouse className="w-4 h-4" />
+              Stocks
+            </TabsTrigger>
+            <TabsTrigger value="inventory" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <ClipboardList className="w-4 h-4" />
+              Inventaire
+            </TabsTrigger>
+            <TabsTrigger value="reviews" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Star className="w-4 h-4" />
+              Avis
+            </TabsTrigger>
+            <TabsTrigger value="home" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Home className="w-4 h-4" />
+              Accueil
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <Sparkles className="w-4 h-4" />
+              IA
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+              <TrendingUp className="w-4 h-4" />
+              Statistiques
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="dashboard" className="space-y-4">
           <AdminDashboard onNavigateToTab={setActiveTab} />
