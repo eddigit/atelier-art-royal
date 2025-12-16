@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const visitorId = localStorage.getItem('visitor_id');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -69,6 +71,15 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
+      // Save visitor message to database
+      if (visitorId) {
+        await base44.entities.ChatMessage.create({
+          visitor_id: visitorId,
+          sender_type: 'visitor',
+          message: input
+        });
+      }
+
       const { data } = await base44.functions.invoke('aiChat', {
         messages: [...messages, userMessage].map((m) => ({ role: m.role, content: m.content }))
       });
@@ -80,6 +91,16 @@ export default function ChatWidget() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // Save AI response to database
+      if (visitorId) {
+        await base44.entities.ChatMessage.create({
+          visitor_id: visitorId,
+          sender_type: 'ai',
+          sender_name: 'Assistant IA',
+          message: data.message
+        });
+      }
 
       // If a lead was created, notify in chat
       if (data.lead_created) {

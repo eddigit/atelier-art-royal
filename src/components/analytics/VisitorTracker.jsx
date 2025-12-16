@@ -26,6 +26,29 @@ export default function VisitorTracker({ pageName }) {
         // Get product ID from URL if on product page
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
+        
+        // Capture UTM parameters and source
+        const utmSource = urlParams.get('utm_source') || null;
+        const utmMedium = urlParams.get('utm_medium') || null;
+        const utmCampaign = urlParams.get('utm_campaign') || null;
+        
+        // Detect source from referrer
+        const referrer = document.referrer;
+        let source = 'direct';
+        if (referrer) {
+          if (referrer.includes('google')) source = 'google';
+          else if (referrer.includes('facebook')) source = 'facebook';
+          else if (referrer.includes('instagram')) source = 'instagram';
+          else if (referrer.includes('linkedin')) source = 'linkedin';
+          else if (utmSource) source = utmSource;
+          else source = 'referral';
+        }
+        
+        // Simple bot detection
+        const ua = navigator.userAgent.toLowerCase();
+        const isLikelyBot = ua.includes('bot') || 
+                           ua.includes('crawler') || 
+                           ua.includes('spider');
 
         // Track page view
         await base44.entities.PageView.create({
@@ -34,9 +57,13 @@ export default function VisitorTracker({ pageName }) {
           page_url: window.location.pathname + window.location.search,
           page_name: pageName,
           product_id: productId,
-          referrer: document.referrer,
+          referrer: referrer || null,
           user_agent: navigator.userAgent,
-          ip_address: 'auto'
+          source: source,
+          utm_source: utmSource,
+          utm_medium: utmMedium,
+          utm_campaign: utmCampaign,
+          is_likely_bot: isLikelyBot
         });
 
         // Update active visitor
@@ -45,7 +72,11 @@ export default function VisitorTracker({ pageName }) {
           user_id: userId,
           current_page: pageName,
           last_activity: new Date().toISOString(),
-          is_new_visitor: isNewVisitor
+          is_new_visitor: isNewVisitor,
+          source: source,
+          referrer: referrer || null,
+          user_agent: navigator.userAgent,
+          is_likely_bot: isLikelyBot
         });
 
         // Update activity every 30 seconds
