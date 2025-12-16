@@ -86,7 +86,12 @@ export default function Layout({ children, currentPageName }) {
 
   // Filter only options with available products and deduplicate by name
   const rites = allRites.filter(r => products.some(p => p.rite_id === r.id));
-  const categoriesFiltered = allCategories.filter(c => products.some(p => p.category_id === c.id));
+  const categoriesFiltered = allCategories.filter(c => 
+    products.some(p => {
+      const categoryIds = Array.isArray(p.category_ids) ? p.category_ids : (p.category_id ? [p.category_id] : []);
+      return categoryIds.includes(c.id);
+    })
+  );
   const categories = categoriesFiltered.filter((cat, index, self) => 
     index === self.findIndex(c => c.name === cat.name)
   );
