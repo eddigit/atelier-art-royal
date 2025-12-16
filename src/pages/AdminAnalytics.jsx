@@ -19,11 +19,11 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import AdminVisitorChat from '@/components/admin/AdminVisitorChat';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 export default function AdminAnalytics() {
   const [timeRange, setTimeRange] = useState('month');
-  const [selectedVisitor, setSelectedVisitor] = useState(null);
 
   const getDateRange = () => {
     const now = new Date();
@@ -273,72 +273,31 @@ export default function AdminAnalytics() {
         </CardContent>
       </Card>
 
-      {/* Visitors Currently Online */}
+      {/* Quick Link to Chat */}
       {activeVisitors.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-green-500" />
-              Visiteurs en Ligne Maintenant
+              Visiteurs en Ligne
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {activeVisitors.map((visitor) => (
-                <div key={visitor.id} className="flex items-center justify-between p-3 rounded border hover:border-primary/50 transition-colors">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-medium">
-                          {visitor.user_id ? 'Utilisateur connecté' : 'Visiteur'}
-                        </span>
-                        {visitor.is_new_visitor && (
-                          <Badge variant="outline" className="text-xs">Nouveau</Badge>
-                        )}
-                        {visitor.is_likely_bot && (
-                          <Badge variant="destructive" className="text-xs gap-1">
-                            <Bot className="w-3 h-3" />
-                            Bot
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>{visitor.current_page}</span>
-                        {visitor.source && visitor.source !== 'direct' && (
-                          <>
-                            <span>•</span>
-                            <Badge variant="outline" className="text-xs gap-1">
-                              <Globe className="w-3 h-3" />
-                              {visitor.source}
-                            </Badge>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="gap-2"
-                    onClick={() => setSelectedVisitor(visitor)}
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    Chat
-                  </Button>
-                </div>
-              ))}
+            <div className="text-center py-6 space-y-4">
+              <div className="text-4xl font-bold text-primary">{activeVisitors.length}</div>
+              <p className="text-muted-foreground">
+                {activeVisitors.length === 1 ? 'visiteur actuellement en ligne' : 'visiteurs actuellement en ligne'}
+              </p>
+              <Link to={createPageUrl('AdminPanel') + '?tab=chat'}>
+                <Button className="gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  Ouvrir le Chat
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
       )}
-      
-      {/* Admin Visitor Chat Dialog */}
-      <AdminVisitorChat
-        visitor={selectedVisitor}
-        open={!!selectedVisitor}
-        onClose={() => setSelectedVisitor(null)}
-      />
 
       {/* Popular Pages */}
       <Card>

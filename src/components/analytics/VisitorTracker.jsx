@@ -50,6 +50,15 @@ export default function VisitorTracker({ pageName }) {
                            ua.includes('crawler') || 
                            ua.includes('spider');
 
+        // Get IP and geolocation
+        let geoData = null;
+        try {
+          const geoResponse = await fetch('https://ipapi.co/json/');
+          geoData = await geoResponse.json();
+        } catch (e) {
+          console.log('Geolocation failed:', e);
+        }
+
         // Track page view
         await base44.entities.PageView.create({
           visitor_id: visitorId,
@@ -76,7 +85,11 @@ export default function VisitorTracker({ pageName }) {
           source: source,
           referrer: referrer || null,
           user_agent: navigator.userAgent,
-          is_likely_bot: isLikelyBot
+          is_likely_bot: isLikelyBot,
+          visitor_ip: geoData?.ip || null,
+          visitor_country: geoData?.country_name || null,
+          visitor_city: geoData?.city || null,
+          visitor_region: geoData?.region || null
         });
 
         // Update activity every 30 seconds

@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { Send, Bot, User, AlertCircle, Globe, ExternalLink, UserPlus, Save } from 'lucide-react';
+import { Send, Bot, User, AlertCircle, Globe, ExternalLink, UserPlus, Save, MapPin } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -392,6 +392,25 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
                 <div>
                   <div className="text-xs text-muted-foreground mb-1">Campagne</div>
                   <Badge variant="outline">{latestView.utm_campaign}</Badge>
+                </div>
+              )}
+
+              {visitor.visitor_ip && (
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Adresse IP</div>
+                  <Badge variant="secondary" className="font-mono">{visitor.visitor_ip}</Badge>
+                </div>
+              )}
+
+              {(visitor.visitor_city || visitor.visitor_country) && (
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Localisation</div>
+                  <div className="flex items-center gap-1 text-sm">
+                    <MapPin className="w-3 h-3" />
+                    {visitor.visitor_city && <span>{visitor.visitor_city}</span>}
+                    {visitor.visitor_city && visitor.visitor_country && <span>,</span>}
+                    {visitor.visitor_country && <span>{visitor.visitor_country}</span>}
+                  </div>
                 </div>
               )}
 
