@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp, ClipboardList, Grid, Briefcase, MessageCircle } from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp, ClipboardList, Grid } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCustomers from './AdminCustomers';
@@ -19,8 +19,6 @@ import AdminLeads from './AdminLeads';
 import AdminAnalytics from './AdminAnalytics';
 import AdminInventory from './AdminInventory';
 import AdminCategories from './AdminCategories';
-import AdminChat from './AdminChat';
-import AdminBusinessPipeline from './AdminBusinessPipeline';
 
 export default function AdminPanel() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -67,7 +65,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 h-auto p-0 gap-0 bg-transparent">
+        <TabsList className="grid grid-cols-5 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-16 h-auto p-0 gap-0 bg-transparent">
           <TabsTrigger value="dashboard" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <LayoutDashboard className="w-5 h-5" />
             <span className="text-xs font-medium">Dashboard</span>
@@ -132,15 +130,7 @@ export default function AdminPanel() {
             <TrendingUp className="w-5 h-5" />
             <span className="text-xs font-medium">Stats</span>
           </TabsTrigger>
-          <TabsTrigger value="chat" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <MessageCircle className="w-5 h-5" />
-            <span className="text-xs font-medium">Chat</span>
-          </TabsTrigger>
-          <TabsTrigger value="pipeline" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <Briefcase className="w-5 h-5" />
-            <span className="text-xs font-medium">Affaires</span>
-          </TabsTrigger>
-          </TabsList>
+        </TabsList>
 
         <TabsContent value="dashboard" className="space-y-4">
           <AdminDashboard onNavigateToTab={setActiveTab} />
@@ -204,14 +194,6 @@ export default function AdminPanel() {
 
         <TabsContent value="inventory" className="space-y-4">
           <AdminInventory />
-        </TabsContent>
-
-        <TabsContent value="chat" className="space-y-4">
-          <AdminChat />
-        </TabsContent>
-
-        <TabsContent value="pipeline" className="space-y-4">
-          <AdminBusinessPipeline />
         </TabsContent>
         </Tabs>
     </div>
