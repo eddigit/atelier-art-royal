@@ -132,7 +132,7 @@ export default function AdminPanel() {
         </TabsList>
 
         <TabsContent value="dashboard" className="space-y-4">
-          <AdminDashboard />
+          <AdminDashboard onNavigateToTab={setActiveTab} />
         </TabsContent>
 
         <TabsContent value="products" className="space-y-4">

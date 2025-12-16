@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -18,9 +18,7 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function AdminDashboard() {
-  const navigate = useNavigate();
-  
+export default function AdminDashboard({ onNavigateToTab }) {
   const { data: user } = useQuery({
     queryKey: ['user'],
     queryFn: () => base44.auth.me()
@@ -107,42 +105,42 @@ export default function AdminDashboard() {
       title: 'Gérer les Produits',
       description: 'Ajouter, modifier ou supprimer des produits',
       icon: Package,
-      link: createPageUrl('AdminPanel') + '?tab=products',
+      tab: 'products',
       color: 'border-blue-200 hover:border-blue-400'
     },
     {
       title: 'Voir les Commandes',
       description: 'Gérer et suivre les commandes clients',
       icon: FileText,
-      link: createPageUrl('AdminPanel') + '?tab=orders',
+      tab: 'orders',
       color: 'border-green-200 hover:border-green-400'
     },
     {
       title: 'Gérer les Clients',
       description: 'Visualiser et gérer les informations clients',
       icon: Users,
-      link: createPageUrl('AdminPanel') + '?tab=customers',
+      tab: 'customers',
       color: 'border-red-200 hover:border-red-400'
     },
     {
       title: 'Gestion de Production',
       description: 'Suivre et gérer les articles en production',
       icon: TrendingUp,
-      link: createPageUrl('AdminPanel') + '?tab=production',
+      tab: 'production',
       color: 'border-orange-200 hover:border-orange-400'
     },
     {
       title: 'Gérer les Avis',
       description: 'Modérer et approuver les avis clients',
       icon: Award,
-      link: createPageUrl('AdminPanel') + '?tab=reviews',
+      tab: 'reviews',
       color: 'border-yellow-200 hover:border-yellow-400'
     },
     {
       title: 'Gestion des Stocks',
       description: 'Gérer les stocks et réapprovisionnements',
       icon: Settings,
-      link: createPageUrl('AdminPanel') + '?tab=stock',
+      tab: 'stock',
       color: 'border-purple-200 hover:border-purple-400'
     }
   ];
@@ -225,7 +223,7 @@ export default function AdminDashboard() {
               <Card 
                 key={idx}
                 className={`border-2 ${action.color} transition-all hover:shadow-lg cursor-pointer h-full`}
-                onClick={() => navigate(action.link)}
+                onClick={() => onNavigateToTab && onNavigateToTab(action.tab)}
               >
                 <CardHeader>
                   <div className="flex items-center gap-3">
