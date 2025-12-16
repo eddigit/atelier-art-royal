@@ -20,12 +20,10 @@ import {
   Heart
 } from 'lucide-react';
 import ChatWidget from '@/components/chat/ChatWidget';
-import CartSidebar from '@/components/cart/CartSidebar';
 import VisitorTracker from '@/components/analytics/VisitorTracker';
 import VisitorNotifier from '@/components/analytics/VisitorNotifier';
 import WelcomeOnboarding from '@/components/onboarding/WelcomeOnboarding';
 import SignUpBanner from '@/components/onboarding/SignUpBanner';
-import LoyaltyBadge from '@/components/loyalty/LoyaltyBadge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +38,6 @@ import { useQuery } from '@tanstack/react-query';
 export default function Layout({ children, currentPageName }) {
   const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cartSidebarOpen, setCartSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
 
   const { data: cartItems = [] } = useQuery({
@@ -55,16 +52,6 @@ export default function Layout({ children, currentPageName }) {
       }
     },
     initialData: []
-  });
-
-  const { data: loyaltyData } = useQuery({
-    queryKey: ['loyalty', user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-      const data = await base44.entities.LoyaltyPoints.filter({ user_id: user.id });
-      return data[0] || null;
-    },
-    enabled: !!user
   });
 
   const { data: products = [] } = useQuery({
@@ -286,19 +273,16 @@ export default function Layout({ children, currentPageName }) {
 
               {/* Cart */}
               {!isAdminPage && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-full relative"
-                  onClick={() => setCartSidebarOpen(true)}
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-bold">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
+                <Link to={createPageUrl('Cart')}>
+                  <Button variant="ghost" size="icon" className="rounded-full relative">
+                    <ShoppingCart className="w-5 h-5" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-bold">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
               )}
 
               {/* User Menu */}
@@ -335,15 +319,6 @@ export default function Layout({ children, currentPageName }) {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                       </>
-                    )}
-                    {loyaltyData && (
-                      <div className="px-2 py-2">
-                        <LoyaltyBadge 
-                          tier={loyaltyData.tier} 
-                          points={loyaltyData.points} 
-                          compact={true} 
-                        />
-                      </div>
                     )}
                     <DropdownMenuItem asChild>
                       <Link to={createPageUrl('Account')} className="cursor-pointer">
@@ -524,9 +499,6 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Admin Visitor Notifications */}
       {isAdmin && <VisitorNotifier />}
-
-      {/* Cart Sidebar */}
-      <CartSidebar open={cartSidebarOpen} onClose={() => setCartSidebarOpen(false)} />
 
       {/* Footer */}
       <footer className="border-t border-border mt-20">
