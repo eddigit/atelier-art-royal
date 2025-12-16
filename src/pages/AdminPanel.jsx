@@ -67,7 +67,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-5 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-17 h-auto p-0 gap-0 bg-transparent">
+        <TabsList className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 h-auto p-0 gap-0 bg-transparent">
           <TabsTrigger value="dashboard" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <LayoutDashboard className="w-5 h-5" />
             <span className="text-xs font-medium">Dashboard</span>
