@@ -141,14 +141,18 @@ EXEMPLES:
 
   return (
     <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 image-immersive">
-        <img
-          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/01e4593f1_GeneratedImageNovember182025-9_37PM.png"
-          alt="Haute Couture Maçonnique"
-          className="w-full h-full object-cover" />
-
-        <div className="absolute inset-0 dark:bg-gradient-to-t dark:from-background dark:via-background/50 dark:to-transparent" />
+      {/* Background Video */}
+      <div className="absolute inset-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src="https://res.cloudinary.com/dkvhbcuaz/video/upload/v1/0a7650a1-db4a-4e13-80ca-159bb98f9862_wifp48.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/30" />
       </div>
 
       {/* Content */}
