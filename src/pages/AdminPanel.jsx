@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp } from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp, ClipboardList } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCustomers from './AdminCustomers';
@@ -17,6 +17,7 @@ import AdminHome from './AdminHome';
 import AdminAI from './AdminAI';
 import AdminLeads from './AdminLeads';
 import AdminAnalytics from './AdminAnalytics';
+import AdminInventory from './AdminInventory';
 
 export default function AdminPanel() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -63,7 +64,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-3 lg:grid-cols-12 gap-2 h-auto p-2">
+        <TabsList className="grid grid-cols-3 lg:grid-cols-13 gap-2 h-auto p-2">
           <TabsTrigger value="dashboard" className="flex flex-col gap-1 py-3">
             <LayoutDashboard className="w-5 h-5" />
             <span className="text-xs">Dashboard</span>
@@ -103,6 +104,10 @@ export default function AdminPanel() {
           <TabsTrigger value="stock" className="flex flex-col gap-1 py-3">
             <Warehouse className="w-5 h-5" />
             <span className="text-xs">Stocks</span>
+          </TabsTrigger>
+          <TabsTrigger value="inventory" className="flex flex-col gap-1 py-3">
+            <ClipboardList className="w-5 h-5" />
+            <span className="text-xs">Inventaire</span>
           </TabsTrigger>
           <TabsTrigger value="reviews" className="flex flex-col gap-1 py-3">
             <Star className="w-5 h-5" />
@@ -177,7 +182,11 @@ export default function AdminPanel() {
         <TabsContent value="analytics" className="space-y-4">
           <AdminAnalytics />
         </TabsContent>
-      </Tabs>
+
+        <TabsContent value="inventory" className="space-y-4">
+          <AdminInventory />
+        </TabsContent>
+        </Tabs>
     </div>
   );
 }

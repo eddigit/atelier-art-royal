@@ -27,6 +27,7 @@ import AdminHome from './pages/AdminHome';
 import AdminLeads from './pages/AdminLeads';
 import AdminAnalytics from './pages/AdminAnalytics';
 import POS from './pages/POS';
+import AdminInventory from './pages/AdminInventory';
 import __Layout from './Layout.jsx';
 
 
@@ -60,6 +61,7 @@ export const PAGES = {
     "AdminLeads": AdminLeads,
     "AdminAnalytics": AdminAnalytics,
     "POS": POS,
+    "AdminInventory": AdminInventory,
 }
 
 export const pagesConfig = {
