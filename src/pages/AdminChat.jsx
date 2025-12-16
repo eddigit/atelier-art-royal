@@ -11,7 +11,11 @@ import {
   Bot,
   Globe,
   Search,
-  MapPin
+  MapPin,
+  Mail,
+  Phone,
+  FileText,
+  Building2
 } from 'lucide-react';
 import AdminVisitorChat from '@/components/admin/AdminVisitorChat';
 
@@ -131,14 +135,25 @@ export default function AdminChat() {
                         {/* Contact Info */}
                         {(qualification?.email || qualification?.phone) && (
                           <div className="text-sm text-muted-foreground space-y-1">
-                            {qualification.email && <div>📧 {qualification.email}</div>}
-                            {qualification.phone && <div>📞 {qualification.phone}</div>}
+                            {qualification.email && (
+                              <div className="flex items-center gap-1">
+                                <Mail className="w-3 h-3" />
+                                {qualification.email}
+                              </div>
+                            )}
+                            {qualification.phone && (
+                              <div className="flex items-center gap-1">
+                                <Phone className="w-3 h-3" />
+                                {qualification.phone}
+                              </div>
+                            )}
                           </div>
                         )}
 
                         {/* Current Page */}
-                        <div className="text-sm text-muted-foreground">
-                          📄 {visitor.current_page}
+                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                          <FileText className="w-3 h-3" />
+                          {visitor.current_page}
                         </div>
 
                         {/* Source and Location */}
@@ -164,8 +179,9 @@ export default function AdminChat() {
 
                         {/* Loge Info */}
                         {qualification?.loge_name && (
-                          <div className="text-sm">
-                            🏛️ Loge: <span className="font-medium">{qualification.loge_name}</span>
+                          <div className="text-sm flex items-center gap-1">
+                            <Building2 className="w-3 h-3" />
+                            Loge: <span className="font-medium">{qualification.loge_name}</span>
                           </div>
                         )}
                       </div>
