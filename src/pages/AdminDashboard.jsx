@@ -272,7 +272,8 @@ export default function AdminDashboard({ onNavigateToTab }) {
               {orders.slice(0, 5).map((order) => (
                 <div 
                   key={order.id}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => onNavigateToTab && onNavigateToTab('orders')}
                 >
                   <div>
                     <p className="font-semibold">{order.order_number}</p>
