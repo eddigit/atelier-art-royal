@@ -2,15 +2,31 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Send, Bot, User, AlertCircle, Globe, ExternalLink } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Send, Bot, User, AlertCircle, Globe, ExternalLink, UserPlus, Save } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 export default function AdminVisitorChat({ visitor, open, onClose }) {
   const [message, setMessage] = useState('');
+  const [showQualification, setShowQualification] = useState(false);
+  const [qualification, setQualification] = useState({
+    name: '',
+    first_name: '',
+    last_name: '',
+    email: '',
+    phone: '',
+    loge_name: '',
+    rite_id: '',
+    obedience_id: '',
+    degree_order_id: '',
+    notes: ''
+  });
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -48,6 +64,42 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
     initialData: []
   });
 
+  const { data: existingQualification } = useQuery({
+    queryKey: ['visitor-qualification', visitor?.visitor_id],
+    queryFn: async () => {
+      if (!visitor) return null;
+      const quals = await base44.entities.VisitorQualification.filter({
+        visitor_id: visitor.visitor_id
+      });
+      return quals.length > 0 ? quals[0] : null;
+    },
+    enabled: !!visitor && open
+  });
+
+  const { data: rites = [] } = useQuery({
+    queryKey: ['rites'],
+    queryFn: () => base44.entities.Rite.list('order', 50),
+    initialData: []
+  });
+
+  const { data: obediences = [] } = useQuery({
+    queryKey: ['obediences'],
+    queryFn: () => base44.entities.Obedience.list('order', 100),
+    initialData: []
+  });
+
+  const { data: degreeOrders = [] } = useQuery({
+    queryKey: ['degreeOrders'],
+    queryFn: () => base44.entities.DegreeOrder.list('level', 200),
+    initialData: []
+  });
+
+  useEffect(() => {
+    if (existingQualification) {
+      setQualification(existingQualification);
+    }
+  }, [existingQualification]);
+
   const sendMessageMutation = useMutation({
     mutationFn: async (text) => {
       await base44.entities.ChatMessage.create({
@@ -73,6 +125,61 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
     },
     onError: () => {
       toast.error('Erreur lors de l\'envoi du message');
+    }
+  });
+
+  const saveQualificationMutation = useMutation({
+    mutationFn: async (data) => {
+      if (existingQualification) {
+        await base44.entities.VisitorQualification.update(existingQualification.id, data);
+      } else {
+        await base44.entities.VisitorQualification.create({
+          ...data,
+          visitor_id: visitor.visitor_id
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['visitor-qualification']);
+      toast.success('Qualification sauvegardée');
+      setShowQualification(false);
+    },
+    onError: () => {
+      toast.error('Erreur lors de la sauvegarde');
+    }
+  });
+
+  const createLeadMutation = useMutation({
+    mutationFn: async () => {
+      const leadData = {
+        contact_name: qualification.name || `${qualification.first_name} ${qualification.last_name}`.trim(),
+        contact_email: qualification.email,
+        contact_phone: qualification.phone,
+        rite: rites.find(r => r.id === qualification.rite_id)?.name,
+        obedience: obediences.find(o => o.id === qualification.obedience_id)?.name,
+        degree_order: degreeOrders.find(d => d.id === qualification.degree_order_id)?.name,
+        request_details: `Lead créé depuis le chat visiteur.\nLoge: ${qualification.loge_name || 'Non spécifiée'}\nNotes: ${qualification.notes || 'Aucune'}`,
+        source: 'chat_admin',
+        conversation_context: messages.map(m => `${m.sender_name || m.sender_type}: ${m.message}`).join('\n'),
+        status: 'nouveau',
+        priority: 'haute'
+      };
+      
+      await base44.entities.LeadRequest.create(leadData);
+      
+      // Mark qualification as lead created
+      if (existingQualification) {
+        await base44.entities.VisitorQualification.update(existingQualification.id, {
+          lead_created: true
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['visitor-qualification']);
+      toast.success('Lead créé avec succès');
+    },
+    onError: () => {
+      toast.error('Erreur lors de la création du lead');
     }
   });
 
@@ -113,6 +220,134 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
           {/* Visitor Info */}
           <Card className="col-span-1 overflow-y-auto">
             <CardContent className="pt-6 space-y-4">
+              {/* Qualification Button */}
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant={showQualification ? "secondary" : "outline"}
+                  onClick={() => setShowQualification(!showQualification)}
+                  className="flex-1"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Qualifier
+                </Button>
+                {existingQualification && !existingQualification.lead_created && (
+                  <Button 
+                    size="sm" 
+                    onClick={() => createLeadMutation.mutate()}
+                    disabled={createLeadMutation.isPending}
+                  >
+                    Lead
+                  </Button>
+                )}
+              </div>
+
+              {/* Qualification Form */}
+              {showQualification && (
+                <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
+                  <div>
+                    <Label className="text-xs">Prénom</Label>
+                    <Input
+                      value={qualification.first_name}
+                      onChange={(e) => setQualification({...qualification, first_name: e.target.value})}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Nom</Label>
+                    <Input
+                      value={qualification.last_name}
+                      onChange={(e) => setQualification({...qualification, last_name: e.target.value})}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Email</Label>
+                    <Input
+                      type="email"
+                      value={qualification.email}
+                      onChange={(e) => setQualification({...qualification, email: e.target.value})}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Téléphone</Label>
+                    <Input
+                      value={qualification.phone}
+                      onChange={(e) => setQualification({...qualification, phone: e.target.value})}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Loge</Label>
+                    <Input
+                      value={qualification.loge_name}
+                      onChange={(e) => setQualification({...qualification, loge_name: e.target.value})}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Rite</Label>
+                    <Select value={qualification.rite_id} onValueChange={(v) => setQualification({...qualification, rite_id: v})}>
+                      <SelectTrigger className="h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {rites.map(r => (
+                          <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Obédience</Label>
+                    <Select value={qualification.obedience_id} onValueChange={(v) => setQualification({...qualification, obedience_id: v})}>
+                      <SelectTrigger className="h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {obediences.map(o => (
+                          <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Degré & Ordre</Label>
+                    <Select value={qualification.degree_order_id} onValueChange={(v) => setQualification({...qualification, degree_order_id: v})}>
+                      <SelectTrigger className="h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {degreeOrders.map(d => (
+                          <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Notes</Label>
+                    <Textarea
+                      value={qualification.notes}
+                      onChange={(e) => setQualification({...qualification, notes: e.target.value})}
+                      className="h-20 text-sm"
+                    />
+                  </div>
+                  <Button 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => saveQualificationMutation.mutate(qualification)}
+                    disabled={saveQualificationMutation.isPending}
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Sauvegarder
+                  </Button>
+                </div>
+              )}
+
+              {existingQualification && existingQualification.lead_created && (
+                <Badge className="w-full justify-center">Lead créé</Badge>
+              )}
               <div>
                 <div className="text-xs text-muted-foreground mb-1">ID Visiteur</div>
                 <div className="text-xs font-mono break-all">{visitor.visitor_id}</div>
