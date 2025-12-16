@@ -254,6 +254,14 @@ export default function AdminProducts() {
             {products.length} produit{products.length > 1 ? 's' : ''} dans le catalogue
           </p>
         </div>
+        <Button
+          size="lg"
+          onClick={() => setEditingProduct({})}
+          className="bg-primary hover:bg-primary/90"
+        >
+          <Package className="w-5 h-5 mr-2" />
+          Créer un produit
+        </Button>
       </div>
 
       <ProductStatsCards products={products} />
