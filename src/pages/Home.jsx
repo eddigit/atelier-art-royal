@@ -1,5 +1,5 @@
 import React from 'react';
-import AnimatedHero from '@/components/home/AnimatedHero';
+import HeroSection from '@/components/home/HeroSection';
 import ValuePropositions from '@/components/home/ValuePropositions';
 import FeaturedRites from '@/components/home/FeaturedRites';
 import SocialProof from '@/components/home/SocialProof';
@@ -51,7 +51,7 @@ export default function Home() {
 
   return (
     <div>
-      <AnimatedHero />
+      <HeroSection />
       <ValuePropositions />
       <FeaturedRites />
       <SocialProof />
