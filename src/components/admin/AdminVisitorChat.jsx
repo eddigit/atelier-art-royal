@@ -57,10 +57,25 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
       return await base44.entities.PageView.filter(
         { visitor_id: visitor.visitor_id },
         '-created_date',
-        20
+        50
       );
     },
     enabled: !!visitor && open,
+    refetchInterval: 5000, // Refresh every 5 seconds for real-time
+    initialData: []
+  });
+
+  const { data: ipHistory = [] } = useQuery({
+    queryKey: ['ip-history', visitor?.visitor_ip],
+    queryFn: async () => {
+      if (!visitor?.visitor_ip) return [];
+      return await base44.entities.PageView.filter(
+        { ip_address: visitor.visitor_ip },
+        '-created_date',
+        100
+      );
+    },
+    enabled: !!visitor?.visitor_ip && open,
     initialData: []
   });
 
@@ -99,6 +114,30 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
       setQualification(existingQualification);
     }
   }, [existingQualification]);
+
+  const visitCount = existingQualification?.visit_count || 1;
+  const isReturningVisitor = visitCount > 1;
+  
+  // Group page views by session (15 min gaps = new session)
+  const sessions = [];
+  let currentSession = [];
+  pageViews.forEach((view, idx) => {
+    if (idx === 0) {
+      currentSession = [view];
+    } else {
+      const prevTime = new Date(pageViews[idx - 1].created_date).getTime();
+      const currentTime = new Date(view.created_date).getTime();
+      const gap = prevTime - currentTime;
+      
+      if (gap > 15 * 60 * 1000) { // 15 minutes
+        sessions.push([...currentSession]);
+        currentSession = [view];
+      } else {
+        currentSession.push(view);
+      }
+    }
+  });
+  if (currentSession.length > 0) sessions.push(currentSession);
 
   const sendMessageMutation = useMutation({
     mutationFn: async (text) => {
@@ -402,6 +441,22 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
                 </div>
               )}
 
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Statut Visiteur</div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={isReturningVisitor ? "default" : "outline"}>
+                    {isReturningVisitor ? `${visitCount} visites` : 'Première visite'}
+                  </Badge>
+                </div>
+              </div>
+
+              {existingQualification?.first_visit_date && (
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Première Visite</div>
+                  <div className="text-xs">{new Date(existingQualification.first_visit_date).toLocaleString('fr-FR')}</div>
+                </div>
+              )}
+
               {(visitor.visitor_city || visitor.visitor_country) && (
                 <div>
                   <div className="text-xs text-muted-foreground mb-1">Localisation</div>
@@ -422,14 +477,23 @@ export default function AdminVisitorChat({ visitor, open, onClose }) {
               )}
 
               <div>
-                <div className="text-xs text-muted-foreground mb-2">Historique de Navigation</div>
-                <div className="space-y-1 max-h-40 overflow-y-auto">
-                  {pageViews.slice(0, 10).map((view, idx) => (
-                    <div key={view.id} className="text-xs p-2 rounded bg-muted/50">
-                      <div className="font-medium">{view.page_name}</div>
-                      <div className="text-muted-foreground text-[10px]">
-                        {new Date(view.created_date).toLocaleTimeString('fr-FR')}
+                <div className="text-xs text-muted-foreground mb-2">
+                  Navigation en Temps Réel
+                </div>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {sessions.map((session, sessionIdx) => (
+                    <div key={sessionIdx} className="border-l-2 border-primary/30 pl-2">
+                      <div className="text-[10px] text-muted-foreground mb-1">
+                        Session {sessions.length - sessionIdx} - {new Date(session[0].created_date).toLocaleDateString('fr-FR')}
                       </div>
+                      {session.slice(0, 15).map((view) => (
+                        <div key={view.id} className="text-xs p-1.5 rounded bg-muted/30 mb-1">
+                          <div className="font-medium truncate">{view.page_name}</div>
+                          <div className="text-muted-foreground text-[10px]">
+                            {new Date(view.created_date).toLocaleTimeString('fr-FR')}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>

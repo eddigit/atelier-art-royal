@@ -89,7 +89,10 @@ export default function AdminChat() {
           </Card>
         ) : (
           filteredVisitors.map((visitor) => {
-            const qualification = allVisitorQualifications.find(q => q.visitor_id === visitor.visitor_id);
+            const qualification = allVisitorQualifications.find(q => q.visitor_id === visitor.visitor_id) ||
+                                 allVisitorQualifications.find(q => q.visitor_ip === visitor.visitor_ip);
+            const visitCount = qualification?.visit_count || 1;
+            const isReturningVisitor = visitCount > 1;
             
             return (
               <Card key={visitor.id} className="hover:border-primary/50 transition-colors cursor-pointer">
@@ -109,8 +112,10 @@ export default function AdminChat() {
                              `${qualification?.first_name || ''} ${qualification?.last_name || ''}`.trim() ||
                              (visitor.user_id ? 'Utilisateur connecté' : 'Visiteur anonyme')}
                           </span>
-                          {visitor.is_new_visitor && (
-                            <Badge variant="outline">Nouveau</Badge>
+                          {isReturningVisitor ? (
+                            <Badge variant="default">{visitCount} visites</Badge>
+                          ) : (
+                            <Badge variant="outline">1ère visite</Badge>
                           )}
                           {visitor.is_likely_bot && (
                             <Badge variant="destructive" className="gap-1">

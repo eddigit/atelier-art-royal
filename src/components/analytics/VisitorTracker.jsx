@@ -92,6 +92,32 @@ export default function VisitorTracker({ pageName }) {
           visitor_region: geoData?.region || null
         });
 
+        // Track visit count by IP
+        if (geoData?.ip) {
+          const existingQuals = await base44.entities.VisitorQualification.filter({
+            visitor_ip: geoData.ip
+          });
+          
+          if (existingQuals.length > 0) {
+            // Returning visitor - increment count
+            const qual = existingQuals[0];
+            await base44.entities.VisitorQualification.update(qual.id, {
+              visit_count: (qual.visit_count || 1) + 1,
+              last_visit_date: new Date().toISOString(),
+              visitor_id: visitorId // Update to latest visitor_id
+            });
+          } else if (isNewVisitor) {
+            // First time visitor - create record
+            await base44.entities.VisitorQualification.create({
+              visitor_id: visitorId,
+              visitor_ip: geoData.ip,
+              visit_count: 1,
+              first_visit_date: new Date().toISOString(),
+              last_visit_date: new Date().toISOString()
+            });
+          }
+        }
+
         // Update activity every 30 seconds
         const interval = setInterval(async () => {
           try {
