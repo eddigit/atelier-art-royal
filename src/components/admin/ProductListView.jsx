@@ -59,11 +59,14 @@ export default function ProductListView({ products, onEdit, onDelete, selectedPr
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onEdit(product)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(product);
+              }}
             >
               <Edit className="w-4 h-4" />
             </Button>
-            <Link to={createPageUrl('ProductDetail') + `?id=${product.id}`}>
+            <Link to={createPageUrl('ProductDetail') + `?id=${product.id}`} onClick={(e) => e.stopPropagation()}>
               <Button variant="ghost" size="icon">
                 <Eye className="w-4 h-4" />
               </Button>
@@ -71,7 +74,12 @@ export default function ProductListView({ products, onEdit, onDelete, selectedPr
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onDelete(product.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm('Supprimer ce produit ?')) {
+                  onDelete(product.id);
+                }
+              }}
               className="text-destructive hover:text-destructive"
             >
               <Trash2 className="w-4 h-4" />

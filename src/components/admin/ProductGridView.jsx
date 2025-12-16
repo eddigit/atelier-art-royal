@@ -11,7 +11,7 @@ export default function ProductGridView({ products, onEdit, onDelete, selectedPr
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((product) => (
-        <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-shadow">
+        <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-shadow relative">
           {onToggleSelect && (
             <div className="absolute top-3 left-3 z-10">
               <Checkbox
@@ -44,15 +44,18 @@ export default function ProductGridView({ products, onEdit, onDelete, selectedPr
                 </div>
               </div>
             )}
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 z-10">
               <Button
                 size="icon"
                 variant="secondary"
-                onClick={() => onEdit(product)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(product);
+                }}
               >
                 <Edit className="w-4 h-4" />
               </Button>
-              <Link to={createPageUrl('ProductDetail') + `?id=${product.id}`}>
+              <Link to={createPageUrl('ProductDetail') + `?id=${product.id}`} onClick={(e) => e.stopPropagation()}>
                 <Button size="icon" variant="secondary">
                   <Eye className="w-4 h-4" />
                 </Button>
@@ -60,7 +63,12 @@ export default function ProductGridView({ products, onEdit, onDelete, selectedPr
               <Button
                 size="icon"
                 variant="secondary"
-                onClick={() => onDelete(product.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm('Supprimer ce produit ?')) {
+                    onDelete(product.id);
+                  }
+                }}
                 className="text-destructive hover:text-destructive"
               >
                 <Trash2 className="w-4 h-4" />
