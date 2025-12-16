@@ -15,7 +15,8 @@ import {
   MessageSquare,
   AlertCircle,
   Star,
-  Filter
+  Filter,
+  Plus
 } from 'lucide-react';
 import { 
   Select,
@@ -204,6 +205,10 @@ export default function AdminCustomers() {
             {stats.totalCustomers} client{stats.totalCustomers > 1 ? 's' : ''} • {stats.customersWithOrders} actif{stats.customersWithOrders > 1 ? 's' : ''}
           </p>
         </div>
+        <Button onClick={() => base44.auth.redirectToLogin('/invite')}>
+          <Plus className="w-4 h-4 mr-2" />
+          Inviter un Client
+        </Button>
       </div>
 
       {/* Stats Overview */}

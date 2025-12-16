@@ -15,8 +15,10 @@ import {
   Filter,
   Clock,
   CheckCircle2,
-  Loader2
+  Loader2,
+  Trash2
 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Select,
   SelectContent,
@@ -51,6 +53,14 @@ export default function AdminProduction() {
     queryKey: ['all-customers'],
     queryFn: () => base44.entities.User.list('-created_date', 500),
     initialData: []
+  });
+
+  const deleteProductionMutation = useMutation({
+    mutationFn: (id) => base44.entities.ProductionItem.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['productions']);
+      toast.success('Projet supprimé');
+    }
   });
 
   const statusConfig = {
@@ -239,6 +249,17 @@ export default function AdminProduction() {
                           >
                             <Eye className="w-4 h-4 mr-2" />
                             Détails
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm('Supprimer ce projet de production ?')) {
+                                deleteProductionMutation.mutate(production.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>

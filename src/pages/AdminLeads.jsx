@@ -34,7 +34,9 @@ import {
   Clock,
   XCircle,
   Target,
-  Search
+  Search,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -59,6 +61,7 @@ export default function AdminLeads() {
   const [filterPriority, setFilterPriority] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('-created_date');
+  const [showNewDialog, setShowNewDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: leads = [], isLoading } = useQuery({
@@ -73,11 +76,29 @@ export default function AdminLeads() {
     initialData: []
   });
 
+  const createLeadMutation = useMutation({
+    mutationFn: (data) => base44.entities.LeadRequest.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['leads']);
+      toast.success('Lead créé');
+      setShowNewDialog(false);
+      setSelectedLead(null);
+    }
+  });
+
   const updateLeadMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.LeadRequest.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['leads']);
       toast.success('Lead mis à jour');
+    }
+  });
+
+  const deleteLeadMutation = useMutation({
+    mutationFn: (id) => base44.entities.LeadRequest.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['leads']);
+      toast.success('Lead supprimé');
     }
   });
 
@@ -127,11 +148,17 @@ export default function AdminLeads() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold mb-2">Gestion des Leads</h2>
-        <p className="text-muted-foreground">
-          Suivez et gérez toutes les demandes de prospects
-        </p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-3xl font-bold mb-2">Gestion des Leads</h2>
+          <p className="text-muted-foreground">
+            Suivez et gérez toutes les demandes de prospects
+          </p>
+        </div>
+        <Button onClick={() => { setSelectedLead(null); setShowNewDialog(true); }}>
+          <Plus className="w-4 h-4 mr-2" />
+          Nouveau Lead
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -358,6 +385,19 @@ export default function AdminLeads() {
                           ))}
                         </SelectContent>
                       </Select>
+
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          if (confirm('Supprimer ce lead ?')) {
+                            deleteLeadMutation.mutate(lead.id);
+                          }
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Supprimer
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -367,61 +407,145 @@ export default function AdminLeads() {
         )}
       </div>
 
-      {/* Lead Detail Dialog */}
-      <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
+      {/* Lead Detail/Create Dialog */}
+      <Dialog open={!!selectedLead || showNewDialog} onOpenChange={() => { setSelectedLead(null); setShowNewDialog(false); }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Détails du Lead</DialogTitle>
+            <DialogTitle>{selectedLead ? 'Détails du Lead' : 'Nouveau Lead'}</DialogTitle>
             <DialogDescription>
-              Informations complètes et gestion du lead
+              {selectedLead ? 'Informations complètes et gestion du lead' : 'Créer un nouveau lead prospect'}
             </DialogDescription>
           </DialogHeader>
 
-          {selectedLead && (
+          {(selectedLead || showNewDialog) && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Statut</label>
-                  <Select
-                    value={selectedLead.status}
-                    onValueChange={(value) => {
-                      handleStatusChange(selectedLead.id, value);
-                      setSelectedLead({ ...selectedLead, status: value });
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(statusConfig).map(([key, config]) => (
-                        <SelectItem key={key} value={key}>{config.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              {!showNewDialog && selectedLead && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium">Statut</label>
+                    <Select
+                      value={selectedLead.status}
+                      onValueChange={(value) => {
+                        handleStatusChange(selectedLead.id, value);
+                        setSelectedLead({ ...selectedLead, status: value });
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(statusConfig).map(([key, config]) => (
+                          <SelectItem key={key} value={key}>{config.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div>
-                  <label className="text-sm font-medium">Priorité</label>
-                  <Select
-                    value={selectedLead.priority}
-                    onValueChange={(value) => {
-                      handlePriorityChange(selectedLead.id, value);
-                      setSelectedLead({ ...selectedLead, priority: value });
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(priorityConfig).map(([key, config]) => (
-                        <SelectItem key={key} value={key}>{config.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div>
+                    <label className="text-sm font-medium">Priorité</label>
+                    <Select
+                      value={selectedLead.priority}
+                      onValueChange={(value) => {
+                        handlePriorityChange(selectedLead.id, value);
+                        setSelectedLead({ ...selectedLead, priority: value });
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(priorityConfig).map(([key, config]) => (
+                          <SelectItem key={key} value={key}>{config.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {selectedLead.conversation_context && (
+              {showNewDialog && (
+                <div className="space-y-4">
+                  <div>
+                    <Label>Nom du Contact</Label>
+                    <Input
+                      value={selectedLead?.contact_name || ''}
+                      onChange={(e) => setSelectedLead({ ...selectedLead, contact_name: e.target.value })}
+                      placeholder="Nom complet"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Email</Label>
+                      <Input
+                        type="email"
+                        value={selectedLead?.contact_email || ''}
+                        onChange={(e) => setSelectedLead({ ...selectedLead, contact_email: e.target.value })}
+                        placeholder="email@exemple.fr"
+                      />
+                    </div>
+                    <div>
+                      <Label>Téléphone</Label>
+                      <Input
+                        value={selectedLead?.contact_phone || ''}
+                        onChange={(e) => setSelectedLead({ ...selectedLead, contact_phone: e.target.value })}
+                        placeholder="+33 6 12 34 56 78"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Demande / Détails *</Label>
+                    <Textarea
+                      value={selectedLead?.request_details || ''}
+                      onChange={(e) => setSelectedLead({ ...selectedLead, request_details: e.target.value })}
+                      placeholder="Description de la demande du prospect..."
+                      rows={4}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Priorité</Label>
+                      <Select
+                        value={selectedLead?.priority || 'normale'}
+                        onValueChange={(value) => setSelectedLead({ ...selectedLead, priority: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(priorityConfig).map(([key, config]) => (
+                            <SelectItem key={key} value={key}>{config.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Source</Label>
+                      <Input
+                        value={selectedLead?.source || 'manuel'}
+                        onChange={(e) => setSelectedLead({ ...selectedLead, source: e.target.value })}
+                        placeholder="Origine du lead"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      if (!selectedLead?.request_details) {
+                        toast.error('La demande est obligatoire');
+                        return;
+                      }
+                      createLeadMutation.mutate({
+                        ...selectedLead,
+                        status: 'nouveau'
+                      });
+                    }}
+                    disabled={createLeadMutation.isPending}
+                  >
+                    Créer le Lead
+                  </Button>
+                </div>
+              )}
+
+              {selectedLead && !showNewDialog && selectedLead.conversation_context && (
                 <div>
                   <label className="text-sm font-medium mb-2 block">Contexte de Conversation</label>
                   <pre className="bg-muted p-3 rounded text-xs whitespace-pre-wrap">
@@ -430,22 +554,24 @@ export default function AdminLeads() {
                 </div>
               )}
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">Notes Admin</label>
-                <Textarea
-                  value={selectedLead.admin_notes || ''}
-                  onChange={(e) => setSelectedLead({ ...selectedLead, admin_notes: e.target.value })}
-                  placeholder="Ajoutez des notes internes..."
-                  rows={4}
-                />
-                <Button
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => handleNotesUpdate(selectedLead.id, selectedLead.admin_notes)}
-                >
-                  Enregistrer les notes
-                </Button>
-              </div>
+              {selectedLead && !showNewDialog && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Notes Admin</label>
+                  <Textarea
+                    value={selectedLead.admin_notes || ''}
+                    onChange={(e) => setSelectedLead({ ...selectedLead, admin_notes: e.target.value })}
+                    placeholder="Ajoutez des notes internes..."
+                    rows={4}
+                  />
+                  <Button
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => handleNotesUpdate(selectedLead.id, selectedLead.admin_notes)}
+                  >
+                    Enregistrer les notes
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
