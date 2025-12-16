@@ -146,7 +146,7 @@ export default function AdminDashboard({ onNavigateToTab }) {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 bg-slate-50">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2">Tableau de Bord Admin</h1>
         <p className="text-muted-foreground">
