@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -19,6 +19,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+  
   const { data: user } = useQuery({
     queryKey: ['user'],
     queryFn: () => base44.auth.me()
@@ -223,7 +225,7 @@ export default function AdminDashboard() {
               <Card 
                 key={idx}
                 className={`border-2 ${action.color} transition-all hover:shadow-lg cursor-pointer h-full`}
-                onClick={() => window.location.href = action.link}
+                onClick={() => navigate(action.link)}
               >
                 <CardHeader>
                   <div className="flex items-center gap-3">
