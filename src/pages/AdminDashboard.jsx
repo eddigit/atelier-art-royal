@@ -220,8 +220,8 @@ export default function AdminDashboard() {
           {quickActions.map((action, idx) => {
             const Icon = action.icon;
             return (
-              <Link key={idx} to={action.link}>
-                <Card className={`border-2 ${action.color} transition-all hover:shadow-lg`}>
+              <Link key={idx} to={action.link} className="block">
+                <Card className={`border-2 ${action.color} transition-all hover:shadow-lg cursor-pointer h-full`}>
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-muted">
