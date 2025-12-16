@@ -25,6 +25,7 @@ import VisitorTracker from '@/components/analytics/VisitorTracker';
 import VisitorNotifier from '@/components/analytics/VisitorNotifier';
 import WelcomeOnboarding from '@/components/onboarding/WelcomeOnboarding';
 import SignUpBanner from '@/components/onboarding/SignUpBanner';
+import LoyaltyBadge from '@/components/loyalty/LoyaltyBadge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +55,16 @@ export default function Layout({ children, currentPageName }) {
       }
     },
     initialData: []
+  });
+
+  const { data: loyaltyData } = useQuery({
+    queryKey: ['loyalty', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const data = await base44.entities.LoyaltyPoints.filter({ user_id: user.id });
+      return data[0] || null;
+    },
+    enabled: !!user
   });
 
   const { data: products = [] } = useQuery({
@@ -324,6 +335,15 @@ export default function Layout({ children, currentPageName }) {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                       </>
+                    )}
+                    {loyaltyData && (
+                      <div className="px-2 py-2">
+                        <LoyaltyBadge 
+                          tier={loyaltyData.tier} 
+                          points={loyaltyData.points} 
+                          compact={true} 
+                        />
+                      </div>
                     )}
                     <DropdownMenuItem asChild>
                       <Link to={createPageUrl('Account')} className="cursor-pointer">

@@ -116,20 +116,20 @@ export default function ProductCard({ product }) {
 
   return (
     <>
-      <Card className="group overflow-hidden h-full hover:shadow-2xl transition-all duration-300">
+      <Card className="group overflow-hidden h-full hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
         <Link to={createPageUrl('ProductDetail') + `?id=${product.id}`}>
           <div className="relative aspect-square overflow-hidden image-immersive bg-muted">
             <img
               src={primaryImage}
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             
             {/* Quick View Button */}
             <Button
               size="sm"
               variant="secondary"
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110 z-10"
               onClick={(e) => {
                 e.preventDefault();
                 setShowQuickView(true);
@@ -156,14 +156,14 @@ export default function ProductCard({ product }) {
             <Button
               size="icon"
               variant="secondary"
-              className="absolute top-3 right-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-3 right-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
               onClick={(e) => {
                 e.preventDefault();
                 toggleWishlistMutation.mutate();
               }}
               disabled={toggleWishlistMutation.isPending}
             >
-              <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current text-red-500' : ''}`} />
+              <Heart className={`w-4 h-4 transition-all ${isInWishlist ? 'fill-current text-red-500 scale-110' : ''}`} />
             </Button>
             {product.stock_quantity <= 0 && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
