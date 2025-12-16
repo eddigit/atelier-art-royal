@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Users,
   Eye,
@@ -12,12 +13,17 @@ import {
   Globe,
   Package,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  MessageCircle,
+  Bot,
+  ExternalLink
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AdminVisitorChat from '@/components/admin/AdminVisitorChat';
 
 export default function AdminAnalytics() {
   const [timeRange, setTimeRange] = useState('month');
+  const [selectedVisitor, setSelectedVisitor] = useState(null);
 
   const getDateRange = () => {
     const now = new Date();
@@ -279,25 +285,60 @@ export default function AdminAnalytics() {
           <CardContent>
             <div className="space-y-2">
               {activeVisitors.map((visitor) => (
-                <div key={visitor.id} className="flex items-center justify-between p-2 rounded bg-muted/50">
-                  <div className="flex items-center gap-2">
+                <div key={visitor.id} className="flex items-center justify-between p-3 rounded border hover:border-primary/50 transition-colors">
+                  <div className="flex items-center gap-3 flex-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium">
-                      {visitor.user_id ? 'Utilisateur connecté' : 'Visiteur'}
-                    </span>
-                    {visitor.is_new_visitor && (
-                      <Badge variant="outline" className="text-xs">Nouveau</Badge>
-                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium">
+                          {visitor.user_id ? 'Utilisateur connecté' : 'Visiteur'}
+                        </span>
+                        {visitor.is_new_visitor && (
+                          <Badge variant="outline" className="text-xs">Nouveau</Badge>
+                        )}
+                        {visitor.is_likely_bot && (
+                          <Badge variant="destructive" className="text-xs gap-1">
+                            <Bot className="w-3 h-3" />
+                            Bot
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{visitor.current_page}</span>
+                        {visitor.source && visitor.source !== 'direct' && (
+                          <>
+                            <span>•</span>
+                            <Badge variant="outline" className="text-xs gap-1">
+                              <Globe className="w-3 h-3" />
+                              {visitor.source}
+                            </Badge>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {visitor.current_page}
-                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => setSelectedVisitor(visitor)}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Chat
+                  </Button>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
       )}
+      
+      {/* Admin Visitor Chat Dialog */}
+      <AdminVisitorChat
+        visitor={selectedVisitor}
+        open={!!selectedVisitor}
+        onClose={() => setSelectedVisitor(null)}
+      />
 
       {/* Popular Pages */}
       <Card>

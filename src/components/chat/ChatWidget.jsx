@@ -25,6 +25,41 @@ export default function ChatWidget() {
     scrollToBottom();
   }, [messages]);
 
+  // Poll for admin messages
+  useQuery({
+    queryKey: ['chat-messages-visitor', visitorId],
+    queryFn: async () => {
+      if (!visitorId || !isOpen) return [];
+      const msgs = await base44.entities.ChatMessage.filter(
+        { visitor_id: visitorId },
+        '-created_date',
+        50
+      );
+      
+      // Update local messages with admin messages
+      const adminMessages = msgs.filter(m => m.sender_type === 'admin');
+      if (adminMessages.length > 0) {
+        setMessages(prev => {
+          const existingIds = new Set(prev.map(m => m.id));
+          const newMsgs = adminMessages.filter(m => !existingIds.has(m.id));
+          if (newMsgs.length > 0) {
+            return [...prev, ...newMsgs.map(m => ({
+              id: m.id,
+              role: 'assistant',
+              content: `**${m.sender_name}**: ${m.message}`
+            }))];
+          }
+          return prev;
+        });
+      }
+      
+      return msgs;
+    },
+    enabled: isOpen && !!visitorId,
+    refetchInterval: 3000,
+    initialData: []
+  });
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
