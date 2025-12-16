@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { createPageUrl } from '@/utils';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, Eye, TrendingUp } from 'lucide-react';
 
 export default function VisitorNotifier() {
   const [lastNotified, setLastNotified] = useState(Date.now());
@@ -47,7 +50,14 @@ export default function VisitorNotifier() {
           <Users className="w-4 h-4 text-green-500" />
           <span className="font-semibold">Visiteurs en ligne</span>
         </div>
-        <Badge variant="secondary">{activeVisitors.length}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">{activeVisitors.length}</Badge>
+          <Link to={createPageUrl('AdminPanel') + '?tab=analytics'}>
+            <Button size="icon" variant="ghost" className="h-7 w-7">
+              <TrendingUp className="w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
       </div>
       <div className="space-y-1 max-h-32 overflow-y-auto">
         {activeVisitors.slice(0, 5).map((visitor) => (

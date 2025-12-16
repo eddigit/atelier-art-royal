@@ -17,7 +17,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function AdminAnalytics() {
-  const [timeRange, setTimeRange] = useState('today');
+  const [timeRange, setTimeRange] = useState('month');
 
   const getDateRange = () => {
     const now = new Date();
@@ -129,6 +129,27 @@ export default function AdminAnalytics() {
     ? filteredViews.reduce((sum, v) => sum + (v.session_duration || 0), 0) / filteredViews.length
     : 0;
 
+  // Visitors per day
+  const visitorsByDay = {};
+  filteredViews.forEach(view => {
+    const date = new Date(view.created_date).toLocaleDateString('fr-FR');
+    if (!visitorsByDay[date]) {
+      visitorsByDay[date] = new Set();
+    }
+    visitorsByDay[date].add(view.visitor_id);
+  });
+
+  const dailyStats = Object.entries(visitorsByDay)
+    .map(([date, visitors]) => ({
+      date,
+      visitors: visitors.size
+    }))
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const avgVisitorsPerDay = dailyStats.length > 0
+    ? Math.round(dailyStats.reduce((sum, day) => sum + day.visitors, 0) / dailyStats.length)
+    : 0;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -151,7 +172,7 @@ export default function AdminAnalytics() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Visiteurs Actifs</CardTitle>
@@ -160,6 +181,17 @@ export default function AdminAnalytics() {
           <CardContent>
             <div className="text-2xl font-bold">{activeVisitors.length}</div>
             <p className="text-xs text-muted-foreground">En temps réel</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Visiteurs / Jour</CardTitle>
+            <TrendingUp className="w-4 h-4 text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{avgVisitorsPerDay}</div>
+            <p className="text-xs text-muted-foreground">Moyenne sur période</p>
           </CardContent>
         </Card>
 
@@ -198,6 +230,42 @@ export default function AdminAnalytics() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Visitors per Day Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            Évolution des Visiteurs par Jour
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {dailyStats.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">Aucune donnée disponible</p>
+          ) : (
+            <div className="space-y-2">
+              {dailyStats.map((day) => (
+                <div key={day.date} className="flex items-center justify-between p-2 rounded hover:bg-muted/50 transition-colors">
+                  <span className="text-sm font-medium">{day.date}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-32 bg-muted rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="bg-primary h-full rounded-full transition-all"
+                        style={{ 
+                          width: `${Math.min((day.visitors / Math.max(...dailyStats.map(d => d.visitors))) * 100, 100)}%` 
+                        }}
+                      />
+                    </div>
+                    <Badge variant="secondary" className="w-16 justify-center">
+                      {day.visitors}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Visitors Currently Online */}
       {activeVisitors.length > 0 && (
