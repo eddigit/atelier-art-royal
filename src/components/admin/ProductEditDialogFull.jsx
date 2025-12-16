@@ -300,22 +300,45 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
             </div>
 
             <div>
-              <label className="text-sm font-medium">Catégorie</label>
-              <Select 
-                value={formData.category_id || ''} 
-                onValueChange={(v) => setFormData({ ...formData, category_id: v })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Sélectionner une catégorie" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map(category => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Catégories (plusieurs possibles)</label>
+              <div className="mt-1 border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
+                {categories.map(category => (
+                  <div key={category.id} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={(formData.category_ids || []).includes(category.id)}
+                      onCheckedChange={(checked) => {
+                        const currentIds = formData.category_ids || [];
+                        const newIds = checked
+                          ? [...currentIds, category.id]
+                          : currentIds.filter(id => id !== category.id);
+                        setFormData({ ...formData, category_ids: newIds });
+                      }}
+                    />
+                    <label className="text-sm cursor-pointer">{category.name}</label>
+                  </div>
+                ))}
+              </div>
+              {(formData.category_ids || []).length > 0 && (
+                <div className="flex gap-1 mt-2 flex-wrap">
+                  {formData.category_ids.map(id => {
+                    const category = categories.find(c => c.id === id);
+                    return category ? (
+                      <Badge key={id} variant="secondary" className="gap-1">
+                        {category.name}
+                        <X 
+                          className="w-3 h-3 cursor-pointer" 
+                          onClick={() => {
+                            setFormData({ 
+                              ...formData, 
+                              category_ids: formData.category_ids.filter(cid => cid !== id) 
+                            });
+                          }}
+                        />
+                      </Badge>
+                    ) : null;
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

@@ -106,7 +106,10 @@ export default function Catalog() {
           if (!obedienceIds.includes(filters.obedience)) return false;
         }
         if (filters.degreeOrder && product.degree_order_id !== filters.degreeOrder) return false;
-        if (filters.category && product.category_id !== filters.category) return false;
+        if (filters.category) {
+          const categoryIds = Array.isArray(product.category_ids) ? product.category_ids : (product.category_id ? [product.category_id] : []);
+          if (!categoryIds.includes(filters.category)) return false;
+        }
         
         // Promotions filter
         if (filters.showPromotions) {
