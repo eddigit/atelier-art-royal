@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Search, Plus, Minus, Trash2, ShoppingCart, User, CreditCard, Banknote, Phone } from 'lucide-react';
+import { Search, Plus, Minus, Trash2, ShoppingCart, User, CreditCard, Banknote, Phone, FileSignature } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function POSSale() {
@@ -51,6 +51,21 @@ export default function POSSale() {
     },
     onError: (error) => {
       toast.error('Erreur lors de l\'enregistrement : ' + error.message);
+    }
+  });
+
+  const createQuoteMutation = useMutation({
+    mutationFn: async (quoteData) => {
+      return await base44.entities.Quote.create(quoteData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pos-quotes'] });
+      toast.success('Devis créé avec succès !');
+      setCart([]);
+      setSelectedCustomer(null);
+    },
+    onError: (error) => {
+      toast.error('Erreur lors de la création du devis : ' + error.message);
     }
   });
 
@@ -130,6 +145,52 @@ export default function POSSale() {
     };
 
     createOrderMutation.mutate(orderData);
+  };
+
+  const handleCreateQuote = async () => {
+    if (cart.length === 0) {
+      toast.error('Le panier est vide');
+      return;
+    }
+
+    if (!selectedCustomer) {
+      toast.error('Veuillez sélectionner un client');
+      return;
+    }
+
+    const quoteNumber = 'DEV-' + Date.now();
+    const total = calculateTotal();
+    const taxRate = 20;
+    const subtotalHT = total / (1 + taxRate / 100);
+    const taxAmount = total - subtotalHT;
+
+    const validUntil = new Date();
+    validUntil.setDate(validUntil.getDate() + 30);
+
+    const quoteData = {
+      quote_number: quoteNumber,
+      customer_id: selectedCustomer.id,
+      customer_name: selectedCustomer.full_name,
+      customer_email: selectedCustomer.email,
+      status: 'draft',
+      items: cart.map(item => ({
+        product_id: item.id,
+        product_name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.price * item.quantity
+      })),
+      subtotal: subtotalHT,
+      shipping_cost: 0,
+      discount: 0,
+      tax_rate: taxRate,
+      tax_amount: taxAmount,
+      total: total,
+      valid_until: validUntil.toISOString().split('T')[0],
+      notes: 'Devis valable 30 jours. Paiement à la commande.'
+    };
+
+    createQuoteMutation.mutate(quoteData);
   };
 
   return (
@@ -282,13 +343,25 @@ export default function POSSale() {
                 </div>
               </div>
 
-              <Button
-                className="w-full h-16 text-xl font-bold mt-4"
-                onClick={handleCheckout}
-                disabled={!selectedCustomer || createOrderMutation.isPending}
-              >
-                {createOrderMutation.isPending ? 'Traitement...' : 'Valider la vente'}
-              </Button>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <Button
+                  variant="outline"
+                  className="h-16 text-lg font-bold"
+                  onClick={handleCreateQuote}
+                  disabled={!selectedCustomer || createQuoteMutation.isPending}
+                >
+                  <FileSignature className="w-5 h-5 mr-2" />
+                  {createQuoteMutation.isPending ? 'Création...' : 'Créer devis'}
+                </Button>
+                <Button
+                  className="h-16 text-lg font-bold"
+                  onClick={handleCheckout}
+                  disabled={!selectedCustomer || createOrderMutation.isPending}
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  {createOrderMutation.isPending ? 'Traitement...' : 'Valider vente'}
+                </Button>
+              </div>
             </>
           )}
         </div>
