@@ -326,21 +326,48 @@ export default function Cart() {
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="w-full"
-                onClick={handleCreateQuote}
-                disabled={isCreatingQuote}
-              >
-                <FileSignature className="mr-2 w-5 h-5" />
-                {isCreatingQuote ? 'Création...' : 'Créer un devis'}
-              </Button>
-              <Link to={createPageUrl('Catalog')}>
-                <Button variant="ghost" size="lg" className="w-full">
-                  Continuer mes achats
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={handleCreateQuote}
+                  disabled={isCreatingQuote}
+                >
+                  <FileSignature className="mr-2 w-5 h-5" />
+                  {isCreatingQuote ? 'Création...' : 'Créer un devis'}
                 </Button>
-              </Link>
+                <Link to={createPageUrl('Catalog')}>
+                  <Button variant="ghost" size="lg" className="w-full">
+                    Continuer mes achats
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Paiement sécurisé */}
+              <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="w-5 h-5 text-primary" />
+                  <span className="font-semibold text-primary">Paiement 100% Sécurisé</span>
+                </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6 opacity-70" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-6 opacity-70" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6 opacity-70" />
+                  <Lock className="w-4 h-4 text-muted-foreground" />
+                </div>
+              </div>
+
+              {/* Contact sur-mesure */}
+              <div className="mt-4 p-4 bg-slate-50 rounded-lg border">
+                <p className="text-sm font-semibold mb-2">Besoin d'une création sur-mesure ?</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Notre atelier réalise toutes vos pièces personnalisées. Contactez-nous pour un devis rapide.
+                </p>
+                <a href="tel:+33646683610" className="flex items-center justify-center gap-2 text-primary font-semibold hover:underline">
+                  <Phone className="w-4 h-4" />
+                  +33 6 46 68 36 10
+                </a>
+              </div>
             </CardContent>
           </Card>
         </div>
