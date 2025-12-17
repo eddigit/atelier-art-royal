@@ -225,7 +225,14 @@ export default function Layout({ children, currentPageName }) {
                       <DropdownMenuLabel>Sélectionner une Obédience</DropdownMenuLabel>
                       {obediences.map(obedience => (
                         <DropdownMenuItem key={obedience.id} asChild>
-                          <Link to={createPageUrl('Catalog') + `?obedience=${obedience.id}`} className="cursor-pointer">
+                          <Link 
+                            to={createPageUrl('Catalog') + `?obedience=${obedience.id}`} 
+                            className="cursor-pointer"
+                            onClick={() => {
+                              // Trigger custom event for same-page navigation
+                              setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
+                            }}
+                          >
                             <Award className="w-4 h-4 mr-2" />
                             {obedience.name}
                           </Link>
@@ -245,13 +252,21 @@ export default function Layout({ children, currentPageName }) {
                     <DropdownMenuContent align="start" className="w-64">
                       <DropdownMenuLabel>Sélectionner le Type</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
-                        <Link to={createPageUrl('Catalog') + `?logeType=Loge Symbolique`} className="cursor-pointer">
+                        <Link 
+                          to={createPageUrl('Catalog') + `?logeType=Loge Symbolique`} 
+                          className="cursor-pointer"
+                          onClick={() => setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0)}
+                        >
                           <Award className="w-4 h-4 mr-2" />
                           Loge Symbolique (1er - 3ème degré)
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to={createPageUrl('Catalog') + `?logeType=Loge Hauts Grades`} className="cursor-pointer">
+                        <Link 
+                          to={createPageUrl('Catalog') + `?logeType=Loge Hauts Grades`} 
+                          className="cursor-pointer"
+                          onClick={() => setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0)}
+                        >
                           <Award className="w-4 h-4 mr-2" />
                           Loge Hauts Grades (4ème+ & Ordres)
                         </Link>
@@ -271,7 +286,11 @@ export default function Layout({ children, currentPageName }) {
                       <DropdownMenuLabel>Type de Produit</DropdownMenuLabel>
                       {categories.map(category => (
                         <DropdownMenuItem key={category.id} asChild>
-                          <Link to={createPageUrl('Catalog') + `?category=${category.id}`} className="cursor-pointer">
+                          <Link 
+                            to={createPageUrl('Catalog') + `?category=${category.id}`} 
+                            className="cursor-pointer"
+                            onClick={() => setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0)}
+                          >
                             <Grid className="w-4 h-4 mr-2" />
                             {category.name}
                           </Link>
@@ -440,7 +459,10 @@ export default function Layout({ children, currentPageName }) {
                         key={obedience.id}
                         to={createPageUrl('Catalog') + `?obedience=${obedience.id}`}
                         className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
+                        }}
                       >
                         {obedience.name}
                       </Link>
@@ -450,14 +472,20 @@ export default function Layout({ children, currentPageName }) {
                     <Link 
                       to={createPageUrl('Catalog') + `?logeType=Loge Symbolique`}
                       className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
+                      }}
                     >
                       Loge Symbolique
                     </Link>
                     <Link 
                       to={createPageUrl('Catalog') + `?logeType=Loge Hauts Grades`}
                       className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
+                      }}
                     >
                       Loge Hauts Grades
                     </Link>
@@ -468,7 +496,10 @@ export default function Layout({ children, currentPageName }) {
                         key={category.id}
                         to={createPageUrl('Catalog') + `?category=${category.id}`}
                         className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
+                        }}
                       >
                         {category.name}
                       </Link>
