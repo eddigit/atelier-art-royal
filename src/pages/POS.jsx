@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { AlertCircle, ShoppingCart, Users, Package, FileText, Store } from 'lucide-react';
+import { AlertCircle, ShoppingCart, Users, Package, FileText, Store, FileSignature } from 'lucide-react';
 import POSSale from '@/components/pos/POSSale';
 import POSCustomers from '@/components/pos/POSCustomers';
 import POSProducts from '@/components/pos/POSProducts';
 import POSInvoices from '@/components/pos/POSInvoices';
+import POSQuotes from '@/components/pos/POSQuotes';
 
 export default function POS() {
   const [activeTab, setActiveTab] = useState('sale');
@@ -42,6 +43,7 @@ export default function POS() {
     { id: 'sale', label: 'Vente', icon: ShoppingCart },
     { id: 'customers', label: 'Clients', icon: Users },
     { id: 'products', label: 'Produits', icon: Package },
+    { id: 'quotes', label: 'Devis', icon: FileSignature },
     { id: 'invoices', label: 'Factures', icon: FileText }
   ];
 
@@ -81,7 +83,7 @@ export default function POS() {
 
         {/* Navigation tactile */}
         <div className="px-6 pb-4">
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-5 gap-3">
             {tabs.map(tab => {
               const Icon = tab.icon;
               return (
@@ -112,6 +114,7 @@ export default function POS() {
           {activeTab === 'sale' && <POSSale />}
           {activeTab === 'customers' && <POSCustomers />}
           {activeTab === 'products' && <POSProducts />}
+          {activeTab === 'quotes' && <POSQuotes />}
           {activeTab === 'invoices' && <POSInvoices />}
         </div>
       </div>
