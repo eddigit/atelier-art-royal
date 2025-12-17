@@ -319,12 +319,13 @@ export default function Cart() {
                   <span className="text-primary">{total.toFixed(2)}€</span>
                 </div>
               </div>
-              <Link to={createPageUrl('Checkout')}>
-                <Button size="lg" className="w-full bg-primary hover:bg-primary/90">
-                  Commander
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
+              <div className="space-y-3">
+                <Link to={createPageUrl('Checkout')}>
+                  <Button size="lg" className="w-full bg-primary hover:bg-primary/90">
+                    Commander
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
               <Button 
                 variant="outline" 
                 size="lg" 

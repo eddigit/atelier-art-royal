@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, CreditCard, Loader2, Banknote, Building2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, Loader2, Banknote, Building2, Shield, Lock, Phone } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -507,6 +507,20 @@ export default function Checkout() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <Card className="sticky top-24">
+              {/* Paiement sécurisé */}
+              <div className="p-4 bg-primary/5 border-b border-primary/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="w-5 h-5 text-primary" />
+                  <span className="font-semibold text-primary">Paiement 100% Sécurisé</span>
+                </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6 opacity-70" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-6 opacity-70" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6 opacity-70" />
+                  <Lock className="w-4 h-4 text-muted-foreground" />
+                </div>
+              </div>
+
               <CardHeader>
                 <CardTitle>Récapitulatif</CardTitle>
               </CardHeader>
@@ -567,6 +581,18 @@ export default function Checkout() {
                   {paymentMethod === 'bank_transfer' && 'Vous recevrez les coordonnées bancaires par email'}
                   {paymentMethod === 'cash' && 'Retrait en atelier sur rendez-vous : +33 6 46 68 36 10'}
                 </p>
+
+                {/* Contact sur-mesure */}
+                <div className="mt-4 p-4 bg-slate-50 rounded-lg border">
+                  <p className="text-sm font-semibold mb-2">Besoin d'une création sur-mesure ?</p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Notre atelier réalise toutes vos pièces personnalisées. Contactez-nous pour un devis rapide.
+                  </p>
+                  <a href="tel:+33646683610" className="flex items-center justify-center gap-2 text-primary font-semibold hover:underline">
+                    <Phone className="w-4 h-4" />
+                    +33 6 46 68 36 10
+                  </a>
+                </div>
               </CardContent>
             </Card>
           </div>
