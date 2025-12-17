@@ -126,7 +126,7 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
 
     setSaving(true);
     try {
-      if (product) {
+      if (product?.id) {
         await base44.entities.Product.update(product.id, formData);
         toast.success('✓ Produit mis à jour avec succès', {
           description: `Le produit "${formData.name}" a été modifié.`,
@@ -158,7 +158,7 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle>{product ? 'Éditer le produit' : 'Nouveau produit'}</DialogTitle>
+          <DialogTitle>{product?.id ? 'Éditer le produit' : 'Nouveau produit'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 overflow-y-auto flex-1 pr-2">
