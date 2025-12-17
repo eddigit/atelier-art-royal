@@ -15,15 +15,21 @@ export default function FeaturedRites() {
   });
 
   return (
-    <section className="py-12 container mx-auto px-4">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-2">
-          Parcourir par <span className="text-gradient">Rite</span>
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          Sélectionnez votre Rite pour découvrir nos créations
-        </p>
-      </div>
+    <section className="py-12 relative" style={{
+      backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/a2afeeff0_background-sectionparrituel.jpg)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    }}>
+      <div className="absolute inset-0 bg-black/60" />
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-white">
+            Parcourir par <span className="text-gradient">Rite</span>
+          </h2>
+          <p className="text-slate-200 text-sm">
+            Sélectionnez votre Rite pour découvrir nos créations
+          </p>
+        </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-w-5xl mx-auto">
         {isLoading ? (
