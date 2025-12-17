@@ -30,6 +30,9 @@ Deno.serve(async (req) => {
       merchant_code: SUMUP_MERCHANT_CODE,
       description: description || 'Atelier Art Royal - Commande',
       redirect_url: `https://691cd26ea8838a859856a6b6.base44.app/OrderConfirmation?order=${reference}`,
+      hosted_checkout: {
+        enabled: true
+      }
     };
 
     console.log('Creating SumUp checkout with payload:', JSON.stringify(payload, null, 2));
@@ -69,8 +72,8 @@ Deno.serve(async (req) => {
     const checkout = JSON.parse(responseText);
     console.log('✅ SumUp Checkout Created:', JSON.stringify(checkout, null, 2));
     
-    if (!checkout.id) {
-      console.error('❌ No checkout ID in response');
+    if (!checkout.id || !checkout.hosted_checkout_url) {
+      console.error('❌ Missing checkout ID or hosted URL');
       return Response.json({ 
         success: false,
         error: 'Réponse SumUp invalide',
@@ -78,14 +81,12 @@ Deno.serve(async (req) => {
       }, { status: 500 });
     }
     
-    // Construire l'URL de paiement avec l'ID du checkout
-    const checkoutUrl = `https://pay.sumup.com/b/${checkout.id}`;
-    console.log('✅ Checkout URL:', checkoutUrl);
+    console.log('✅ Checkout URL:', checkout.hosted_checkout_url);
     
     return Response.json({
       success: true,
       checkoutId: checkout.id,
-      checkoutUrl: checkoutUrl,
+      checkoutUrl: checkout.hosted_checkout_url,
       amount: checkout.amount,
       currency: checkout.currency
     });
