@@ -36,14 +36,34 @@ export default function ProductEditDialog({ product, open, onClose, onSaved }) {
   };
 
   const handleSave = async () => {
+    // Validation
+    if (!formData.name || formData.name.trim() === '') {
+      toast.error('Le nom du produit est requis', {
+        duration: 4000
+      });
+      return;
+    }
+    if (!formData.price || formData.price <= 0) {
+      toast.error('Le prix doit être supérieur à 0', {
+        duration: 4000
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       await base44.entities.Product.update(product.id, formData);
-      toast.success('Produit mis à jour');
+      toast.success('✓ Produit mis à jour avec succès', {
+        description: `"${formData.name}" a été modifié.`,
+        duration: 3000
+      });
       onSaved();
       onClose();
     } catch (error) {
-      toast.error('Erreur: ' + error.message);
+      toast.error('Erreur lors de l\'enregistrement', {
+        description: error.message,
+        duration: 5000
+      });
     } finally {
       setSaving(false);
     }

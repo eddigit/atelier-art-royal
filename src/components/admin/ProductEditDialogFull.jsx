@@ -111,8 +111,16 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.price) {
-      toast.error('Veuillez remplir tous les champs obligatoires (nom et prix)');
+    // Validation détaillée
+    const missingFields = [];
+    if (!formData.name || formData.name.trim() === '') missingFields.push('Nom du produit');
+    if (!formData.price || formData.price <= 0) missingFields.push('Prix');
+    
+    if (missingFields.length > 0) {
+      toast.error(`Champs manquants : ${missingFields.join(', ')}`, {
+        description: 'Veuillez remplir tous les champs obligatoires pour continuer.',
+        duration: 5000
+      });
       return;
     }
 
@@ -120,10 +128,16 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
     try {
       if (product) {
         await base44.entities.Product.update(product.id, formData);
-        toast.success('Produit mis à jour');
+        toast.success('✓ Produit mis à jour avec succès', {
+          description: `Le produit "${formData.name}" a été modifié.`,
+          duration: 3000
+        });
       } else {
         await base44.entities.Product.create(formData);
-        toast.success('Produit créé');
+        toast.success('✓ Produit créé avec succès', {
+          description: `Le produit "${formData.name}" a été ajouté au catalogue.`,
+          duration: 3000
+        });
       }
       queryClient.invalidateQueries(['products']);
       queryClient.invalidateQueries(['admin-products']);
@@ -131,7 +145,10 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
       onSaved();
       onClose();
     } catch (error) {
-      toast.error('Erreur: ' + error.message);
+      toast.error('Erreur lors de l\'enregistrement', {
+        description: error.message,
+        duration: 5000
+      });
     } finally {
       setSaving(false);
     }
