@@ -159,11 +159,8 @@ export default function Checkout() {
           clearGuestCart();
         }
 
-        // Redirect to OrderConfirmation with pending payment
-        toast.info('Redirection vers le paiement SumUp...');
-        setTimeout(() => {
-          window.location.href = createPageUrl('OrderConfirmation') + `?order=${order.id}&payment=pending&checkoutId=${sumupCheckout.checkoutId}`;
-        }, 1000);
+        // Redirect to SumUp payment page
+        window.location.href = sumupCheckout.checkoutUrl;
         return { orderId: order.id, redirecting: true };
       }
 

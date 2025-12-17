@@ -67,24 +67,27 @@ Deno.serve(async (req) => {
     }
 
     const checkout = JSON.parse(responseText);
-    console.log('✅ SumUp Checkout Created Successfully:', JSON.stringify(checkout, null, 2));
+    console.log('✅ SumUp Checkout Created:', JSON.stringify(checkout, null, 2));
     
     if (!checkout.id) {
       console.error('❌ No checkout ID in response');
       return Response.json({ 
         success: false,
-        error: 'Réponse SumUp invalide - pas d\'ID',
+        error: 'Réponse SumUp invalide',
         fullResponse: checkout
       }, { status: 500 });
     }
     
+    // Construire l'URL de paiement avec l'ID du checkout
+    const checkoutUrl = `https://pay.sumup.com/b/${checkout.id}`;
+    console.log('✅ Checkout URL:', checkoutUrl);
+    
     return Response.json({
       success: true,
       checkoutId: checkout.id,
+      checkoutUrl: checkoutUrl,
       amount: checkout.amount,
-      currency: checkout.currency,
-      status: checkout.status,
-      fullResponse: checkout
+      currency: checkout.currency
     });
 
   } catch (error) {

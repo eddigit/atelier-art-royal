@@ -32,7 +32,6 @@ import AdminCategories from './pages/AdminCategories';
 import AdminChat from './pages/AdminChat';
 import AdminBusinessPipeline from './pages/AdminBusinessPipeline';
 import OrderConfirmation from './pages/OrderConfirmation';
-import SumupPayment from './pages/SumupPayment';
 import __Layout from './Layout.jsx';
 
 
@@ -71,7 +70,6 @@ export const PAGES = {
     "AdminChat": AdminChat,
     "AdminBusinessPipeline": AdminBusinessPipeline,
     "OrderConfirmation": OrderConfirmation,
-    "SumupPayment": SumupPayment,
 }
 
 export const pagesConfig = {
