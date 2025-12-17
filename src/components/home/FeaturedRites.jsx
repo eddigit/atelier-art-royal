@@ -21,7 +21,7 @@ export default function FeaturedRites() {
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed'
     }}>
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/40" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-white">
