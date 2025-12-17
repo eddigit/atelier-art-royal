@@ -150,7 +150,7 @@ EXEMPLES:
           playsInline
           className="w-full h-full object-cover"
         >
-          <source src="https://res.cloudinary.com/dkvhbcuaz/video/upload/v1/0a7650a1-db4a-4e13-80ca-159bb98f9862_wifp48.mp4" type="video/mp4" />
+          <source src="https://res.cloudinary.com/dkvhbcuaz/video/upload/background_hero_video_raji06.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0" style={{ backgroundColor: '#0a182d', opacity: 0.6 }} />
       </div>
