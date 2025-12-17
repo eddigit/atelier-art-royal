@@ -32,6 +32,13 @@ export default function OrderConfirmation() {
               payment_status: 'paid'
             });
             orderData.payment_status = 'paid';
+            
+            // Send confirmation emails
+            try {
+              await base44.functions.invoke('sendOrderConfirmation', { orderId: orderData.id });
+            } catch (emailError) {
+              console.error('Email error:', emailError);
+            }
           }
         } catch (error) {
           console.error('Payment verification error:', error);

@@ -186,7 +186,7 @@ Deno.serve(async (req) => {
     // Envoyer copie au support
     await base44.asServiceRole.integrations.Core.SendEmail({
       from_name: 'Atelier Art Royal',
-      to: 'coachdigitalparis@gmail.com',
+      to: 'gilleskorzec@gmail.com',
       subject: `[COPIE] Commande ${order.order_number} - ${customerName}`,
       body: emailBody
     });
