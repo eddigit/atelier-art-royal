@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Package, Search, Eye, Truck, User, Download, Bell } from 'lucide-react';
+import { Package, Search, Eye, Truck, User, Download, Bell, Star } from 'lucide-react';
 import OrderReturns from '@/components/admin/OrderReturns';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -282,6 +282,22 @@ export default function AdminOrders() {
                     >
                       <Download className="w-4 h-4" />
                     </Button>
+                    {order.status === 'delivered' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                          try {
+                            await base44.functions.invoke('requestReview', { orderId: order.id });
+                            toast.success('Email d\'avis envoyé');
+                          } catch (error) {
+                            toast.error('Erreur lors de l\'envoi');
+                          }
+                        }}
+                      >
+                        <Star className="w-4 h-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       onClick={() => setSelectedOrder(order)}
