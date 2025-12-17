@@ -155,14 +155,12 @@ export default function Checkout() {
       queryClient.invalidateQueries(['cart']);
       queryClient.invalidateQueries(['guest-cart']);
       queryClient.invalidateQueries(['orders']);
-      toast.success('Commande créée avec succès !');
+      toast.success('✅ Commande validée avec succès !');
       
-      if (user) {
-        window.location.href = createPageUrl('Orders');
-      } else {
-        toast.info('Commande enregistrée ! Connectez-vous pour suivre votre commande.');
-        window.location.href = createPageUrl('Home');
-      }
+      // Redirect to confirmation page
+      setTimeout(() => {
+        window.location.href = createPageUrl('OrderConfirmation') + `?order=${order.id}`;
+      }, 1000);
     },
     onError: (error) => {
       toast.error(error.message || 'Erreur lors de la création de la commande');
@@ -560,13 +558,30 @@ export default function Checkout() {
                     <span>Total</span>
                     <span className="text-primary">{total.toFixed(2)}€</span>
                   </div>
-                </div>
-                <Button
+                  </div>
+
+                  {/* Trust Message */}
+                  <Card className="mb-4 bg-primary/5 border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <Award className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">Fabrication sur-mesure</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Toutes nos créations sont fabriquées en France avec le plus grand respect des traditions maçonniques. 
+                          Chaque pièce est confectionnée selon les spécificités de votre obédience et de votre rite.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                  </Card>
+
+                  <Button
                   type="submit"
                   size="lg"
                   className="w-full bg-primary hover:bg-primary/90"
                   disabled={isProcessing}
-                >
+                  >
                   {isProcessing ? (
                     <>
                       <Loader2 className="mr-2 w-5 h-5 animate-spin" />
