@@ -69,15 +69,27 @@ Deno.serve(async (req) => {
     const checkout = JSON.parse(responseText);
     console.log('SumUp Checkout Created:', JSON.stringify(checkout, null, 2));
     
-    // Get the checkout URL from the response
-    const checkoutUrl = checkout.id ? `https://pay.sumup.com/${checkout.id}` : null;
+    // SumUp renvoie l'URL dans checkout.checkout_url ou checkout._links
+    let checkoutUrl = null;
+    
+    // Chercher l'URL dans différents emplacements possibles
+    if (checkout.checkout_url) {
+      checkoutUrl = checkout.checkout_url;
+    } else if (checkout._links?.['online-checkout']?.href) {
+      checkoutUrl = checkout._links['online-checkout'].href;
+    } else if (checkout._links?.checkout?.href) {
+      checkoutUrl = checkout._links.checkout.href;
+    }
+    
+    console.log('Extracted checkout URL:', checkoutUrl);
     
     if (!checkoutUrl) {
-      console.error('No checkout URL in response');
+      console.error('No checkout URL found in response. Response structure:', Object.keys(checkout));
       return Response.json({ 
         success: false,
-        error: 'Invalid checkout response - no URL',
-        details: JSON.stringify(checkout, null, 2)
+        error: 'Impossible de générer l\'URL de paiement',
+        details: 'La réponse SumUp ne contient pas d\'URL de checkout',
+        responseKeys: Object.keys(checkout)
       }, { status: 500 });
     }
     
