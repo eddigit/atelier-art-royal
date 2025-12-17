@@ -26,26 +26,39 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        merchant_code: SUMUP_MERCHANT_CODE,
-        amount: parseFloat(amount),
-        currency: 'EUR',
         checkout_reference: reference,
+        amount: parseFloat(amount).toFixed(2),
+        currency: 'EUR',
+        merchant_code: SUMUP_MERCHANT_CODE,
         description: description || 'Atelier Art Royal - Commande',
-        redirect_url: `https://691cd26ea8838a859856a6b6.base44.app/OrderConfirmation?order=${reference}`,
+        return_url: `https://691cd26ea8838a859856a6b6.base44.app/OrderConfirmation?order=${reference}`,
       }),
     });
 
+    const responseText = await response.text();
+    console.log('SumUp Response:', response.status, responseText);
+
     if (!response.ok) {
-      const error = await response.json();
-      return Response.json({ error: error.error_message || 'SumUp error' }, { status: 400 });
+      let errorMsg = 'SumUp API error';
+      try {
+        const error = JSON.parse(responseText);
+        errorMsg = error.error_message || error.message || errorMsg;
+      } catch (e) {
+        errorMsg = responseText;
+      }
+      return Response.json({ 
+        success: false,
+        error: errorMsg,
+        details: responseText 
+      }, { status: 400 });
     }
 
-    const checkout = await response.json();
+    const checkout = JSON.parse(responseText);
     
     return Response.json({
       success: true,
       checkoutId: checkout.id,
-      checkoutUrl: `https://pay.sumup.com/${checkout.id}`,
+      checkoutUrl: checkout._links?.['online-checkout']?.href || `https://pay.sumup.com/${checkout.id}`,
       amount: checkout.amount,
       currency: checkout.currency,
     });
