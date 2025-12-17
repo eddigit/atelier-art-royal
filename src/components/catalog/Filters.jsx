@@ -153,9 +153,22 @@ export default function Filters({ filters, onFilterChange, onReset }) {
 
         {/* Rite */}
         <div className="space-y-2">
-          <Label>Rite</Label>
+          <div className="flex items-center justify-between">
+            <Label>Rite</Label>
+            {filters.rite && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => handleChange('rite', '')}
+                className="h-6 px-2 text-xs"
+              >
+                <X className="w-3 h-3 mr-1" />
+                Effacer
+              </Button>
+            )}
+          </div>
           <Select value={filters.rite || 'all'} onValueChange={(v) => handleChange('rite', v === 'all' ? '' : v)}>
-            <SelectTrigger>
+            <SelectTrigger className={filters.rite ? 'border-primary' : ''}>
               <SelectValue placeholder="Tous les Rites" />
             </SelectTrigger>
             <SelectContent>
@@ -171,9 +184,22 @@ export default function Filters({ filters, onFilterChange, onReset }) {
 
         {/* Obedience */}
         <div className="space-y-2">
-          <Label>Obédience</Label>
+          <div className="flex items-center justify-between">
+            <Label>Obédience</Label>
+            {filters.obedience && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => handleChange('obedience', '')}
+                className="h-6 px-2 text-xs"
+              >
+                <X className="w-3 h-3 mr-1" />
+                Effacer
+              </Button>
+            )}
+          </div>
           <Select value={filters.obedience || 'all'} onValueChange={(v) => handleChange('obedience', v === 'all' ? '' : v)}>
-            <SelectTrigger>
+            <SelectTrigger className={filters.obedience ? 'border-primary' : ''}>
               <SelectValue placeholder="Toutes les Obédiences" />
             </SelectTrigger>
             <SelectContent>
@@ -189,9 +215,28 @@ export default function Filters({ filters, onFilterChange, onReset }) {
 
         {/* Type de Loge */}
         <div className="space-y-2">
-          <Label>Type de Loge</Label>
-          <Select value={filters.logeType || 'all'} onValueChange={(v) => handleChange('logeType', v === 'all' ? '' : v)}>
-            <SelectTrigger>
+          <div className="flex items-center justify-between">
+            <Label>Type de Loge</Label>
+            {filters.logeType && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  handleChange('logeType', '');
+                  handleChange('degreeOrder', '');
+                }}
+                className="h-6 px-2 text-xs"
+              >
+                <X className="w-3 h-3 mr-1" />
+                Effacer
+              </Button>
+            )}
+          </div>
+          <Select value={filters.logeType || 'all'} onValueChange={(v) => {
+            handleChange('logeType', v === 'all' ? '' : v);
+            if (v === 'all') handleChange('degreeOrder', '');
+          }}>
+            <SelectTrigger className={filters.logeType ? 'border-primary' : ''}>
               <SelectValue placeholder="Tous les types" />
             </SelectTrigger>
             <SelectContent>
@@ -204,9 +249,22 @@ export default function Filters({ filters, onFilterChange, onReset }) {
 
         {/* Degree & Order */}
         <div className="space-y-2">
-          <Label>Degré & Ordre</Label>
+          <div className="flex items-center justify-between">
+            <Label>Degré & Ordre</Label>
+            {filters.degreeOrder && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => handleChange('degreeOrder', '')}
+                className="h-6 px-2 text-xs"
+              >
+                <X className="w-3 h-3 mr-1" />
+                Effacer
+              </Button>
+            )}
+          </div>
           <Select value={filters.degreeOrder || 'all'} onValueChange={(v) => handleChange('degreeOrder', v === 'all' ? '' : v)}>
-            <SelectTrigger>
+            <SelectTrigger className={filters.degreeOrder ? 'border-primary' : ''}>
               <SelectValue placeholder="Tous les degrés" />
             </SelectTrigger>
             <SelectContent className="max-h-80">
@@ -241,9 +299,22 @@ export default function Filters({ filters, onFilterChange, onReset }) {
 
         {/* Category */}
         <div className="space-y-2">
-          <Label>Catégorie</Label>
+          <div className="flex items-center justify-between">
+            <Label>Catégorie</Label>
+            {filters.category && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => handleChange('category', '')}
+                className="h-6 px-2 text-xs"
+              >
+                <X className="w-3 h-3 mr-1" />
+                Effacer
+              </Button>
+            )}
+          </div>
           <Select value={filters.category || 'all'} onValueChange={(v) => handleChange('category', v === 'all' ? '' : v)}>
-            <SelectTrigger>
+            <SelectTrigger className={filters.category ? 'border-primary' : ''}>
               <SelectValue placeholder="Toutes les Catégories" />
             </SelectTrigger>
             <SelectContent>
@@ -260,9 +331,22 @@ export default function Filters({ filters, onFilterChange, onReset }) {
         {/* Size */}
         {availableSizes.length > 0 && (
           <div className="space-y-2">
-            <Label>Taille</Label>
+            <div className="flex items-center justify-between">
+              <Label>Taille</Label>
+              {filters.size && filters.size !== 'all' && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleChange('size', 'all')}
+                  className="h-6 px-2 text-xs"
+                >
+                  <X className="w-3 h-3 mr-1" />
+                  Effacer
+                </Button>
+              )}
+            </div>
             <Select value={filters.size || 'all'} onValueChange={(v) => handleChange('size', v)}>
-              <SelectTrigger>
+              <SelectTrigger className={filters.size && filters.size !== 'all' ? 'border-primary' : ''}>
                 <SelectValue placeholder="Toutes tailles" />
               </SelectTrigger>
               <SelectContent>
@@ -280,9 +364,22 @@ export default function Filters({ filters, onFilterChange, onReset }) {
         {/* Color */}
         {availableColors.length > 0 && (
           <div className="space-y-2">
-            <Label>Couleur</Label>
+            <div className="flex items-center justify-between">
+              <Label>Couleur</Label>
+              {filters.color && filters.color !== 'all' && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleChange('color', 'all')}
+                  className="h-6 px-2 text-xs"
+                >
+                  <X className="w-3 h-3 mr-1" />
+                  Effacer
+                </Button>
+              )}
+            </div>
             <Select value={filters.color || 'all'} onValueChange={(v) => handleChange('color', v)}>
-              <SelectTrigger>
+              <SelectTrigger className={filters.color && filters.color !== 'all' ? 'border-primary' : ''}>
                 <SelectValue placeholder="Toutes couleurs" />
               </SelectTrigger>
               <SelectContent>
@@ -300,9 +397,22 @@ export default function Filters({ filters, onFilterChange, onReset }) {
         {/* Material */}
         {availableMaterials.length > 0 && (
           <div className="space-y-2">
-            <Label>Matière</Label>
+            <div className="flex items-center justify-between">
+              <Label>Matière</Label>
+              {filters.material && filters.material !== 'all' && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleChange('material', 'all')}
+                  className="h-6 px-2 text-xs"
+                >
+                  <X className="w-3 h-3 mr-1" />
+                  Effacer
+                </Button>
+              )}
+            </div>
             <Select value={filters.material || 'all'} onValueChange={(v) => handleChange('material', v)}>
-              <SelectTrigger>
+              <SelectTrigger className={filters.material && filters.material !== 'all' ? 'border-primary' : ''}>
                 <SelectValue placeholder="Toutes matières" />
               </SelectTrigger>
               <SelectContent>
