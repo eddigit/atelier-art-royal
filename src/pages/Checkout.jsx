@@ -140,8 +140,11 @@ export default function Checkout() {
           description: `Commande ${orderNumber}`
         });
 
-        if (!sumupCheckout.success) {
-          throw new Error('Erreur lors de la création du paiement');
+        console.log('SumUp Response:', sumupCheckout);
+
+        if (!sumupCheckout.success || !sumupCheckout.checkoutId) {
+          console.error('SumUp Error:', sumupCheckout);
+          throw new Error(sumupCheckout.error || 'Erreur lors de la création du paiement');
         }
 
         // Update order with checkout ID
@@ -156,8 +159,11 @@ export default function Checkout() {
           clearGuestCart();
         }
 
-        // Redirect to SumUp payment page
-        window.location.href = sumupCheckout.checkoutUrl;
+        // Redirect to OrderConfirmation with pending payment
+        toast.info('Redirection vers le paiement SumUp...');
+        setTimeout(() => {
+          window.location.href = createPageUrl('OrderConfirmation') + `?order=${order.id}&payment=pending&checkoutId=${sumupCheckout.checkoutId}`;
+        }, 1000);
         return { orderId: order.id, redirecting: true };
       }
 
