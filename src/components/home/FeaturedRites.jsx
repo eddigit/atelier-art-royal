@@ -31,27 +31,28 @@ export default function FeaturedRites() {
           </p>
         </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-w-5xl mx-auto">
-        {isLoading ? (
-          Array(6).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full rounded-lg" />
-          ))
-        ) : (
-          rites.map((rite) => (
-            <Link 
-              key={rite.id} 
-              to={createPageUrl('Catalog') + `?rite=${rite.id}`}
-            >
-              <Button
-                variant="outline"
-                className="w-full h-12 px-4 justify-start group hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-w-5xl mx-auto">
+          {isLoading ? (
+            Array(6).fill(0).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))
+          ) : (
+            rites.map((rite) => (
+              <Link 
+                key={rite.id} 
+                to={createPageUrl('Catalog') + `?rite=${rite.id}`}
               >
-                <Award className="w-4 h-4 mr-2 text-primary group-hover:text-primary-foreground" />
-                <span className="font-semibold text-sm truncate">{rite.name}</span>
-              </Button>
-            </Link>
-          ))
-        )}
+                <Button
+                  variant="outline"
+                  className="w-full h-12 px-4 justify-start group hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                >
+                  <Award className="w-4 h-4 mr-2 text-primary group-hover:text-primary-foreground" />
+                  <span className="font-semibold text-sm truncate">{rite.name}</span>
+                </Button>
+              </Link>
+            ))
+          )}
+        </div>
       </div>
     </section>
   );
