@@ -3,7 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, FileSignature, Phone, Shield, Lock } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, FileSignature, Phone, Shield, Lock, Sparkles } from 'lucide-react';
+import ProgressBar from '@/components/checkout/ProgressBar';
+import ProductCard from '@/components/catalog/ProductCard';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -49,6 +51,31 @@ export default function Cart() {
       return Promise.all(productPromises);
     },
     enabled: (user && cartItems.length > 0) || (!user && guestCartItems.length > 0),
+    initialData: []
+  });
+
+  // Suggested products based on cart items
+  const { data: suggestedProducts = [] } = useQuery({
+    queryKey: ['suggested-products', products],
+    queryFn: async () => {
+      if (products.length === 0) return [];
+      
+      const cartProductIds = products.map(p => p.id);
+      const riteIds = [...new Set(products.flatMap(p => p.rite_ids || []))];
+      const categoryIds = [...new Set(products.flatMap(p => p.category_ids || []))];
+      
+      const allProducts = await base44.entities.Product.filter({ is_active: true }, '-created_date', 200);
+      
+      return allProducts
+        .filter(p => !cartProductIds.includes(p.id))
+        .filter(p => {
+          const hasCommonRite = (p.rite_ids || []).some(rid => riteIds.includes(rid));
+          const hasCommonCategory = (p.category_ids || []).some(cid => categoryIds.includes(cid));
+          return hasCommonRite || hasCommonCategory;
+        })
+        .slice(0, 4);
+    },
+    enabled: products.length > 0,
     initialData: []
   });
 
@@ -201,6 +228,7 @@ export default function Cart() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <ProgressBar currentStep="cart" />
       <h1 className="text-4xl font-bold mb-8">Votre Panier</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

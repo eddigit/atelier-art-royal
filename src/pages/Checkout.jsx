@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, CreditCard, Loader2, Banknote, Building2, Shield, Lock, Phone } from 'lucide-react';
+import { ArrowLeft, CreditCard, Loader2, Banknote, Building2, Shield, Lock, Phone, Award } from 'lucide-react';
+import ProgressBar from '@/components/checkout/ProgressBar';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -228,6 +229,7 @@ export default function Checkout() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <ProgressBar currentStep="checkout" />
       <Link to={createPageUrl('Cart')} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Retour au panier

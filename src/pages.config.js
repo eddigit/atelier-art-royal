@@ -31,6 +31,7 @@ import AdminInventory from './pages/AdminInventory';
 import AdminCategories from './pages/AdminCategories';
 import AdminChat from './pages/AdminChat';
 import AdminBusinessPipeline from './pages/AdminBusinessPipeline';
+import OrderConfirmation from './pages/OrderConfirmation';
 import __Layout from './Layout.jsx';
 
 
@@ -68,6 +69,7 @@ export const PAGES = {
     "AdminCategories": AdminCategories,
     "AdminChat": AdminChat,
     "AdminBusinessPipeline": AdminBusinessPipeline,
+    "OrderConfirmation": OrderConfirmation,
 }
 
 export const pagesConfig = {
