@@ -56,6 +56,28 @@ export default function VisitorNotifier() {
 
   if (activeVisitors.length === 0) return null;
 
+  const toggleVisibility = () => {
+    const newValue = !isVisible;
+    setIsVisible(newValue);
+    localStorage.setItem('visitorNotifierVisible', JSON.stringify(newValue));
+  };
+
+  // Bouton flottant si le widget est masqué
+  if (!isVisible) {
+    return (
+      <Button
+        onClick={toggleVisibility}
+        size="icon"
+        className="fixed bottom-24 right-6 z-40 h-12 w-12 rounded-full shadow-lg bg-green-500 hover:bg-green-600"
+      >
+        <Users className="w-5 h-5" />
+        <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+          {activeVisitors.length}
+        </Badge>
+      </Button>
+    );
+  }
+
   return (
     <Card className="fixed bottom-24 right-6 z-40 p-4 w-64 shadow-lg">
       <div className="flex items-center justify-between mb-2">
@@ -65,6 +87,9 @@ export default function VisitorNotifier() {
         </div>
         <div className="flex items-center gap-1">
           <Badge variant="secondary">{activeVisitors.length}</Badge>
+          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={toggleVisibility}>
+            <X className="w-4 h-4" />
+          </Button>
           <Link to={createPageUrl('AdminPanel') + '?tab=chat'}>
             <Button size="icon" variant="ghost" className="h-7 w-7">
               <MessageCircle className="w-4 h-4" />
