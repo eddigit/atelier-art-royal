@@ -101,19 +101,27 @@ export default function Catalog() {
       // Apply filters
       return allProducts.filter(product => {
         if (filters.rite) {
-          const riteIds = Array.isArray(product.rite_ids) ? product.rite_ids : [];
+          const riteIds = Array.isArray(product.rite_ids) && product.rite_ids.length > 0
+            ? product.rite_ids 
+            : (product.rite_id ? [product.rite_id] : []);
           if (!riteIds.includes(filters.rite)) return false;
         }
         if (filters.obedience) {
-          const obedienceIds = Array.isArray(product.obedience_ids) ? product.obedience_ids : [];
+          const obedienceIds = Array.isArray(product.obedience_ids) && product.obedience_ids.length > 0
+            ? product.obedience_ids 
+            : (product.obedience_id ? [product.obedience_id] : []);
           if (!obedienceIds.includes(filters.obedience)) return false;
         }
         if (filters.degreeOrder) {
-          const degreeIds = Array.isArray(product.degree_order_ids) ? product.degree_order_ids : [];
+          const degreeIds = Array.isArray(product.degree_order_ids) && product.degree_order_ids.length > 0
+            ? product.degree_order_ids 
+            : (product.degree_order_id ? [product.degree_order_id] : []);
           if (!degreeIds.includes(filters.degreeOrder)) return false;
         }
         if (filters.category) {
-          const categoryIds = Array.isArray(product.category_ids) ? product.category_ids : [];
+          const categoryIds = Array.isArray(product.category_ids) && product.category_ids.length > 0
+            ? product.category_ids 
+            : (product.category_id ? [product.category_id] : []);
           if (!categoryIds.includes(filters.category)) return false;
         }
         

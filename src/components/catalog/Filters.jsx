@@ -46,12 +46,16 @@ export default function Filters({ filters, onFilterChange, onReset }) {
 
   // Filter only options with available products and deduplicate by name
   const rites = allRites.filter(r => products.some(p => {
-    const riteIds = Array.isArray(p.rite_ids) ? p.rite_ids : [];
+    const riteIds = Array.isArray(p.rite_ids) && p.rite_ids.length > 0 
+      ? p.rite_ids 
+      : (p.rite_id ? [p.rite_id] : []);
     return riteIds.includes(r.id);
   }));
   
   const categoriesFiltered = allCategories.filter(c => products.some(p => {
-    const categoryIds = Array.isArray(p.category_ids) ? p.category_ids : [];
+    const categoryIds = Array.isArray(p.category_ids) && p.category_ids.length > 0
+      ? p.category_ids 
+      : (p.category_id ? [p.category_id] : []);
     return categoryIds.includes(c.id);
   }));
   const categories = categoriesFiltered.filter((cat, index, self) => 
@@ -60,13 +64,17 @@ export default function Filters({ filters, onFilterChange, onReset }) {
   
   const obediences = allObediences.filter(o => 
     products.some(p => {
-      const obedienceIds = Array.isArray(p.obedience_ids) ? p.obedience_ids : [];
+      const obedienceIds = Array.isArray(p.obedience_ids) && p.obedience_ids.length > 0
+        ? p.obedience_ids 
+        : (p.obedience_id ? [p.obedience_id] : []);
       return obedienceIds.includes(o.id);
     })
   );
   
   const degreeOrdersFiltered = allDegreeOrders.filter(d => products.some(p => {
-    const degreeIds = Array.isArray(p.degree_order_ids) ? p.degree_order_ids : [];
+    const degreeIds = Array.isArray(p.degree_order_ids) && p.degree_order_ids.length > 0
+      ? p.degree_order_ids 
+      : (p.degree_order_id ? [p.degree_order_id] : []);
     return degreeIds.includes(d.id);
   }));
   const degreeOrders = degreeOrdersFiltered.filter((deg, index, self) => 
