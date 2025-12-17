@@ -139,12 +139,12 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{product ? 'Éditer le produit' : 'Nouveau produit'}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 overflow-y-auto flex-1 pr-2">
           {/* AI Assistant */}
           <ProductAIAssistant 
             product={formData}
