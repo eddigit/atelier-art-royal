@@ -6,11 +6,15 @@ import { createPageUrl } from '@/utils';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Eye, TrendingUp, MessageCircle } from 'lucide-react';
+import { Users, Eye, TrendingUp, MessageCircle, X, Maximize2 } from 'lucide-react';
 
 export default function VisitorNotifier() {
   const [lastNotified, setLastNotified] = useState(Date.now());
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => {
+    const saved = localStorage.getItem('visitorNotifierVisible');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
 
   const { data: activeVisitors = [] } = useQuery({
     queryKey: ['active-visitors'],
