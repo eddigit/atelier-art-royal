@@ -138,10 +138,36 @@ export default function AdminProducts() {
     if (searchQuery && !(p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.sku?.toLowerCase().includes(searchQuery.toLowerCase()))) {
       return false;
     }
-    if (filterRite !== 'all' && p.rite_id !== filterRite) return false;
-    if (filterObedience !== 'all' && p.obedience_id !== filterObedience) return false;
-    if (filterDegreeOrder !== 'all' && p.degree_order_id !== filterDegreeOrder) return false;
-    if (filterCategory !== 'all' && p.category_id !== filterCategory) return false;
+    
+    // Support both single and multiple format
+    if (filterRite !== 'all') {
+      const riteIds = Array.isArray(p.rite_ids) && p.rite_ids.length > 0 
+        ? p.rite_ids 
+        : (p.rite_id ? [p.rite_id] : []);
+      if (!riteIds.includes(filterRite)) return false;
+    }
+    
+    if (filterObedience !== 'all') {
+      const obedienceIds = Array.isArray(p.obedience_ids) && p.obedience_ids.length > 0 
+        ? p.obedience_ids 
+        : (p.obedience_id ? [p.obedience_id] : []);
+      if (!obedienceIds.includes(filterObedience)) return false;
+    }
+    
+    if (filterDegreeOrder !== 'all') {
+      const degreeIds = Array.isArray(p.degree_order_ids) && p.degree_order_ids.length > 0 
+        ? p.degree_order_ids 
+        : (p.degree_order_id ? [p.degree_order_id] : []);
+      if (!degreeIds.includes(filterDegreeOrder)) return false;
+    }
+    
+    if (filterCategory !== 'all') {
+      const categoryIds = Array.isArray(p.category_ids) && p.category_ids.length > 0 
+        ? p.category_ids 
+        : (p.category_id ? [p.category_id] : []);
+      if (!categoryIds.includes(filterCategory)) return false;
+    }
+    
     if (filterStatus === 'active' && !p.is_active) return false;
     if (filterStatus === 'inactive' && p.is_active !== false) return false;
     return true;
