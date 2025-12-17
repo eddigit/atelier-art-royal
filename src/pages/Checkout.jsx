@@ -21,7 +21,7 @@ export default function Checkout() {
   const [createAccount, setCreateAccount] = useState(false);
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPassword, setGuestPassword] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const [deliveryMethod, setDeliveryMethod] = useState('shipping');
 
   const [shippingAddress, setShippingAddress] = useState({
@@ -458,6 +458,19 @@ export default function Checkout() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <div className="flex items-start space-x-3 border-2 border-primary rounded-lg p-4 cursor-pointer hover:bg-accent bg-primary/5">
+                    <RadioGroupItem value="card" id="card" />
+                    <div className="flex-1">
+                      <Label htmlFor="card" className="cursor-pointer font-semibold flex items-center gap-2">
+                        <CreditCard className="w-5 h-5 text-primary" />
+                        Carte bancaire
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Paiement sécurisé par CB via SumUp - Recommandé
+                      </p>
+                    </div>
+                  </div>
+
                   <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
                     <RadioGroupItem value="bank_transfer" id="bank_transfer" />
                     <div className="flex-1">
@@ -472,27 +485,27 @@ export default function Checkout() {
                   </div>
 
                   <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
-                    <RadioGroupItem value="cash" id="cash" />
+                    <RadioGroupItem value="check" id="check" />
                     <div className="flex-1">
-                      <Label htmlFor="cash" className="cursor-pointer font-semibold flex items-center gap-2">
+                      <Label htmlFor="check" className="cursor-pointer font-semibold flex items-center gap-2">
                         <Banknote className="w-5 h-5" />
-                        Espèces sur place
+                        Chèque bancaire
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Paiement en espèces lors du retrait en atelier
+                        Envoi du chèque après validation de la commande
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
-                    <RadioGroupItem value="card" id="card" />
+                    <RadioGroupItem value="cash" id="cash" />
                     <div className="flex-1">
-                      <Label htmlFor="card" className="cursor-pointer font-semibold flex items-center gap-2">
-                        <CreditCard className="w-5 h-5" />
-                        Carte bancaire
+                      <Label htmlFor="cash" className="cursor-pointer font-semibold flex items-center gap-2">
+                        <Banknote className="w-5 h-5" />
+                        Espèces à l'atelier
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Paiement sécurisé par CB via SumUp
+                        Paiement en espèces lors du retrait en atelier
                       </p>
                     </div>
                   </div>
@@ -664,7 +677,9 @@ export default function Checkout() {
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
+                  {paymentMethod === 'card' && 'Paiement sécurisé via SumUp'}
                   {paymentMethod === 'bank_transfer' && 'Vous recevrez les coordonnées bancaires par email'}
+                  {paymentMethod === 'check' && 'Vous recevrez l\'adresse d\'envoi par email'}
                   {paymentMethod === 'cash' && 'Retrait en atelier sur rendez-vous : +33 6 46 68 36 10'}
                 </p>
 
