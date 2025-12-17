@@ -18,7 +18,8 @@ export default function FeaturedRites() {
     <section className="py-12 relative" style={{
       backgroundImage: 'url(https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/691cd26ea8838a859856a6b6/a2afeeff0_background-sectionparrituel.jpg)',
       backgroundSize: 'cover',
-      backgroundPosition: 'center'
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
     }}>
       <div className="absolute inset-0 bg-black/60" />
       <div className="container mx-auto px-4 relative z-10">
