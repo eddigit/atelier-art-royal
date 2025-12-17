@@ -45,36 +45,39 @@ export default function Catalog() {
     };
   }, []);
 
-  // Parse URL params on mount
+  // Sync filters with URL
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const riteParam = urlParams.get('rite');
-    const obedienceParam = urlParams.get('obedience');
-    const degreeOrderParam = urlParams.get('degreeOrder');
-    const logeTypeParam = urlParams.get('logeType');
-    const categoryParam = urlParams.get('category');
-    const searchParam = urlParams.get('search');
-    const minPriceParam = urlParams.get('minPrice');
-    const maxPriceParam = urlParams.get('maxPrice');
-    const showPromotionsParam = urlParams.get('showPromotions');
-    const showNewParam = urlParams.get('showNew');
-    const inStockOnlyParam = urlParams.get('inStockOnly');
+    const params = {
+      rite: urlParams.get('rite') || '',
+      obedience: urlParams.get('obedience') || '',
+      degreeOrder: urlParams.get('degreeOrder') || '',
+      logeType: urlParams.get('logeType') || '',
+      category: urlParams.get('category') || '',
+      search: urlParams.get('search') || '',
+      minPrice: urlParams.get('minPrice') || '',
+      maxPrice: urlParams.get('maxPrice') || '',
+      size: urlParams.get('size') || 'all',
+      color: urlParams.get('color') || 'all',
+      material: urlParams.get('material') || 'all',
+      showPromotions: urlParams.get('showPromotions') === 'true',
+      showNew: urlParams.get('showNew') === 'true',
+      inStockOnly: urlParams.get('inStockOnly') === 'true'
+    };
+    setFilters(params);
+  }, [window.location.search]);
 
-    setFilters(prev => ({
-      ...prev,
-      ...(riteParam && { rite: riteParam }),
-      ...(obedienceParam && { obedience: obedienceParam }),
-      ...(degreeOrderParam && { degreeOrder: degreeOrderParam }),
-      ...(logeTypeParam && { logeType: logeTypeParam }),
-      ...(categoryParam && { category: categoryParam }),
-      ...(searchParam && { search: searchParam }),
-      ...(minPriceParam && { minPrice: minPriceParam }),
-      ...(maxPriceParam && { maxPrice: maxPriceParam }),
-      ...(showPromotionsParam && { showPromotions: showPromotionsParam === 'true' }),
-      ...(showNewParam && { showNew: showNewParam === 'true' }),
-      ...(inStockOnlyParam && { inStockOnly: inStockOnlyParam === 'true' })
-    }));
-  }, []);
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value && value !== '' && value !== 'all' && value !== false) {
+        params.set(key, value.toString());
+      }
+    });
+    const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+    window.history.replaceState({}, '', newUrl);
+  }, [filters]);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products', filters, sortBy],
