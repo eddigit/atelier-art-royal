@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
         currency: 'EUR',
         checkout_reference: reference,
         description: description || 'Atelier Art Royal - Commande',
-        redirect_url: `${Deno.env.get('BASE44_APP_URL') || 'https://votre-site.fr'}/OrderConfirmation?order=${reference}`,
+        redirect_url: `https://app.base44.com/apps/691cd26ea8838a859856a6b6/editor/preview/OrderConfirmation?order=${reference}`,
       }),
     });
 
