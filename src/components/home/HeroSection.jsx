@@ -152,7 +152,7 @@ EXEMPLES:
         >
           <source src="https://res.cloudinary.com/dkvhbcuaz/video/upload/background_hero_video_raji06.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0" style={{ backgroundColor: '#0a182d', opacity: 0.6 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#0a0a0a', opacity: 0.6 }} />
       </div>
 
       {/* Content */}
