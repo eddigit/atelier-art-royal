@@ -53,9 +53,21 @@ export default function CartSidebar({ open, onClose }) {
     mutationFn: async (itemId) => {
       await base44.entities.CartItem.delete(itemId);
     },
-    onSuccess: () => {
+    onMutate: async (itemId) => {
+      await queryClient.cancelQueries(['cart']);
+      const previousCart = queryClient.getQueryData(['cart']);
+      queryClient.setQueryData(['cart'], (old) => old?.filter(item => item.id !== itemId));
+      return { previousCart };
+    },
+    onError: (err, itemId, context) => {
+      queryClient.setQueryData(['cart'], context.previousCart);
+      toast.error('Erreur lors de la suppression');
+    },
+    onSettled: () => {
       queryClient.invalidateQueries(['cart']);
-      toast.success('Article retiré du panier');
+    },
+    onSuccess: () => {
+      toast.success('Article retiré');
     }
   });
 

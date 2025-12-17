@@ -106,13 +106,29 @@ export default function Cart() {
         return Promise.resolve();
       }
     },
-    onSuccess: () => {
+    onMutate: async ({ itemId, productId }) => {
+      if (user) {
+        await queryClient.cancelQueries(['cart']);
+        const previousCart = queryClient.getQueryData(['cart']);
+        queryClient.setQueryData(['cart'], (old) => old?.filter(item => item.id !== itemId));
+        return { previousCart };
+      }
+    },
+    onError: (err, variables, context) => {
+      if (user && context?.previousCart) {
+        queryClient.setQueryData(['cart'], context.previousCart);
+        toast.error('Erreur lors de la suppression');
+      }
+    },
+    onSettled: () => {
       if (user) {
         queryClient.invalidateQueries(['cart']);
       } else {
         setGuestCartRefresh(prev => prev + 1);
       }
-      toast.success('Produit retiré du panier');
+    },
+    onSuccess: () => {
+      toast.success('Produit retiré');
     }
   });
 

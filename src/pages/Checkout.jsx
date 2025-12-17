@@ -22,6 +22,7 @@ export default function Checkout() {
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPassword, setGuestPassword] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+  const [deliveryMethod, setDeliveryMethod] = useState('shipping');
 
   const [shippingAddress, setShippingAddress] = useState({
     name: '',
@@ -80,7 +81,7 @@ export default function Checkout() {
     return sum + (product?.price || 0) * item.quantity;
   }, 0);
 
-  const shippingCost = subtotal >= 500 ? 0 : 15;
+  const shippingCost = deliveryMethod === 'pickup' ? 0 : (subtotal >= 500 ? 0 : 15);
   const total = subtotal + shippingCost;
 
   const createOrderMutation = useMutation({
@@ -217,15 +218,17 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation complète
-    const requiredFields = ['name', 'street', 'city', 'postal_code', 'phone'];
+    // Validation complète (seulement si livraison)
     let hasErrors = false;
     
-    requiredFields.forEach(field => {
-      if (!validateField(field, shippingAddress[field])) {
-        hasErrors = true;
-      }
-    });
+    if (deliveryMethod === 'shipping') {
+      const requiredFields = ['name', 'street', 'city', 'postal_code', 'phone'];
+      requiredFields.forEach(field => {
+        if (!validateField(field, shippingAddress[field])) {
+          hasErrors = true;
+        }
+      });
+    }
 
     if (!user && createAccount) {
       if (!guestEmail || !guestPassword) {
@@ -315,12 +318,46 @@ export default function Checkout() {
               </Card>
             )}
 
-            {/* Shipping Address */}
+            {/* Delivery Method */}
             <Card>
               <CardHeader>
-                <CardTitle>Adresse de livraison</CardTitle>
+                <CardTitle>Mode de livraison</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <RadioGroup value={deliveryMethod} onValueChange={setDeliveryMethod}>
+                  <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="shipping" id="shipping" />
+                    <div className="flex-1">
+                      <Label htmlFor="shipping" className="cursor-pointer font-semibold">
+                        Livraison à domicile
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {subtotal >= 500 ? 'Livraison gratuite' : '15€ de frais de port'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="pickup" id="pickup" />
+                    <div className="flex-1">
+                      <Label htmlFor="pickup" className="cursor-pointer font-semibold">
+                        Retrait en atelier
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Gratuit - Sur rendez-vous au +33 6 46 68 36 10
+                      </p>
+                    </div>
+                  </div>
+                </RadioGroup>
+              </CardContent>
+            </Card>
+
+            {/* Shipping Address */}
+            {deliveryMethod === 'shipping' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Adresse de livraison</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="ship-name">Nom complet *</Label>
                   <Input
@@ -412,6 +449,7 @@ export default function Checkout() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
             {/* Payment Method */}
             <Card>
@@ -574,7 +612,9 @@ export default function Checkout() {
                     <span className="font-medium">{subtotal.toFixed(2)}€</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Livraison</span>
+                    <span className="text-muted-foreground">
+                      {deliveryMethod === 'pickup' ? 'Retrait' : 'Livraison'}
+                    </span>
                     <span className="font-medium">
                       {shippingCost === 0 ? (
                         <span className="text-green-600">Gratuit</span>
