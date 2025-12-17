@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, FileSignature } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +13,7 @@ import { getGuestCart, updateGuestCartItem, removeFromGuestCart } from '@/compon
 export default function Cart() {
   const queryClient = useQueryClient();
   const [guestCartRefresh, setGuestCartRefresh] = React.useState(0);
+  const [isCreatingQuote, setIsCreatingQuote] = React.useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -97,6 +98,73 @@ export default function Cart() {
 
   const shippingCost = subtotal >= 500 ? 0 : 15;
   const total = subtotal + shippingCost;
+
+  const handleCreateQuote = async () => {
+    if (!user) {
+      toast.error('Veuillez vous connecter pour créer un devis');
+      base44.auth.redirectToLogin();
+      return;
+    }
+
+    if (activeCartItems.length === 0) {
+      toast.error('Le panier est vide');
+      return;
+    }
+
+    setIsCreatingQuote(true);
+    try {
+      const quoteNumber = 'WEB-' + Date.now();
+      const taxRate = 20;
+      const subtotalHT = total / (1 + taxRate / 100);
+      const taxAmount = total - subtotalHT;
+
+      const validUntil = new Date();
+      validUntil.setDate(validUntil.getDate() + 30);
+
+      const quoteData = {
+        quote_number: quoteNumber,
+        customer_id: user.id,
+        customer_name: user.full_name,
+        customer_email: user.email,
+        status: 'draft',
+        items: activeCartItems.map((item, idx) => {
+          const product = products[idx];
+          return {
+            product_id: product.id,
+            product_name: product.name,
+            quantity: item.quantity,
+            price: product.price,
+            total: product.price * item.quantity
+          };
+        }),
+        subtotal: subtotalHT,
+        shipping_cost: shippingCost,
+        discount: 0,
+        tax_rate: taxRate,
+        tax_amount: taxAmount,
+        total: total,
+        valid_until: validUntil.toISOString().split('T')[0],
+        notes: 'Devis valable 30 jours. Paiement à la commande.'
+      };
+
+      await base44.entities.Quote.create(quoteData);
+      toast.success('Devis créé avec succès ! Vous pouvez le consulter dans vos commandes.');
+      
+      // Vider le panier
+      if (user) {
+        const deletePromises = cartItems.map(item => base44.entities.CartItem.delete(item.id));
+        await Promise.all(deletePromises);
+        queryClient.invalidateQueries(['cart']);
+      } else {
+        localStorage.removeItem('guest_cart');
+        setGuestCartRefresh(prev => prev + 1);
+      }
+    } catch (error) {
+      toast.error('Erreur lors de la création du devis');
+    } finally {
+      setIsCreatingQuote(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -257,8 +325,18 @@ export default function Cart() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full"
+                onClick={handleCreateQuote}
+                disabled={isCreatingQuote}
+              >
+                <FileSignature className="mr-2 w-5 h-5" />
+                {isCreatingQuote ? 'Création...' : 'Créer un devis'}
+              </Button>
               <Link to={createPageUrl('Catalog')}>
-                <Button variant="outline" size="lg" className="w-full">
+                <Button variant="ghost" size="lg" className="w-full">
                   Continuer mes achats
                 </Button>
               </Link>
