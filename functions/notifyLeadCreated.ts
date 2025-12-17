@@ -79,14 +79,13 @@ Deno.serve(async (req) => {
       </p>
     `;
 
-    // Get admin emails
-    const admins = await base44.asServiceRole.entities.User.filter({ role: 'admin' });
+    // Send to fixed emails
+    const emailRecipients = ['contact@artroyal.fr', 'coachdigitalparis@gmail.com'];
     
-    // Send email to all admins
-    for (const admin of admins) {
+    for (const recipient of emailRecipients) {
       await base44.asServiceRole.integrations.Core.SendEmail({
         from_name: 'Atelier Art Royal - Notifications',
-        to: admin.email,
+        to: recipient,
         subject: `🔔 Nouvelle Demande ${lead.priority === 'urgente' || lead.priority === 'haute' ? '🔥 PRIORITAIRE' : ''} - ${lead.contact_name || 'Prospect'}`,
         body: emailBody
       });
@@ -94,7 +93,7 @@ Deno.serve(async (req) => {
 
     return Response.json({
       success: true,
-      message: `Notification envoyée à ${admins.length} administrateur(s)`
+      message: `Notifications envoyées à ${emailRecipients.length} destinataire(s)`
     });
 
   } catch (error) {
