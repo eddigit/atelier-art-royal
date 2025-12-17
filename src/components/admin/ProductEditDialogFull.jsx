@@ -20,11 +20,16 @@ import {
 
 export default function ProductEditDialogFull({ product, open, onClose, onSaved }) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(product || {
+  const [formData, setFormData] = useState(() => ({
     sizes: [],
     colors: [],
-    materials: []
-  });
+    materials: [],
+    rite_ids: [],
+    obedience_ids: [],
+    degree_order_ids: [],
+    category_ids: [],
+    ...product
+  }));
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [newSize, setNewSize] = useState('');

@@ -256,7 +256,7 @@ export default function AdminProducts() {
         </div>
         <Button
           size="lg"
-          onClick={() => setEditingProduct({})}
+          onClick={() => setEditingProduct({ sizes: [], colors: [], materials: [] })}
           className="bg-primary hover:bg-primary/90"
         >
           <Package className="w-5 h-5 mr-2" />
