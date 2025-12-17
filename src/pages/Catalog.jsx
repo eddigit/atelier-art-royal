@@ -7,7 +7,7 @@ import AdvancedSearchBar from '@/components/catalog/AdvancedSearchBar';
 import ProductCard from '@/components/catalog/ProductCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Package } from 'lucide-react';
+import { Package, Phone, Wrench } from 'lucide-react';
 
 export default function Catalog() {
   const [filters, setFilters] = useState({
@@ -201,12 +201,30 @@ export default function Catalog() {
       <Breadcrumb filters={filters} />
       
       <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Notre <span className="text-primary">Catalogue</span>
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Découvrez l'excellence de nos créations maçonniques
-        </p>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Notre <span className="text-primary">Catalogue</span>
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Découvrez l'excellence de nos créations maçonniques
+            </p>
+          </div>
+          
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 lg:max-w-md">
+            <div className="flex items-center gap-3 mb-2">
+              <Wrench className="w-5 h-5 text-primary" />
+              <h3 className="font-bold text-primary">Création Sur-Mesure</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-2">
+              Toutes nos pièces peuvent être réalisées sur-mesure selon vos besoins spécifiques.
+            </p>
+            <a href="tel:+33646683610" className="inline-flex items-center gap-2 text-primary font-semibold hover:underline text-sm">
+              <Phone className="w-4 h-4" />
+              +33 6 46 68 36 10
+            </a>
+          </div>
+        </div>
       </div>
 
       <AdvancedSearchBar 

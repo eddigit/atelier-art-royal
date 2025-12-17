@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
-import { ShoppingCart, Star, Package, Truck, Shield, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, Star, Package, Truck, Shield, ArrowLeft, Phone, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -282,6 +282,29 @@ export default function ProductDetail() {
               <p className="text-xs text-muted-foreground">Franco dès 500€</p>
             </div>
           </div>
+
+          {/* Sur-mesure */}
+          <Card className="p-6 bg-primary/5 border-primary/20">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Wrench className="w-6 h-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg mb-2">Création Sur-Mesure</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  L'Atelier Art Royal réalise toutes vos pièces sur-mesure avec le plus grand soin. 
+                  Contactez-nous directement pour discuter de votre projet et obtenir un devis personnalisé.
+                </p>
+                <a href="tel:+33646683610" className="inline-flex items-center gap-2 text-primary font-semibold hover:underline">
+                  <Phone className="w-4 h-4" />
+                  +33 6 46 68 36 10
+                  <span className="text-xs text-muted-foreground font-normal ml-2">
+                    Une personne dédiée prend en charge votre demande
+                  </span>
+                </a>
+              </div>
+            </div>
+          </Card>
 
           {/* Description */}
           {product.description && (
