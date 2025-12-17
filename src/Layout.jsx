@@ -545,27 +545,79 @@ export default function Layout({ children, currentPageName }) {
       <CartSidebar open={cartSidebarOpen} onClose={() => setCartSidebarOpen(false)} />
 
       {/* Footer */}
-      <footer className="border-t border-border mt-20">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-3 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Link to={createPageUrl('Setup')}>
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-muted-foreground text-xs font-bold cursor-pointer hover:border-primary hover:text-primary transition-colors">©</span>
-              </Link>
-              <span>{new Date().getFullYear()} Atelier Art Royal</span>
+      <footer className="border-t border-border mt-20 bg-slate-50">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* Contact */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-primary">Contactez-nous</h3>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="font-semibold mb-1">Service Commercial & Support</p>
+                  <a href="tel:+33646683610" className="text-primary hover:underline font-semibold text-lg">
+                    +33 6 46 68 36 10
+                  </a>
+                  <p className="text-xs text-muted-foreground mt-1">Une personne dédiée prend en charge votre demande</p>
+                </div>
+                <div>
+                  <p className="font-semibold mb-1">Email</p>
+                  <a href="mailto:contact@artroyal.fr" className="text-primary hover:underline">
+                    contact@artroyal.fr
+                  </a>
+                </div>
+              </div>
             </div>
-            <span className="hidden md:inline">•</span>
-            <span>
-              Design et E-commerce réalisé par{' '}
-              <a 
-                href="https://coachdigitalparis.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="font-semibold hover:text-primary transition-colors"
-              >
-                GILLES KORZEC
-              </a>
-            </span>
+
+            {/* Sur-mesure */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-primary">Notre Savoir-Faire</h3>
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p className="font-semibold text-foreground">Création Sur-Mesure</p>
+                <p>L'Atelier Art Royal réalise toutes vos pièces sur-mesure avec le plus grand soin.</p>
+                <p className="text-primary font-semibold">Contactez-nous pour un devis personnalisé</p>
+              </div>
+            </div>
+
+            {/* Informations */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-primary">Informations</h3>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-0.5">
+                    <div className="w-1 h-4 bg-blue-600 rounded-l"></div>
+                    <div className="w-1 h-4 bg-white"></div>
+                    <div className="w-1 h-4 bg-red-600 rounded-r"></div>
+                  </div>
+                  <span className="font-semibold text-primary">Fabrication Française</span>
+                </div>
+                <p>Livraison rapide sous 5-7 jours</p>
+                <p>Paiement sécurisé</p>
+                <p>Service client dédié</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-6">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Link to={createPageUrl('Setup')}>
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-muted-foreground text-xs font-bold cursor-pointer hover:border-primary hover:text-primary transition-colors">©</span>
+                </Link>
+                <span>{new Date().getFullYear()} Atelier Art Royal</span>
+              </div>
+              <span className="hidden md:inline">•</span>
+              <span>
+                Design et E-commerce réalisé par{' '}
+                <a 
+                  href="https://coachdigitalparis.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="font-semibold hover:text-primary transition-colors"
+                >
+                  GILLES KORZEC
+                </a>
+              </span>
+            </div>
           </div>
         </div>
       </footer>
