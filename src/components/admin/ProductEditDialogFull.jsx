@@ -111,8 +111,8 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.price || !formData.rite_id || !formData.degree_order_id) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
+    if (!formData.name || !formData.price) {
+      toast.error('Veuillez remplir tous les champs obligatoires (nom et prix)');
       return;
     }
 
@@ -213,22 +213,45 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
           {/* Rite, Obedience, Degree & Order, Category */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Rite *</label>
-              <Select 
-                value={formData.rite_id || ''} 
-                onValueChange={(v) => setFormData({ ...formData, rite_id: v })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Sélectionner un rite" />
-                </SelectTrigger>
-                <SelectContent>
-                  {rites.map(rite => (
-                    <SelectItem key={rite.id} value={rite.id}>
-                      {rite.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Rites (plusieurs possibles)</label>
+              <div className="mt-1 border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
+                {rites.map(rite => (
+                  <div key={rite.id} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={(formData.rite_ids || []).includes(rite.id)}
+                      onCheckedChange={(checked) => {
+                        const currentIds = formData.rite_ids || [];
+                        const newIds = checked
+                          ? [...currentIds, rite.id]
+                          : currentIds.filter(id => id !== rite.id);
+                        setFormData({ ...formData, rite_ids: newIds });
+                      }}
+                    />
+                    <label className="text-sm cursor-pointer">{rite.name}</label>
+                  </div>
+                ))}
+              </div>
+              {(formData.rite_ids || []).length > 0 && (
+                <div className="flex gap-1 mt-2 flex-wrap">
+                  {formData.rite_ids.map(id => {
+                    const rite = rites.find(r => r.id === id);
+                    return rite ? (
+                      <Badge key={id} variant="secondary" className="gap-1">
+                        {rite.name}
+                        <X 
+                          className="w-3 h-3 cursor-pointer" 
+                          onClick={() => {
+                            setFormData({ 
+                              ...formData, 
+                              rite_ids: formData.rite_ids.filter(rid => rid !== id) 
+                            });
+                          }}
+                        />
+                      </Badge>
+                    ) : null;
+                  })}
+                </div>
+              )}
             </div>
 
             <div>
@@ -274,29 +297,62 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
             </div>
 
             <div>
-              <label className="text-sm font-medium">Degré & Ordre *</label>
-              <Select 
-                value={formData.degree_order_id || ''} 
-                onValueChange={(v) => setFormData({ ...formData, degree_order_id: v })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Sélectionner un degré" />
-                </SelectTrigger>
-                <SelectContent className="max-h-80">
-                  <div className="px-2 py-1.5 text-xs font-semibold text-primary">Loge Symbolique</div>
-                  {degreeOrders.filter(d => d.loge_type === 'Loge Symbolique').map(degree => (
-                    <SelectItem key={degree.id} value={degree.id}>
-                      {degree.name}
-                    </SelectItem>
-                  ))}
-                  <div className="px-2 py-1.5 text-xs font-semibold text-primary mt-2">Loge Hauts Grades</div>
-                  {degreeOrders.filter(d => d.loge_type === 'Loge Hauts Grades').map(degree => (
-                    <SelectItem key={degree.id} value={degree.id}>
-                      {degree.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Degrés & Ordres (plusieurs possibles)</label>
+              <div className="mt-1 border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
+                <div className="px-2 py-1 text-xs font-semibold text-primary">Loge Symbolique</div>
+                {degreeOrders.filter(d => d.loge_type === 'Loge Symbolique').map(degree => (
+                  <div key={degree.id} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={(formData.degree_order_ids || []).includes(degree.id)}
+                      onCheckedChange={(checked) => {
+                        const currentIds = formData.degree_order_ids || [];
+                        const newIds = checked
+                          ? [...currentIds, degree.id]
+                          : currentIds.filter(id => id !== degree.id);
+                        setFormData({ ...formData, degree_order_ids: newIds });
+                      }}
+                    />
+                    <label className="text-sm cursor-pointer">{degree.name}</label>
+                  </div>
+                ))}
+                <div className="px-2 py-1 text-xs font-semibold text-primary mt-2">Loge Hauts Grades</div>
+                {degreeOrders.filter(d => d.loge_type === 'Loge Hauts Grades').map(degree => (
+                  <div key={degree.id} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={(formData.degree_order_ids || []).includes(degree.id)}
+                      onCheckedChange={(checked) => {
+                        const currentIds = formData.degree_order_ids || [];
+                        const newIds = checked
+                          ? [...currentIds, degree.id]
+                          : currentIds.filter(id => id !== degree.id);
+                        setFormData({ ...formData, degree_order_ids: newIds });
+                      }}
+                    />
+                    <label className="text-sm cursor-pointer">{degree.name}</label>
+                  </div>
+                ))}
+              </div>
+              {(formData.degree_order_ids || []).length > 0 && (
+                <div className="flex gap-1 mt-2 flex-wrap">
+                  {formData.degree_order_ids.map(id => {
+                    const degree = degreeOrders.find(d => d.id === id);
+                    return degree ? (
+                      <Badge key={id} variant="secondary" className="gap-1">
+                        {degree.name}
+                        <X 
+                          className="w-3 h-3 cursor-pointer" 
+                          onClick={() => {
+                            setFormData({ 
+                              ...formData, 
+                              degree_order_ids: formData.degree_order_ids.filter(did => did !== id) 
+                            });
+                          }}
+                        />
+                      </Badge>
+                    ) : null;
+                  })}
+                </div>
+              )}
             </div>
 
             <div>
