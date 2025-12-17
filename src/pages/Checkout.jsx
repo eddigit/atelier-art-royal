@@ -93,8 +93,6 @@ export default function Checkout() {
           throw new Error('Email et mot de passe requis pour créer un compte');
         }
         
-        // Create account using email/password
-        // Note: This requires proper user creation setup
         const newUser = await base44.auth.signUp({
           email: guestEmail,
           password: guestPassword,
@@ -104,7 +102,6 @@ export default function Checkout() {
       } else if (user) {
         customerId = user.id;
       } else {
-        // Guest checkout - create temporary customer reference
         customerId = `guest_${Date.now()}`;
       }
 
@@ -134,7 +131,36 @@ export default function Checkout() {
         payment_method: paymentMethod
       });
 
-      // Clear cart
+      // If card payment, create SumUp checkout
+      if (paymentMethod === 'card') {
+        const { data: sumupCheckout } = await base44.functions.invoke('createSumupCheckout', {
+          amount: total,
+          reference: order.id,
+          description: `Commande ${orderNumber}`
+        });
+
+        if (!sumupCheckout.success) {
+          throw new Error('Erreur lors de la création du paiement');
+        }
+
+        // Update order with checkout ID
+        await base44.entities.Order.update(order.id, {
+          stripe_payment_id: sumupCheckout.checkoutId
+        });
+
+        // Clear cart
+        if (user) {
+          await Promise.all(cartItems.map(item => base44.entities.CartItem.delete(item.id)));
+        } else {
+          clearGuestCart();
+        }
+
+        // Redirect to SumUp payment page
+        window.location.href = sumupCheckout.checkoutUrl;
+        return { orderId: order.id, redirecting: true };
+      }
+
+      // Clear cart for other payment methods
       if (user) {
         await Promise.all(cartItems.map(item => base44.entities.CartItem.delete(item.id)));
       } else {
@@ -143,23 +169,26 @@ export default function Checkout() {
 
       // Send confirmation emails
       try {
-        await base44.asServiceRole.functions.invoke('sendOrderConfirmation', { orderId: order.id });
+        await base44.functions.invoke('sendOrderConfirmation', { orderId: order.id });
       } catch (emailError) {
         console.error('Email error:', emailError);
-        // Continue even if email fails
       }
 
-      return order;
+      return { orderId: order.id };
     },
-    onSuccess: (order) => {
+    onSuccess: (result) => {
+      if (result.redirecting) {
+        // SumUp redirect - don't show toast
+        return;
+      }
+      
       queryClient.invalidateQueries(['cart']);
       queryClient.invalidateQueries(['guest-cart']);
       queryClient.invalidateQueries(['orders']);
       toast.success('✅ Commande validée avec succès !');
       
-      // Redirect to confirmation page
       setTimeout(() => {
-        window.location.href = createPageUrl('OrderConfirmation') + `?order=${order.id}`;
+        window.location.href = createPageUrl('OrderConfirmation') + `?order=${result.orderId}`;
       }, 1000);
     },
     onError: (error) => {
@@ -417,15 +446,15 @@ export default function Checkout() {
                     </div>
                   </div>
 
-                  <div className="flex items-start space-x-3 border rounded-lg p-4 opacity-50 cursor-not-allowed bg-muted">
-                    <RadioGroupItem value="card" id="card" disabled />
+                  <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="card" id="card" />
                     <div className="flex-1">
-                      <Label htmlFor="card" className="font-semibold flex items-center gap-2">
+                      <Label htmlFor="card" className="cursor-pointer font-semibold flex items-center gap-2">
                         <CreditCard className="w-5 h-5" />
-                        Carte bancaire (bientôt disponible)
+                        Carte bancaire
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Paiement sécurisé par CB - Prochainement
+                        Paiement sécurisé par CB via SumUp
                       </p>
                     </div>
                   </div>

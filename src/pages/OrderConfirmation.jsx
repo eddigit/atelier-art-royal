@@ -17,7 +17,28 @@ export default function OrderConfirmation() {
     queryKey: ['order', orderId],
     queryFn: async () => {
       const orders = await base44.entities.Order.filter({ id: orderId });
-      return orders[0];
+      const orderData = orders[0];
+      
+      // If card payment, verify SumUp payment status
+      if (orderData && orderData.payment_method === 'card' && orderData.stripe_payment_id) {
+        try {
+          const { data: verification } = await base44.functions.invoke('verifySumupPayment', {
+            checkoutId: orderData.stripe_payment_id
+          });
+          
+          if (verification.paid) {
+            // Update order to paid
+            await base44.entities.Order.update(orderData.id, {
+              payment_status: 'paid'
+            });
+            orderData.payment_status = 'paid';
+          }
+        } catch (error) {
+          console.error('Payment verification error:', error);
+        }
+      }
+      
+      return orderData;
     },
     enabled: !!orderId
   });
@@ -80,9 +101,18 @@ export default function OrderConfirmation() {
                   <span className="text-muted-foreground">Mode de paiement</span>
                   <span className="font-medium">
                     {order.payment_method === 'bank_transfer' ? 'Virement bancaire' : 
-                     order.payment_method === 'cash' ? 'Espèces' : 'Carte bancaire'}
+                     order.payment_method === 'cash' ? 'Espèces' : 
+                     order.payment_method === 'card' ? 'Carte bancaire' : 'Autre'}
                   </span>
                 </div>
+                {order.payment_method === 'card' && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Statut du paiement</span>
+                    <span className={`font-semibold ${order.payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
+                      {order.payment_status === 'paid' ? '✓ Payé' : 'En attente'}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -104,6 +134,28 @@ export default function OrderConfirmation() {
                 </p>
                 <p className="text-xs text-green-700">
                   Merci de nous contacter au +33 6 46 68 36 10 pour convenir d'un rendez-vous.
+                </p>
+              </div>
+            )}
+
+            {order.payment_method === 'card' && order.payment_status === 'paid' && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-green-800 font-semibold mb-2">
+                  ✓ Paiement confirmé
+                </p>
+                <p className="text-xs text-green-700">
+                  Votre paiement par carte a été accepté. Nous préparons votre commande.
+                </p>
+              </div>
+            )}
+
+            {order.payment_method === 'card' && order.payment_status !== 'paid' && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-yellow-800 font-semibold mb-2">
+                  ⏳ Paiement en attente
+                </p>
+                <p className="text-xs text-yellow-700">
+                  Nous vérifions votre paiement. Vous recevrez une confirmation par email.
                 </p>
               </div>
             )}
