@@ -213,21 +213,21 @@ export default function Layout({ children, currentPageName }) {
 
               {!isAdminPage && (
                 <>
-                  {/* Menu Rites */}
+                  {/* Menu Obédiences */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="text-sm font-medium hover:text-primary h-auto p-0 gap-1">
-                        Rites
+                        Obédiences
                         <ChevronDown className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56">
-                      <DropdownMenuLabel>Sélectionner un Rite</DropdownMenuLabel>
-                      {rites.map(rite => (
-                        <DropdownMenuItem key={rite.id} asChild>
-                          <Link to={createPageUrl('Catalog') + `?rite=${rite.id}`} className="cursor-pointer">
+                      <DropdownMenuLabel>Sélectionner une Obédience</DropdownMenuLabel>
+                      {obediences.map(obedience => (
+                        <DropdownMenuItem key={obedience.id} asChild>
+                          <Link to={createPageUrl('Catalog') + `?obedience=${obedience.id}`} className="cursor-pointer">
                             <Award className="w-4 h-4 mr-2" />
-                            {rite.name}
+                            {obedience.name}
                           </Link>
                         </DropdownMenuItem>
                       ))}
@@ -434,15 +434,15 @@ export default function Layout({ children, currentPageName }) {
 
                   {!isAdminPage && (
                   <>
-                    <div className="text-xs text-muted-foreground font-semibold mt-2">Rites</div>
-                    {rites.map(rite => (
+                    <div className="text-xs text-muted-foreground font-semibold mt-2">Obédiences</div>
+                    {obediences.map(obedience => (
                       <Link 
-                        key={rite.id}
-                        to={createPageUrl('Catalog') + `?rite=${rite.id}`}
+                        key={obedience.id}
+                        to={createPageUrl('Catalog') + `?obedience=${obedience.id}`}
                         className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        {rite.name}
+                        {obedience.name}
                       </Link>
                     ))}
 
