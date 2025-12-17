@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
       currency: 'EUR',
       merchant_code: SUMUP_MERCHANT_CODE,
       description: description || 'Atelier Art Royal - Commande',
-      redirect_url: `https://691cd26ea8838a859856a6b6-691cd26ea8838a859856a6b6.base44.app/OrderConfirmation?order=${reference}`,
+      redirect_url: `https://artroyal.fr/OrderConfirmation?order=${reference}`,
       hosted_checkout: {
         enabled: true
       }
