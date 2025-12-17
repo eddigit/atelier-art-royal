@@ -6,14 +6,17 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Sparkles } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Sparkles, Truck, Store } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 export default function CartSidebar({ open, onClose }) {
   const queryClient = useQueryClient();
+  const [deliveryMethod, setDeliveryMethod] = React.useState('shipping');
 
   const { data: user } = useQuery({
     queryKey: ['current-user'],
@@ -80,7 +83,7 @@ export default function CartSidebar({ open, onClose }) {
     return sum + (product?.price || 0) * item.quantity;
   }, 0);
 
-  const shipping = subtotal > 100 ? 0 : 8.90;
+  const shipping = deliveryMethod === 'pickup' ? 0 : (subtotal > 100 ? 0 : 8.90);
   const total = subtotal + shipping;
 
   if (!user) return null;
@@ -194,15 +197,46 @@ export default function CartSidebar({ open, onClose }) {
             </ScrollArea>
 
             <div className="border-t p-6 space-y-4 bg-muted/30">
+              {/* Delivery Method Selection */}
+              <div className="space-y-3 pb-3 border-b">
+                <Label className="text-sm font-semibold">Mode de livraison</Label>
+                <RadioGroup value={deliveryMethod} onValueChange={setDeliveryMethod}>
+                  <div className="flex items-center space-x-2 p-2 rounded border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="shipping" id="sidebar-shipping" />
+                    <Label htmlFor="sidebar-shipping" className="flex-1 cursor-pointer text-sm">
+                      <div className="flex items-center gap-2">
+                        <Truck className="w-4 h-4" />
+                        <span>Livraison à domicile</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {subtotal > 100 ? 'Gratuite' : '8.90€'}
+                      </span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-2 rounded border hover:bg-accent cursor-pointer">
+                    <RadioGroupItem value="pickup" id="sidebar-pickup" />
+                    <Label htmlFor="sidebar-pickup" className="flex-1 cursor-pointer text-sm">
+                      <div className="flex items-center gap-2">
+                        <Store className="w-4 h-4" />
+                        <span>Retrait en atelier</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">Gratuit</span>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Sous-total</span>
                   <span className="font-semibold">{subtotal.toFixed(2)}€</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Livraison</span>
+                  <span className="text-muted-foreground">
+                    {deliveryMethod === 'pickup' ? 'Retrait' : 'Livraison'}
+                  </span>
                   <span className="font-semibold">
-                    {shipping === 0 ? 'Gratuite' : `${shipping.toFixed(2)}€`}
+                    {shipping === 0 ? 'Gratuit' : `${shipping.toFixed(2)}€`}
                   </span>
                 </div>
                 {subtotal < 100 && subtotal > 0 && (
