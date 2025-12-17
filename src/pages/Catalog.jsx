@@ -101,19 +101,19 @@ export default function Catalog() {
       // Apply filters
       return allProducts.filter(product => {
         if (filters.rite) {
-          const riteIds = Array.isArray(product.rite_ids) ? product.rite_ids : (product.rite_id ? [product.rite_id] : []);
+          const riteIds = Array.isArray(product.rite_ids) ? product.rite_ids : [];
           if (!riteIds.includes(filters.rite)) return false;
         }
         if (filters.obedience) {
-          const obedienceIds = Array.isArray(product.obedience_ids) ? product.obedience_ids : (product.obedience_id ? [product.obedience_id] : []);
+          const obedienceIds = Array.isArray(product.obedience_ids) ? product.obedience_ids : [];
           if (!obedienceIds.includes(filters.obedience)) return false;
         }
         if (filters.degreeOrder) {
-          const degreeIds = Array.isArray(product.degree_order_ids) ? product.degree_order_ids : (product.degree_order_id ? [product.degree_order_id] : []);
+          const degreeIds = Array.isArray(product.degree_order_ids) ? product.degree_order_ids : [];
           if (!degreeIds.includes(filters.degreeOrder)) return false;
         }
         if (filters.category) {
-          const categoryIds = Array.isArray(product.category_ids) ? product.category_ids : (product.category_id ? [product.category_id] : []);
+          const categoryIds = Array.isArray(product.category_ids) ? product.category_ids : [];
           if (!categoryIds.includes(filters.category)) return false;
         }
         
