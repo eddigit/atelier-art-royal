@@ -35,6 +35,11 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
   const [newSize, setNewSize] = useState('');
   const [newColor, setNewColor] = useState('');
   const [newMaterial, setNewMaterial] = useState('');
+  const [showNewRite, setShowNewRite] = useState(false);
+  const [showNewObedience, setShowNewObedience] = useState(false);
+  const [showNewDegree, setShowNewDegree] = useState(false);
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newItemData, setNewItemData] = useState({});
 
   const { data: rites = [] } = useQuery({
     queryKey: ['rites'],
@@ -113,6 +118,81 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
 
   const removeMaterial = (material) => {
     setFormData({ ...formData, materials: formData.materials.filter(m => m !== material) });
+  };
+
+  const createNewRite = async () => {
+    if (!newItemData.name) return;
+    try {
+      const created = await base44.entities.Rite.create({
+        name: newItemData.name,
+        code: newItemData.code || '',
+        description: newItemData.description || '',
+        order: 0
+      });
+      await queryClient.invalidateQueries(['rites']);
+      setFormData({ ...formData, rite_ids: [...(formData.rite_ids || []), created.id] });
+      toast.success('Rite créé');
+      setShowNewRite(false);
+      setNewItemData({});
+    } catch (error) {
+      toast.error('Erreur lors de la création');
+    }
+  };
+
+  const createNewObedience = async () => {
+    if (!newItemData.name) return;
+    try {
+      const created = await base44.entities.Obedience.create({
+        name: newItemData.name,
+        description: newItemData.description || '',
+        order: 0
+      });
+      await queryClient.invalidateQueries(['obediences']);
+      setFormData({ ...formData, obedience_ids: [...(formData.obedience_ids || []), created.id] });
+      toast.success('Obédience créée');
+      setShowNewObedience(false);
+      setNewItemData({});
+    } catch (error) {
+      toast.error('Erreur lors de la création');
+    }
+  };
+
+  const createNewDegree = async () => {
+    if (!newItemData.name) return;
+    try {
+      const created = await base44.entities.DegreeOrder.create({
+        name: newItemData.name,
+        description: newItemData.description || '',
+        loge_type: newItemData.loge_type || 'Loge Symbolique',
+        level: parseInt(newItemData.level) || 1
+      });
+      await queryClient.invalidateQueries(['degreeOrders']);
+      setFormData({ ...formData, degree_order_ids: [...(formData.degree_order_ids || []), created.id] });
+      toast.success('Degré créé');
+      setShowNewDegree(false);
+      setNewItemData({});
+    } catch (error) {
+      toast.error('Erreur lors de la création');
+    }
+  };
+
+  const createNewCategory = async () => {
+    if (!newItemData.name) return;
+    try {
+      const created = await base44.entities.Category.create({
+        name: newItemData.name,
+        slug: newItemData.name.toLowerCase().replace(/\s+/g, '-'),
+        description: newItemData.description || '',
+        order: 0
+      });
+      await queryClient.invalidateQueries(['categories']);
+      setFormData({ ...formData, category_ids: [...(formData.category_ids || []), created.id] });
+      toast.success('Catégorie créée');
+      setShowNewCategory(false);
+      setNewItemData({});
+    } catch (error) {
+      toast.error('Erreur lors de la création');
+    }
   };
 
   const handleSave = async () => {
@@ -235,7 +315,44 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
           {/* Rite, Obedience, Degree & Order, Category */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Rites (plusieurs possibles)</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">Rites (plusieurs possibles)</label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNewRite(!showNewRite)}
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Nouveau
+                </Button>
+              </div>
+              {showNewRite && (
+                <div className="border rounded-lg p-3 mb-2 bg-muted/50 space-y-2">
+                  <Input
+                    placeholder="Nom du rite"
+                    value={newItemData.name || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Code (ex: REAA)"
+                    value={newItemData.code || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, code: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Description"
+                    value={newItemData.description || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
+                  />
+                  <div className="flex gap-2">
+                    <Button type="button" size="sm" onClick={createNewRite}>Créer</Button>
+                    <Button type="button" size="sm" variant="outline" onClick={() => {
+                      setShowNewRite(false);
+                      setNewItemData({});
+                    }}>Annuler</Button>
+                  </div>
+                </div>
+              )}
               <div className="mt-1 border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
                 {rites.map(rite => (
                   <div key={rite.id} className="flex items-center gap-2">
@@ -277,7 +394,39 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
             </div>
 
             <div>
-              <label className="text-sm font-medium">Obédiences (plusieurs possibles)</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">Obédiences (plusieurs possibles)</label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNewObedience(!showNewObedience)}
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Nouveau
+                </Button>
+              </div>
+              {showNewObedience && (
+                <div className="border rounded-lg p-3 mb-2 bg-muted/50 space-y-2">
+                  <Input
+                    placeholder="Nom de l'obédience"
+                    value={newItemData.name || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Description"
+                    value={newItemData.description || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
+                  />
+                  <div className="flex gap-2">
+                    <Button type="button" size="sm" onClick={createNewObedience}>Créer</Button>
+                    <Button type="button" size="sm" variant="outline" onClick={() => {
+                      setShowNewObedience(false);
+                      setNewItemData({});
+                    }}>Annuler</Button>
+                  </div>
+                </div>
+              )}
               <div className="mt-1 border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
                 {obediences.map(obedience => (
                   <div key={obedience.id} className="flex items-center gap-2">
@@ -319,7 +468,57 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
             </div>
 
             <div>
-              <label className="text-sm font-medium">Degrés & Ordres (plusieurs possibles)</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">Degrés & Ordres (plusieurs possibles)</label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNewDegree(!showNewDegree)}
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Nouveau
+                </Button>
+              </div>
+              {showNewDegree && (
+                <div className="border rounded-lg p-3 mb-2 bg-muted/50 space-y-2">
+                  <Input
+                    placeholder="Nom du degré"
+                    value={newItemData.name || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Description"
+                    value={newItemData.description || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Niveau (1, 2, 3...)"
+                    value={newItemData.level || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, level: e.target.value })}
+                  />
+                  <Select
+                    value={newItemData.loge_type || 'Loge Symbolique'}
+                    onValueChange={(value) => setNewItemData({ ...newItemData, loge_type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Loge Symbolique">Loge Symbolique</SelectItem>
+                      <SelectItem value="Loge Hauts Grades">Loge Hauts Grades</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex gap-2">
+                    <Button type="button" size="sm" onClick={createNewDegree}>Créer</Button>
+                    <Button type="button" size="sm" variant="outline" onClick={() => {
+                      setShowNewDegree(false);
+                      setNewItemData({});
+                    }}>Annuler</Button>
+                  </div>
+                </div>
+              )}
               <div className="mt-1 border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
                 <div className="px-2 py-1 text-xs font-semibold text-primary">Loge Symbolique</div>
                 {degreeOrders.filter(d => d.loge_type === 'Loge Symbolique').map(degree => (
@@ -378,7 +577,39 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
             </div>
 
             <div>
-              <label className="text-sm font-medium">Catégories (plusieurs possibles)</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">Catégories (plusieurs possibles)</label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNewCategory(!showNewCategory)}
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Nouveau
+                </Button>
+              </div>
+              {showNewCategory && (
+                <div className="border rounded-lg p-3 mb-2 bg-muted/50 space-y-2">
+                  <Input
+                    placeholder="Nom de la catégorie"
+                    value={newItemData.name || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Description"
+                    value={newItemData.description || ''}
+                    onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
+                  />
+                  <div className="flex gap-2">
+                    <Button type="button" size="sm" onClick={createNewCategory}>Créer</Button>
+                    <Button type="button" size="sm" variant="outline" onClick={() => {
+                      setShowNewCategory(false);
+                      setNewItemData({});
+                    }}>Annuler</Button>
+                  </div>
+                </div>
+              )}
               <div className="mt-1 border rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
                 {categories.map(category => (
                   <div key={category.id} className="flex items-center gap-2">
