@@ -46,7 +46,12 @@ export default function AdminDegreeOrders() {
   });
 
   const getProductCount = (degreeOrderId) => {
-    return products.filter(p => p.degree_order_id === degreeOrderId).length;
+    return products.filter(p => {
+      const degreeIds = Array.isArray(p.degree_order_ids) && p.degree_order_ids.length > 0
+        ? p.degree_order_ids 
+        : (p.degree_order_id ? [p.degree_order_id] : []);
+      return degreeIds.includes(degreeOrderId);
+    }).length;
   };
 
   const getRiteName = (riteId) => {
