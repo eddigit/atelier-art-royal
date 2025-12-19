@@ -39,7 +39,10 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
   const [showNewObedience, setShowNewObedience] = useState(false);
   const [showNewDegree, setShowNewDegree] = useState(false);
   const [showNewCategory, setShowNewCategory] = useState(false);
-  const [newItemData, setNewItemData] = useState({});
+  const [newRiteData, setNewRiteData] = useState({});
+  const [newObedienceData, setNewObedienceData] = useState({});
+  const [newDegreeData, setNewDegreeData] = useState({});
+  const [newCategoryData, setNewCategoryData] = useState({});
 
   const { data: rites = [] } = useQuery({
     queryKey: ['rites'],
@@ -121,77 +124,89 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
   };
 
   const createNewRite = async () => {
-    if (!newItemData.name) return;
+    if (!newRiteData.name) {
+      toast.error('Le nom est requis');
+      return;
+    }
     try {
       const created = await base44.entities.Rite.create({
-        name: newItemData.name,
-        code: newItemData.code || '',
-        description: newItemData.description || '',
+        name: newRiteData.name,
+        code: newRiteData.code || '',
+        description: newRiteData.description || '',
         order: 0
       });
       await queryClient.invalidateQueries(['rites']);
       setFormData({ ...formData, rite_ids: [...(formData.rite_ids || []), created.id] });
-      toast.success('Rite créé');
+      toast.success('Rite créé avec succès');
       setShowNewRite(false);
-      setNewItemData({});
+      setNewRiteData({});
     } catch (error) {
-      toast.error('Erreur lors de la création');
+      toast.error('Erreur: ' + error.message);
     }
   };
 
   const createNewObedience = async () => {
-    if (!newItemData.name) return;
+    if (!newObedienceData.name) {
+      toast.error('Le nom est requis');
+      return;
+    }
     try {
       const created = await base44.entities.Obedience.create({
-        name: newItemData.name,
-        description: newItemData.description || '',
+        name: newObedienceData.name,
+        description: newObedienceData.description || '',
         order: 0
       });
       await queryClient.invalidateQueries(['obediences']);
       setFormData({ ...formData, obedience_ids: [...(formData.obedience_ids || []), created.id] });
-      toast.success('Obédience créée');
+      toast.success('Obédience créée avec succès');
       setShowNewObedience(false);
-      setNewItemData({});
+      setNewObedienceData({});
     } catch (error) {
-      toast.error('Erreur lors de la création');
+      toast.error('Erreur: ' + error.message);
     }
   };
 
   const createNewDegree = async () => {
-    if (!newItemData.name) return;
+    if (!newDegreeData.name) {
+      toast.error('Le nom est requis');
+      return;
+    }
     try {
       const created = await base44.entities.DegreeOrder.create({
-        name: newItemData.name,
-        description: newItemData.description || '',
-        loge_type: newItemData.loge_type || 'Loge Symbolique',
-        level: parseInt(newItemData.level) || 1
+        name: newDegreeData.name,
+        description: newDegreeData.description || '',
+        loge_type: newDegreeData.loge_type || 'Loge Symbolique',
+        level: parseInt(newDegreeData.level) || 1
       });
       await queryClient.invalidateQueries(['degreeOrders']);
       setFormData({ ...formData, degree_order_ids: [...(formData.degree_order_ids || []), created.id] });
-      toast.success('Degré créé');
+      toast.success('Degré créé avec succès');
       setShowNewDegree(false);
-      setNewItemData({});
+      setNewDegreeData({});
     } catch (error) {
-      toast.error('Erreur lors de la création');
+      toast.error('Erreur: ' + error.message);
     }
   };
 
   const createNewCategory = async () => {
-    if (!newItemData.name) return;
+    if (!newCategoryData.name) {
+      toast.error('Le nom est requis');
+      return;
+    }
     try {
       const created = await base44.entities.Category.create({
-        name: newItemData.name,
-        slug: newItemData.name.toLowerCase().replace(/\s+/g, '-'),
-        description: newItemData.description || '',
+        name: newCategoryData.name,
+        slug: newCategoryData.name.toLowerCase().replace(/\s+/g, '-'),
+        description: newCategoryData.description || '',
         order: 0
       });
       await queryClient.invalidateQueries(['categories']);
       setFormData({ ...formData, category_ids: [...(formData.category_ids || []), created.id] });
-      toast.success('Catégorie créée');
+      toast.success('Catégorie créée avec succès');
       setShowNewCategory(false);
-      setNewItemData({});
+      setNewCategoryData({});
     } catch (error) {
-      toast.error('Erreur lors de la création');
+      toast.error('Erreur: ' + error.message);
     }
   };
 
@@ -331,24 +346,24 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
                 <div className="border rounded-lg p-3 mb-2 bg-muted/50 space-y-2">
                   <Input
                     placeholder="Nom du rite"
-                    value={newItemData.name || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                    value={newRiteData.name || ''}
+                    onChange={(e) => setNewRiteData({ ...newRiteData, name: e.target.value })}
                   />
                   <Input
                     placeholder="Code (ex: REAA)"
-                    value={newItemData.code || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, code: e.target.value })}
+                    value={newRiteData.code || ''}
+                    onChange={(e) => setNewRiteData({ ...newRiteData, code: e.target.value })}
                   />
                   <Input
                     placeholder="Description"
-                    value={newItemData.description || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
+                    value={newRiteData.description || ''}
+                    onChange={(e) => setNewRiteData({ ...newRiteData, description: e.target.value })}
                   />
                   <div className="flex gap-2">
                     <Button type="button" size="sm" onClick={createNewRite}>Créer</Button>
                     <Button type="button" size="sm" variant="outline" onClick={() => {
                       setShowNewRite(false);
-                      setNewItemData({});
+                      setNewRiteData({});
                     }}>Annuler</Button>
                   </div>
                 </div>
@@ -410,19 +425,19 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
                 <div className="border rounded-lg p-3 mb-2 bg-muted/50 space-y-2">
                   <Input
                     placeholder="Nom de l'obédience"
-                    value={newItemData.name || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                    value={newObedienceData.name || ''}
+                    onChange={(e) => setNewObedienceData({ ...newObedienceData, name: e.target.value })}
                   />
                   <Input
                     placeholder="Description"
-                    value={newItemData.description || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
+                    value={newObedienceData.description || ''}
+                    onChange={(e) => setNewObedienceData({ ...newObedienceData, description: e.target.value })}
                   />
                   <div className="flex gap-2">
                     <Button type="button" size="sm" onClick={createNewObedience}>Créer</Button>
                     <Button type="button" size="sm" variant="outline" onClick={() => {
                       setShowNewObedience(false);
-                      setNewItemData({});
+                      setNewObedienceData({});
                     }}>Annuler</Button>
                   </div>
                 </div>
@@ -484,23 +499,23 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
                 <div className="border rounded-lg p-3 mb-2 bg-muted/50 space-y-2">
                   <Input
                     placeholder="Nom du degré"
-                    value={newItemData.name || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                    value={newDegreeData.name || ''}
+                    onChange={(e) => setNewDegreeData({ ...newDegreeData, name: e.target.value })}
                   />
                   <Input
                     placeholder="Description"
-                    value={newItemData.description || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
+                    value={newDegreeData.description || ''}
+                    onChange={(e) => setNewDegreeData({ ...newDegreeData, description: e.target.value })}
                   />
                   <Input
                     type="number"
                     placeholder="Niveau (1, 2, 3...)"
-                    value={newItemData.level || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, level: e.target.value })}
+                    value={newDegreeData.level || ''}
+                    onChange={(e) => setNewDegreeData({ ...newDegreeData, level: e.target.value })}
                   />
                   <Select
-                    value={newItemData.loge_type || 'Loge Symbolique'}
-                    onValueChange={(value) => setNewItemData({ ...newItemData, loge_type: value })}
+                    value={newDegreeData.loge_type || 'Loge Symbolique'}
+                    onValueChange={(value) => setNewDegreeData({ ...newDegreeData, loge_type: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -514,7 +529,7 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
                     <Button type="button" size="sm" onClick={createNewDegree}>Créer</Button>
                     <Button type="button" size="sm" variant="outline" onClick={() => {
                       setShowNewDegree(false);
-                      setNewItemData({});
+                      setNewDegreeData({});
                     }}>Annuler</Button>
                   </div>
                 </div>
@@ -593,19 +608,19 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
                 <div className="border rounded-lg p-3 mb-2 bg-muted/50 space-y-2">
                   <Input
                     placeholder="Nom de la catégorie"
-                    value={newItemData.name || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                    value={newCategoryData.name || ''}
+                    onChange={(e) => setNewCategoryData({ ...newCategoryData, name: e.target.value })}
                   />
                   <Input
                     placeholder="Description"
-                    value={newItemData.description || ''}
-                    onChange={(e) => setNewItemData({ ...newItemData, description: e.target.value })}
+                    value={newCategoryData.description || ''}
+                    onChange={(e) => setNewCategoryData({ ...newCategoryData, description: e.target.value })}
                   />
                   <div className="flex gap-2">
                     <Button type="button" size="sm" onClick={createNewCategory}>Créer</Button>
                     <Button type="button" size="sm" variant="outline" onClick={() => {
                       setShowNewCategory(false);
-                      setNewItemData({});
+                      setNewCategoryData({});
                     }}>Annuler</Button>
                   </div>
                 </div>
