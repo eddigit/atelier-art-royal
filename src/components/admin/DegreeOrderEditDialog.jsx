@@ -23,12 +23,13 @@ import {
 
 export default function DegreeOrderEditDialog({ degreeOrder, rites, open, onClose, onSaved }) {
   const isNew = !degreeOrder;
-  const [formData, setFormData] = useState(degreeOrder || {
+  const [formData, setFormData] = useState({
     name: '',
     level: 1,
-    rite_id: '',
+    loge_type: 'Loge Symbolique',
     description: '',
-    order: 0
+    order: 0,
+    ...degreeOrder
   });
   const [newDegreeOrderId, setNewDegreeOrderId] = useState('');
 
@@ -82,11 +83,20 @@ export default function DegreeOrderEditDialog({ degreeOrder, rites, open, onClos
   });
 
   const handleSave = () => {
-    if (!formData.name || !formData.level) {
-      toast.error('Veuillez remplir les champs obligatoires');
+    if (!formData.name || !formData.level || !formData.loge_type) {
+      toast.error('Veuillez remplir tous les champs obligatoires (Nom, Niveau, Type de Loge)');
       return;
     }
-    saveMutation.mutate(formData);
+    
+    const dataToSave = {
+      name: formData.name,
+      level: parseInt(formData.level),
+      loge_type: formData.loge_type,
+      description: formData.description || '',
+      order: parseInt(formData.order) || 0
+    };
+    
+    saveMutation.mutate(dataToSave);
   };
 
   const handleDelete = () => {
@@ -165,21 +175,17 @@ export default function DegreeOrderEditDialog({ degreeOrder, rites, open, onClos
                   />
                 </div>
                 <div>
-                  <Label>Rite (optionnel)</Label>
+                  <Label>Type de Loge *</Label>
                   <Select 
-                    value={formData.rite_id || ''} 
-                    onValueChange={(v) => setFormData({...formData, rite_id: v})}
+                    value={formData.loge_type || 'Loge Symbolique'} 
+                    onValueChange={(v) => setFormData({...formData, loge_type: v})}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un rite" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={null}>Aucun rite spécifique</SelectItem>
-                      {rites.map(rite => (
-                        <SelectItem key={rite.id} value={rite.id}>
-                          {rite.name}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="Loge Symbolique">Loge Symbolique (1er - 3ème degré)</SelectItem>
+                      <SelectItem value="Loge Hauts Grades">Loge Hauts Grades (4ème+ & Ordres)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
