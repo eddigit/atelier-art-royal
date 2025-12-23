@@ -87,7 +87,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
   const availableMaterials = [...new Set(products.flatMap(p => p.materials || []))].sort();
 
   return (
-    <Card className="glass sticky top-24">
+    <Card className="glass lg:sticky lg:top-24">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
@@ -102,7 +102,7 @@ export default function Filters({ filters, onFilterChange, onReset }) {
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 max-h-[70vh] overflow-y-auto lg:max-h-[calc(100vh-12rem)]">
         {/* Search */}
         <div className="space-y-2">
           <Label>Recherche</Label>
