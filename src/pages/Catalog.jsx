@@ -47,41 +47,49 @@ export default function Catalog() {
 
   // Sync filters with URL params whenever URL changes
   useEffect(() => {
-    const handleUrlChange = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      
-      setFilters({
-        rite: urlParams.get('rite') || '',
-        obedience: urlParams.get('obedience') || '',
-        degreeOrder: urlParams.get('degreeOrder') || '',
-        logeType: urlParams.get('logeType') || '',
-        category: urlParams.get('category') || '',
-        search: urlParams.get('search') || '',
-        minPrice: urlParams.get('minPrice') || '',
-        maxPrice: urlParams.get('maxPrice') || '',
-        size: urlParams.get('size') || 'all',
-        color: urlParams.get('color') || 'all',
-        material: urlParams.get('material') || 'all',
-        showPromotions: urlParams.get('showPromotions') === 'true',
-        showNew: urlParams.get('showNew') === 'true',
-        inStockOnly: urlParams.get('inStockOnly') === 'true'
-      });
-    };
-
-    // Initial load
-    handleUrlChange();
-
-    // Listen for URL changes (back/forward, link clicks)
-    window.addEventListener('popstate', handleUrlChange);
-
-    // Custom event for same-page navigation
-    window.addEventListener('urlchange', handleUrlChange);
-
-    return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-      window.removeEventListener('urlchange', handleUrlChange);
-    };
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Read filters from URL on mount and URL changes
+    setFilters({
+      rite: urlParams.get('rite') || '',
+      obedience: urlParams.get('obedience') || '',
+      degreeOrder: urlParams.get('degreeOrder') || '',
+      logeType: urlParams.get('logeType') || '',
+      category: urlParams.get('category') || '',
+      search: urlParams.get('search') || '',
+      minPrice: urlParams.get('minPrice') || '',
+      maxPrice: urlParams.get('maxPrice') || '',
+      size: urlParams.get('size') || 'all',
+      color: urlParams.get('color') || 'all',
+      material: urlParams.get('material') || 'all',
+      showPromotions: urlParams.get('showPromotions') === 'true',
+      showNew: urlParams.get('showNew') === 'true',
+      inStockOnly: urlParams.get('inStockOnly') === 'true'
+    });
   }, []);
+
+  // Sync state → URL whenever filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    
+    if (filters.rite) params.set('rite', filters.rite);
+    if (filters.obedience) params.set('obedience', filters.obedience);
+    if (filters.degreeOrder) params.set('degreeOrder', filters.degreeOrder);
+    if (filters.logeType) params.set('logeType', filters.logeType);
+    if (filters.category) params.set('category', filters.category);
+    if (filters.search) params.set('search', filters.search);
+    if (filters.minPrice) params.set('minPrice', filters.minPrice);
+    if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+    if (filters.size && filters.size !== 'all') params.set('size', filters.size);
+    if (filters.color && filters.color !== 'all') params.set('color', filters.color);
+    if (filters.material && filters.material !== 'all') params.set('material', filters.material);
+    if (filters.showPromotions) params.set('showPromotions', 'true');
+    if (filters.showNew) params.set('showNew', 'true');
+    if (filters.inStockOnly) params.set('inStockOnly', 'true');
+    
+    const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
+  }, [filters]);
 
   const { data: allDegreeOrders = [] } = useQuery({
     queryKey: ['degreeOrders'],
