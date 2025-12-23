@@ -1,75 +1,75 @@
-import Home from './pages/Home';
-import Catalog from './pages/Catalog';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import Orders from './pages/Orders';
 import Account from './pages/Account';
-import AdminOrders from './pages/AdminOrders';
-import AdminSettings from './pages/AdminSettings';
-import AdminDashboard from './pages/AdminDashboard';
-import SavedCustomizations from './pages/SavedCustomizations';
-import AdminProducts from './pages/AdminProducts';
-import AdminCustomers from './pages/AdminCustomers';
-import AdminProduction from './pages/AdminProduction';
-import AdminRites from './pages/AdminRites';
-import AdminStock from './pages/AdminStock';
-import Contact from './pages/Contact';
-import AdminReviews from './pages/AdminReviews';
-import Sitemap from './pages/Sitemap';
-import AdminPanel from './pages/AdminPanel';
-import Setup from './pages/Setup';
 import AdminAI from './pages/AdminAI';
-import Wishlist from './pages/Wishlist';
-import AdminObediences from './pages/AdminObediences';
-import AdminDegreeOrders from './pages/AdminDegreeOrders';
-import AdminHome from './pages/AdminHome';
-import AdminLeads from './pages/AdminLeads';
 import AdminAnalytics from './pages/AdminAnalytics';
-import POS from './pages/POS';
-import AdminInventory from './pages/AdminInventory';
+import AdminBusinessPipeline from './pages/AdminBusinessPipeline';
 import AdminCategories from './pages/AdminCategories';
 import AdminChat from './pages/AdminChat';
-import AdminBusinessPipeline from './pages/AdminBusinessPipeline';
+import AdminCustomers from './pages/AdminCustomers';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminDegreeOrders from './pages/AdminDegreeOrders';
+import AdminHome from './pages/AdminHome';
+import AdminInventory from './pages/AdminInventory';
+import AdminLeads from './pages/AdminLeads';
+import AdminObediences from './pages/AdminObediences';
+import AdminOrders from './pages/AdminOrders';
+import AdminPanel from './pages/AdminPanel';
+import AdminProduction from './pages/AdminProduction';
+import AdminProducts from './pages/AdminProducts';
+import AdminReviews from './pages/AdminReviews';
+import AdminRites from './pages/AdminRites';
+import AdminSettings from './pages/AdminSettings';
+import AdminStock from './pages/AdminStock';
+import Cart from './pages/Cart';
+import Catalog from './pages/Catalog';
+import Checkout from './pages/Checkout';
+import Contact from './pages/Contact';
+import Home from './pages/Home';
 import OrderConfirmation from './pages/OrderConfirmation';
+import Orders from './pages/Orders';
+import POS from './pages/POS';
+import ProductDetail from './pages/ProductDetail';
+import SavedCustomizations from './pages/SavedCustomizations';
+import Setup from './pages/Setup';
+import Sitemap from './pages/Sitemap';
+import Wishlist from './pages/Wishlist';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
-    "Catalog": Catalog,
-    "ProductDetail": ProductDetail,
-    "Cart": Cart,
-    "Checkout": Checkout,
-    "Orders": Orders,
     "Account": Account,
-    "AdminOrders": AdminOrders,
-    "AdminSettings": AdminSettings,
-    "AdminDashboard": AdminDashboard,
-    "SavedCustomizations": SavedCustomizations,
-    "AdminProducts": AdminProducts,
-    "AdminCustomers": AdminCustomers,
-    "AdminProduction": AdminProduction,
-    "AdminRites": AdminRites,
-    "AdminStock": AdminStock,
-    "Contact": Contact,
-    "AdminReviews": AdminReviews,
-    "Sitemap": Sitemap,
-    "AdminPanel": AdminPanel,
-    "Setup": Setup,
     "AdminAI": AdminAI,
-    "Wishlist": Wishlist,
-    "AdminObediences": AdminObediences,
-    "AdminDegreeOrders": AdminDegreeOrders,
-    "AdminHome": AdminHome,
-    "AdminLeads": AdminLeads,
     "AdminAnalytics": AdminAnalytics,
-    "POS": POS,
-    "AdminInventory": AdminInventory,
+    "AdminBusinessPipeline": AdminBusinessPipeline,
     "AdminCategories": AdminCategories,
     "AdminChat": AdminChat,
-    "AdminBusinessPipeline": AdminBusinessPipeline,
+    "AdminCustomers": AdminCustomers,
+    "AdminDashboard": AdminDashboard,
+    "AdminDegreeOrders": AdminDegreeOrders,
+    "AdminHome": AdminHome,
+    "AdminInventory": AdminInventory,
+    "AdminLeads": AdminLeads,
+    "AdminObediences": AdminObediences,
+    "AdminOrders": AdminOrders,
+    "AdminPanel": AdminPanel,
+    "AdminProduction": AdminProduction,
+    "AdminProducts": AdminProducts,
+    "AdminReviews": AdminReviews,
+    "AdminRites": AdminRites,
+    "AdminSettings": AdminSettings,
+    "AdminStock": AdminStock,
+    "Cart": Cart,
+    "Catalog": Catalog,
+    "Checkout": Checkout,
+    "Contact": Contact,
+    "Home": Home,
     "OrderConfirmation": OrderConfirmation,
+    "Orders": Orders,
+    "POS": POS,
+    "ProductDetail": ProductDetail,
+    "SavedCustomizations": SavedCustomizations,
+    "Setup": Setup,
+    "Sitemap": Sitemap,
+    "Wishlist": Wishlist,
 }
 
 export const pagesConfig = {

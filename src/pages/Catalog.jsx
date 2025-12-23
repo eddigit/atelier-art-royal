@@ -73,15 +73,35 @@ export default function Catalog() {
 
     // Listen for URL changes (back/forward, link clicks)
     window.addEventListener('popstate', handleUrlChange);
-    
+
     // Custom event for same-page navigation
     window.addEventListener('urlchange', handleUrlChange);
+
+    // Reset filters when component mounts if no URL params
+    if (window.location.search === '') {
+      setFilters({
+        rite: '',
+        obedience: '',
+        degreeOrder: '',
+        logeType: '',
+        category: '',
+        search: '',
+        minPrice: '',
+        maxPrice: '',
+        size: 'all',
+        color: 'all',
+        material: 'all',
+        showPromotions: false,
+        showNew: false,
+        inStockOnly: false
+      });
+    }
 
     return () => {
       window.removeEventListener('popstate', handleUrlChange);
       window.removeEventListener('urlchange', handleUrlChange);
     };
-  }, []);
+    }, []);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products', filters, sortBy],
