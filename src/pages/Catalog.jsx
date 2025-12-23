@@ -77,31 +77,17 @@ export default function Catalog() {
     // Custom event for same-page navigation
     window.addEventListener('urlchange', handleUrlChange);
 
-    // Reset filters when component mounts if no URL params
-    if (window.location.search === '') {
-      setFilters({
-        rite: '',
-        obedience: '',
-        degreeOrder: '',
-        logeType: '',
-        category: '',
-        search: '',
-        minPrice: '',
-        maxPrice: '',
-        size: 'all',
-        color: 'all',
-        material: 'all',
-        showPromotions: false,
-        showNew: false,
-        inStockOnly: false
-      });
-    }
-
     return () => {
       window.removeEventListener('popstate', handleUrlChange);
       window.removeEventListener('urlchange', handleUrlChange);
     };
-    }, []);
+  }, []);
+
+  const { data: allDegreeOrders = [] } = useQuery({
+    queryKey: ['degreeOrders'],
+    queryFn: () => base44.entities.DegreeOrder.list('level', 200),
+    initialData: []
+  });
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products', filters, sortBy],
@@ -144,6 +130,17 @@ export default function Catalog() {
             ? product.degree_order_ids 
             : (product.degree_order_id ? [product.degree_order_id] : []);
           if (!degreeIds.includes(filters.degreeOrder)) return false;
+        }
+        if (filters.logeType) {
+          const degreeIds = Array.isArray(product.degree_order_ids) && product.degree_order_ids.length > 0
+            ? product.degree_order_ids 
+            : (product.degree_order_id ? [product.degree_order_id] : []);
+          if (degreeIds.length === 0) return false;
+          
+          // Fetch degree info to check loge_type
+          const productDegrees = allDegreeOrders.filter(d => degreeIds.includes(d.id));
+          if (productDegrees.length === 0) return false;
+          if (!productDegrees.some(d => d.loge_type === filters.logeType)) return false;
         }
         if (filters.category) {
           const categoryIds = Array.isArray(product.category_ids) && product.category_ids.length > 0
