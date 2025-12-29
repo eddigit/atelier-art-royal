@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp, ClipboardList, Grid, Briefcase, MessageCircle, Download } from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp, ClipboardList, Grid, Briefcase, MessageCircle, Download, Key } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCustomers from './AdminCustomers';
@@ -22,6 +22,7 @@ import AdminCategories from './AdminCategories';
 import AdminChat from './AdminChat';
 import AdminBusinessPipeline from './AdminBusinessPipeline';
 import AdminExport from './AdminExport';
+import AdminSecrets from './AdminSecrets';
 
 export default function AdminPanel() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -145,6 +146,10 @@ export default function AdminPanel() {
             <Download className="w-5 h-5" />
             <span className="text-xs font-medium">Export</span>
           </TabsTrigger>
+          <TabsTrigger value="secrets" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Key className="w-5 h-5" />
+            <span className="text-xs font-medium">Secrets</span>
+          </TabsTrigger>
           </TabsList>
 
         <TabsContent value="dashboard" className="space-y-4">
@@ -221,6 +226,10 @@ export default function AdminPanel() {
 
         <TabsContent value="export" className="space-y-4">
           <AdminExport />
+        </TabsContent>
+
+        <TabsContent value="secrets" className="space-y-4">
+          <AdminSecrets />
         </TabsContent>
         </Tabs>
     </div>
