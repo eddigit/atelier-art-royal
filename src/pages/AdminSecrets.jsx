@@ -49,22 +49,29 @@ export default function AdminSecrets() {
     {
       name: 'SUMUP_API_KEY',
       description: 'Clé API SumUp pour les paiements',
-      value: realSecrets.SUMUP_API_KEY || '••••••••••••••••',
+      realValue: realSecrets.SUMUP_API_KEY,
       documentation: 'https://developer.sumup.com/',
       status: 'active',
       usage: ['createSumupCheckout', 'verifySumupPayment'],
-      configured: true
+      configured: !!realSecrets.SUMUP_API_KEY && realSecrets.SUMUP_API_KEY !== 'Non configuré'
     },
     {
       name: 'GROQ_API_KEY',
       description: 'Clé API Groq pour l\'IA (Llama)',
-      value: realSecrets.GROQ_API_KEY || '••••••••••••••••',
+      realValue: realSecrets.GROQ_API_KEY,
       documentation: 'https://console.groq.com/',
       status: 'active',
       usage: ['aiChat', 'Product AI Assistant'],
-      configured: true
+      configured: !!realSecrets.GROQ_API_KEY && realSecrets.GROQ_API_KEY !== 'Non configuré'
     }
   ];
+
+  const getDisplayValue = (secret) => {
+    if (visibleSecrets[secret.name] && secret.realValue) {
+      return secret.realValue;
+    }
+    return '••••••••••••••••';
+  };
 
   const toggleVisibility = (secretName) => {
     setVisibleSecrets(prev => ({
@@ -167,8 +174,8 @@ export default function AdminSecrets() {
                 <div className="flex items-center gap-2">
                   <div className="flex-1 relative">
                     <Input
-                      type={visibleSecrets[secret.name] ? 'text' : 'password'}
-                      value={secret.value}
+                      type="text"
+                      value={getDisplayValue(secret)}
                       readOnly
                       className="pr-20 font-mono text-sm"
                     />
@@ -189,7 +196,8 @@ export default function AdminSecrets() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7"
-                        onClick={() => copyToClipboard(secret.value, secret.name)}
+                        onClick={() => copyToClipboard(secret.realValue || 'Non configuré', secret.name)}
+                        disabled={!secret.realValue}
                       >
                         {copiedSecret === secret.name ? (
                           <Check className="w-4 h-4 text-green-600" />

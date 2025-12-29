@@ -18,6 +18,7 @@ import AdminProduction from './pages/AdminProduction';
 import AdminProducts from './pages/AdminProducts';
 import AdminReviews from './pages/AdminReviews';
 import AdminRites from './pages/AdminRites';
+import AdminSecrets from './pages/AdminSecrets';
 import AdminSettings from './pages/AdminSettings';
 import AdminStock from './pages/AdminStock';
 import Cart from './pages/Cart';
@@ -33,7 +34,6 @@ import SavedCustomizations from './pages/SavedCustomizations';
 import Setup from './pages/Setup';
 import Sitemap from './pages/Sitemap';
 import Wishlist from './pages/Wishlist';
-import AdminSecrets from './pages/AdminSecrets';
 import __Layout from './Layout.jsx';
 
 
@@ -58,6 +58,7 @@ export const PAGES = {
     "AdminProducts": AdminProducts,
     "AdminReviews": AdminReviews,
     "AdminRites": AdminRites,
+    "AdminSecrets": AdminSecrets,
     "AdminSettings": AdminSettings,
     "AdminStock": AdminStock,
     "Cart": Cart,
@@ -73,7 +74,6 @@ export const PAGES = {
     "Setup": Setup,
     "Sitemap": Sitemap,
     "Wishlist": Wishlist,
-    "AdminSecrets": AdminSecrets,
 }
 
 export const pagesConfig = {
