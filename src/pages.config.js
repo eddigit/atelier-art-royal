@@ -34,6 +34,7 @@ import SavedCustomizations from './pages/SavedCustomizations';
 import Setup from './pages/Setup';
 import Sitemap from './pages/Sitemap';
 import Wishlist from './pages/Wishlist';
+import AdminDocumentation from './pages/AdminDocumentation';
 import __Layout from './Layout.jsx';
 
 
@@ -74,6 +75,7 @@ export const PAGES = {
     "Setup": Setup,
     "Sitemap": Sitemap,
     "Wishlist": Wishlist,
+    "AdminDocumentation": AdminDocumentation,
 }
 
 export const pagesConfig = {
