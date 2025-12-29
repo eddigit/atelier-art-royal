@@ -22,10 +22,26 @@ export default function AdminSecrets() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newSecretName, setNewSecretName] = useState('');
   const [newSecretDescription, setNewSecretDescription] = useState('');
+  const [realSecrets, setRealSecrets] = useState({});
 
   const { data: user } = useQuery({
     queryKey: ['user'],
     queryFn: () => base44.auth.me()
+  });
+
+  // Récupérer les vraies valeurs des secrets
+  const { data: secretsData } = useQuery({
+    queryKey: ['secrets'],
+    queryFn: async () => {
+      const response = await base44.functions.invoke('getSecrets', {});
+      return response.data;
+    },
+    enabled: !!user && user.role === 'admin',
+    onSuccess: (data) => {
+      if (data?.secrets) {
+        setRealSecrets(data.secrets);
+      }
+    }
   });
 
   // Liste des secrets configurés dans l'application
@@ -33,7 +49,7 @@ export default function AdminSecrets() {
     {
       name: 'SUMUP_API_KEY',
       description: 'Clé API SumUp pour les paiements',
-      value: '••••••••••••••••',
+      value: realSecrets.SUMUP_API_KEY || '••••••••••••••••',
       documentation: 'https://developer.sumup.com/',
       status: 'active',
       usage: ['createSumupCheckout', 'verifySumupPayment'],
@@ -42,7 +58,7 @@ export default function AdminSecrets() {
     {
       name: 'GROQ_API_KEY',
       description: 'Clé API Groq pour l\'IA (Llama)',
-      value: '••••••••••••••••',
+      value: realSecrets.GROQ_API_KEY || '••••••••••••••••',
       documentation: 'https://console.groq.com/',
       status: 'active',
       usage: ['aiChat', 'Product AI Assistant'],
