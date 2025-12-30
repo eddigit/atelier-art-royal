@@ -7,6 +7,7 @@ import AdminChat from './pages/AdminChat';
 import AdminCustomers from './pages/AdminCustomers';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminDegreeOrders from './pages/AdminDegreeOrders';
+import AdminDocumentation from './pages/AdminDocumentation';
 import AdminExport from './pages/AdminExport';
 import AdminHome from './pages/AdminHome';
 import AdminInventory from './pages/AdminInventory';
@@ -34,7 +35,7 @@ import SavedCustomizations from './pages/SavedCustomizations';
 import Setup from './pages/Setup';
 import Sitemap from './pages/Sitemap';
 import Wishlist from './pages/Wishlist';
-import AdminDocumentation from './pages/AdminDocumentation';
+import AdminProductRelations from './pages/AdminProductRelations';
 import __Layout from './Layout.jsx';
 
 
@@ -48,6 +49,7 @@ export const PAGES = {
     "AdminCustomers": AdminCustomers,
     "AdminDashboard": AdminDashboard,
     "AdminDegreeOrders": AdminDegreeOrders,
+    "AdminDocumentation": AdminDocumentation,
     "AdminExport": AdminExport,
     "AdminHome": AdminHome,
     "AdminInventory": AdminInventory,
@@ -75,7 +77,7 @@ export const PAGES = {
     "Setup": Setup,
     "Sitemap": Sitemap,
     "Wishlist": Wishlist,
-    "AdminDocumentation": AdminDocumentation,
+    "AdminProductRelations": AdminProductRelations,
 }
 
 export const pagesConfig = {

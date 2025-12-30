@@ -24,6 +24,7 @@ import AdminBusinessPipeline from './AdminBusinessPipeline';
 import AdminExport from './AdminExport';
 import AdminSecrets from './AdminSecrets';
 import AdminDocumentation from './AdminDocumentation';
+import AdminProductRelations from './AdminProductRelations';
 
 export default function AdminPanel() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -155,6 +156,10 @@ export default function AdminPanel() {
             <BookOpen className="w-5 h-5" />
             <span className="text-xs font-medium">Docs</span>
           </TabsTrigger>
+          <TabsTrigger value="relations" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Package className="w-5 h-5" />
+            <span className="text-xs font-medium">Relations</span>
+          </TabsTrigger>
           </TabsList>
 
         <TabsContent value="dashboard" className="space-y-4">
@@ -239,6 +244,10 @@ export default function AdminPanel() {
 
         <TabsContent value="documentation" className="space-y-4">
           <AdminDocumentation />
+        </TabsContent>
+
+        <TabsContent value="relations" className="space-y-4">
+          <AdminProductRelations />
         </TabsContent>
         </Tabs>
     </div>
