@@ -92,51 +92,137 @@ export default function AdminProductRelations() {
     );
   }, [enrichedProducts, searchTerm]);
 
-  // Export au format texte
-  const handleExport = () => {
-    let content = '=== RAPPORT COMPLET DES PRODUITS ET LEURS RELATIONS ===\n\n';
-    content += `Date: ${new Date().toLocaleDateString('fr-FR')}\n`;
-    content += `Nombre total de produits: ${enrichedProducts.length}\n\n`;
-    content += '═'.repeat(80) + '\n\n';
-
-    enrichedProducts.forEach((product, index) => {
-      content += `${index + 1}. ${product.name}\n`;
-      content += `   SKU: ${product.sku || 'N/A'}\n`;
-      content += `   Prix: ${product.price}€\n`;
-      content += `   Stock: ${product.stock_quantity || 0}\n`;
-      
-      if (product.riteNames.length > 0) {
-        content += `   Rites: ${product.riteNames.join(', ')}\n`;
-      } else {
-        content += `   Rites: Aucun\n`;
-      }
-      
-      if (product.obedienceNames.length > 0) {
-        content += `   Obédiences: ${product.obedienceNames.join(', ')}\n`;
-      } else {
-        content += `   Obédiences: Aucune\n`;
-      }
-      
-      if (product.degreeNames.length > 0) {
-        content += `   Degrés: ${product.degreeNames.join(', ')}\n`;
-      } else {
-        content += `   Degrés: Aucun\n`;
-      }
-      
-      if (product.categoryNames.length > 0) {
-        content += `   Catégories: ${product.categoryNames.join(', ')}\n`;
-      } else {
-        content += `   Catégories: Aucune\n`;
-      }
-      
-      content += '\n' + '-'.repeat(80) + '\n\n';
+  // Helper pour convertir en CSV
+  const convertToCSV = (data, headers) => {
+    const csvRows = [];
+    csvRows.push(headers.join(','));
+    
+    data.forEach(row => {
+      const values = headers.map(header => {
+        const value = row[header] || '';
+        // Échapper les guillemets et virgules
+        const escaped = String(value).replace(/"/g, '""');
+        return `"${escaped}"`;
+      });
+      csvRows.push(values.join(','));
     });
+    
+    return csvRows.join('\n');
+  };
 
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  // Export produits
+  const handleExportProducts = () => {
+    const data = enrichedProducts.map(p => ({
+      'Nom': p.name,
+      'SKU': p.sku || '',
+      'Prix': p.price,
+      'Stock': p.stock_quantity || 0,
+      'Rites': p.riteNames.join('; '),
+      'Obédiences': p.obedienceNames.join('; '),
+      'Degrés': p.degreeNames.join('; '),
+      'Catégories': p.categoryNames.join('; '),
+      'Description': p.description || '',
+      'Image': (p.images && p.images[0]) || ''
+    }));
+    
+    const csv = convertToCSV(data, ['Nom', 'SKU', 'Prix', 'Stock', 'Rites', 'Obédiences', 'Degrés', 'Catégories', 'Description', 'Image']);
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `produits-relations-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `produits-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export rites
+  const handleExportRites = () => {
+    const data = rites.map(r => ({
+      'ID': r.id,
+      'Nom': r.name,
+      'Code': r.code,
+      'Description': r.description || '',
+      'Image': r.image_url || '',
+      'Ordre': r.order || 0
+    }));
+    
+    const csv = convertToCSV(data, ['ID', 'Nom', 'Code', 'Description', 'Image', 'Ordre']);
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rites-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export obédiences
+  const handleExportObediences = () => {
+    const data = obediences.map(o => ({
+      'ID': o.id,
+      'Nom': o.name,
+      'Code': o.code,
+      'Description': o.description || '',
+      'Image': o.image_url || '',
+      'Ordre': o.order || 0
+    }));
+    
+    const csv = convertToCSV(data, ['ID', 'Nom', 'Code', 'Description', 'Image', 'Ordre']);
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `obediences-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export degrés
+  const handleExportDegrees = () => {
+    const data = degrees.map(d => ({
+      'ID': d.id,
+      'Nom': d.name,
+      'Niveau': d.level || 0,
+      'Type de Loge': d.loge_type || '',
+      'Description': d.description || '',
+      'Ordre': d.order || 0
+    }));
+    
+    const csv = convertToCSV(data, ['ID', 'Nom', 'Niveau', 'Type de Loge', 'Description', 'Ordre']);
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `degres-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export catégories
+  const handleExportCategories = () => {
+    const data = categories.map(c => ({
+      'ID': c.id,
+      'Nom': c.name,
+      'Slug': c.slug,
+      'Description': c.description || '',
+      'Image': c.image_url || '',
+      'Ordre': c.order || 0
+    }));
+    
+    const csv = convertToCSV(data, ['ID', 'Nom', 'Slug', 'Description', 'Image', 'Ordre']);
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `categories-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -165,14 +251,18 @@ export default function AdminProductRelations() {
         </p>
       </div>
 
-      {/* Statistiques */}
+      {/* Statistiques et exports */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Produits</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{products.length}</div>
+            <div className="text-2xl font-bold mb-2">{products.length}</div>
+            <Button onClick={handleExportProducts} size="sm" variant="outline" className="w-full">
+              <Download className="w-3 h-3 mr-1" />
+              CSV
+            </Button>
           </CardContent>
         </Card>
         <Card>
@@ -180,7 +270,11 @@ export default function AdminProductRelations() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Rites</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{rites.length}</div>
+            <div className="text-2xl font-bold mb-2">{rites.length}</div>
+            <Button onClick={handleExportRites} size="sm" variant="outline" className="w-full">
+              <Download className="w-3 h-3 mr-1" />
+              CSV
+            </Button>
           </CardContent>
         </Card>
         <Card>
@@ -188,7 +282,11 @@ export default function AdminProductRelations() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Obédiences</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{obediences.length}</div>
+            <div className="text-2xl font-bold mb-2">{obediences.length}</div>
+            <Button onClick={handleExportObediences} size="sm" variant="outline" className="w-full">
+              <Download className="w-3 h-3 mr-1" />
+              CSV
+            </Button>
           </CardContent>
         </Card>
         <Card>
@@ -196,7 +294,11 @@ export default function AdminProductRelations() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Degrés</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{degrees.length}</div>
+            <div className="text-2xl font-bold mb-2">{degrees.length}</div>
+            <Button onClick={handleExportDegrees} size="sm" variant="outline" className="w-full">
+              <Download className="w-3 h-3 mr-1" />
+              CSV
+            </Button>
           </CardContent>
         </Card>
         <Card>
@@ -204,7 +306,11 @@ export default function AdminProductRelations() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Catégories</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{categories.length}</div>
+            <div className="text-2xl font-bold mb-2">{categories.length}</div>
+            <Button onClick={handleExportCategories} size="sm" variant="outline" className="w-full">
+              <Download className="w-3 h-3 mr-1" />
+              CSV
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -222,9 +328,9 @@ export default function AdminProductRelations() {
                 className="pl-10"
               />
             </div>
-            <Button onClick={handleExport} variant="outline">
+            <Button onClick={handleExportProducts} variant="outline">
               <Download className="w-4 h-4 mr-2" />
-              Exporter
+              Export Produits CSV
             </Button>
           </div>
         </CardContent>
