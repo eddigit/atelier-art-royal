@@ -171,7 +171,7 @@ Deno.serve(async (req) => {
     - Propose des options selon le budget (essentiel / complet / prestige)
     - Mentionne la possibilité de personnalisation
     
-    6. RECOMMANDATION DE PRODUITS - RÈGLES ABSOLUES:
+    7. RECOMMANDATION DE PRODUITS - RÈGLES ABSOLUES:
     - INTERDIT: Ne JAMAIS générer de liens, URLs, ou paramètres de filtres (degreeOrder, category, logeType, etc.)
     - INTERDIT: Ne JAMAIS utiliser des mots comme "je", "cherche", "recherche" dans tes recommandations
     - OBLIGATOIRE: Utilise UNIQUEMENT le format [PRODUCT:product_id] pour recommander des produits
