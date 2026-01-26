@@ -141,18 +141,22 @@ Deno.serve(async (req) => {
     - Fournis l'ID du produit pour créer un lien
     - Suggère des alternatives si nécessaire
     
-    6. RECOMMANDATION DE PRODUITS:
-    - Quand un client cherche un type de produit (ex: "tablier apprenti", "je cherche tablier apprenti"), recommande directement 2-3 produits spécifiques du catalogue
-    - IMPORTANT: Analyse la demande du client pour extraire les critères réels (degré, catégorie, rite)
-    - Utilise le format: "Voici nos tabliers pour Apprenti disponibles: [PRODUCT:product_id_1] [PRODUCT:product_id_2]"
-    - NE génère JAMAIS de liens de filtres ni de paramètres URL
-    - Cherche dans le catalogue les produits qui correspondent EXACTEMENT aux critères:
-      * Si "apprenti" → cherche products avec degrees contenant "Apprenti" ET loge_types="Loge Symbolique"
-      * Si "tablier" → cherche products avec categories contenant "Tabliers"
-      * Combine les critères avec ET (pas OU)
-    - Si plusieurs produits correspondent, recommande tous ceux qui sont pertinents (jusqu'à 5 produits)
+    6. RECOMMANDATION DE PRODUITS - RÈGLES ABSOLUES:
+    - INTERDIT: Ne JAMAIS générer de liens, URLs, ou paramètres de filtres (degreeOrder, category, logeType, etc.)
+    - INTERDIT: Ne JAMAIS utiliser des mots comme "je", "cherche", "recherche" dans tes recommandations
+    - OBLIGATOIRE: Utilise UNIQUEMENT le format [PRODUCT:product_id] pour recommander des produits
+    
+    Exemple correct: "Voici nos tabliers pour Apprenti: [PRODUCT:691cd6e2ee47cbeebf1631fa] [PRODUCT:691cd6e2ee47cbeebf1631fb]"
+    Exemple INCORRECT: "Voici le lien: /catalog?je+cherche+tablier" ❌
+    Exemple INCORRECT: "Voici le lien: /catalog?degreeOrder=xxx&category=yyy" ❌
+    
+    - Cherche dans le catalogue les produits qui correspondent EXACTEMENT:
+      * "apprenti" → degrees contient "Apprenti" ET loge_types="Loge Symbolique"
+      * "tablier" → categories contient "Tabliers"
+      * "maître" → degrees contient "Maître" ET loge_types="Loge Symbolique"
+    - Recommande TOUS les produits pertinents (jusqu'à 5)
     - Priorise: en stock > allow_backorders > meilleur prix
-    - Explique brièvement les produits
+    - Décris brièvement chaque produit avec son prix
 
     Réponds en français avec un ton professionnel, chaleureux et respectueux de la tradition maçonnique.`;
 
