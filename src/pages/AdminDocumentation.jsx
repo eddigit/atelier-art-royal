@@ -1,18 +1,73 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Network, Package, Filter, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BookOpen, Network, Package, Filter, Search, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export default function AdminDocumentation() {
+  const contentRef = useRef(null);
+
+  const handleExportPDF = async () => {
+    if (!contentRef.current) return;
+
+    try {
+      const canvas = await html2canvas(contentRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      let imgY = 0;
+      let heightLeft = imgHeight * ratio;
+      
+      // Add pages if content is too long
+      while (heightLeft > 0) {
+        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+        heightLeft -= pdfHeight;
+        
+        if (heightLeft > 0) {
+          pdf.addPage();
+          imgY = -pdfHeight;
+        }
+      }
+
+      pdf.save(`Documentation_Technique_AtelierArtRoyal_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Erreur export PDF:', error);
+      alert('Erreur lors de l\'export PDF');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-12 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-          <BookOpen className="w-10 h-10 text-primary" />
-          Documentation Technique
-        </h1>
-        <p className="text-muted-foreground">Architecture et logique de filtrage des produits</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
+            <BookOpen className="w-10 h-10 text-primary" />
+            Documentation Technique
+          </h1>
+          <p className="text-muted-foreground">Architecture et logique de filtrage des produits</p>
+        </div>
+        <Button onClick={handleExportPDF} className="gap-2">
+          <Download className="w-4 h-4" />
+          Exporter en PDF
+        </Button>
       </div>
+
+      <div ref={contentRef}>
 
       {/* Schéma hiérarchique visuel */}
       <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
@@ -662,5 +717,6 @@ const rites = allRites.filter(r =>
         </CardContent>
       </Card>
     </div>
-  );
-}
+    </div>
+    );
+    }
