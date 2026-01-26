@@ -250,11 +250,21 @@ export default function Catalog() {
   });
 
   const handleFilterChange = (newFilters) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters,
-      ...(newFilters.logeType && newFilters.logeType !== prev.logeType ? { degreeOrder: '' } : {})
-    }));
+    // Si l'utilisateur tape dans la recherche, on utilise UNIQUEMENT le texte de recherche
+    // et on efface tous les autres filtres automatiques
+    if (newFilters.search !== undefined) {
+      setFilters(prev => ({
+        ...prev,
+        search: newFilters.search,
+        // Ne PAS appliquer d'autres filtres automatiques
+      }));
+    } else {
+      setFilters(prev => ({
+        ...prev,
+        ...newFilters,
+        ...(newFilters.logeType && newFilters.logeType !== prev.logeType ? { degreeOrder: '' } : {})
+      }));
+    }
   };
 
   const handleResetFilters = () => {
