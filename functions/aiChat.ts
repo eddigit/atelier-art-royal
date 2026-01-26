@@ -27,12 +27,28 @@ Deno.serve(async (req) => {
 
     // Build context for AI
     const productsContext = products.map(p => {
-      const rite = rites.find(r => r.id === p.rite_id);
-            const productObediences = Array.isArray(p.obedience_ids) 
-              ? obediences.filter(o => p.obedience_ids.includes(o.id)).map(o => o.name)
-              : (p.obedience_id ? [obediences.find(o => o.id === p.obedience_id)?.name].filter(Boolean) : []);
-            const degreeOrder = degreeOrders.find(d => d.id === p.degree_order_id);
-      const category = categories.find(c => c.id === p.category_id);
+      // Normaliser les IDs (supporter anciens et nouveaux formats)
+      const riteIds = Array.isArray(p.rite_ids) && p.rite_ids.length > 0
+        ? p.rite_ids 
+        : (p.rite_id ? [p.rite_id] : []);
+      
+      const obedienceIds = Array.isArray(p.obedience_ids) && p.obedience_ids.length > 0
+        ? p.obedience_ids 
+        : (p.obedience_id ? [p.obedience_id] : []);
+      
+      const degreeIds = Array.isArray(p.degree_order_ids) && p.degree_order_ids.length > 0
+        ? p.degree_order_ids 
+        : (p.degree_order_id ? [p.degree_order_id] : []);
+      
+      const categoryIds = Array.isArray(p.category_ids) && p.category_ids.length > 0
+        ? p.category_ids 
+        : (p.category_id ? [p.category_id] : []);
+      
+      // Récupérer les noms
+      const productRites = rites.filter(r => riteIds.includes(r.id)).map(r => r.name);
+      const productObediences = obediences.filter(o => obedienceIds.includes(o.id)).map(o => o.name);
+      const productDegrees = degreeOrders.filter(d => degreeIds.includes(d.id));
+      const productCategories = categories.filter(c => categoryIds.includes(c.id)).map(c => c.name);
       
       return {
         id: p.id,
@@ -40,11 +56,11 @@ Deno.serve(async (req) => {
         price: p.price,
         stock: p.stock_quantity || 0,
         in_stock: (p.stock_quantity > 0) || p.allow_backorders,
-        rite: rite?.name,
-        obediences: productObediences.length > 0 ? productObediences : 'Toutes obédiences',
-        degree_order: degreeOrder?.name,
-        loge_type: degreeOrder?.loge_type,
-        category: category?.name,
+        rites: productRites.length > 0 ? productRites.join(', ') : 'Tous rites',
+        obediences: productObediences.length > 0 ? productObediences.join(', ') : 'Toutes obédiences',
+        degrees: productDegrees.map(d => d.name).join(', '),
+        loge_types: [...new Set(productDegrees.map(d => d.loge_type))].join(', '),
+        categories: productCategories.join(', '),
         description: p.short_description || p.description?.substring(0, 200)
       };
     });
@@ -124,6 +140,12 @@ Deno.serve(async (req) => {
     - Propose des produits correspondant EXACTEMENT aux critères du client
     - Fournis l'ID du produit pour créer un lien
     - Suggère des alternatives si nécessaire
+    
+    6. FONCTIONNALITÉ DE NAVIGATION INTELLIGENTE:
+    - Quand tu recommandes des produits, tu peux aussi générer un lien de filtre pour le catalogue
+    - Format: "Voir tous les tabliers pour Apprenti: [FILTRES: logeType=Loge Symbolique, degreeOrder=Apprenti, category=Tabliers]"
+    - L'application détectera ces tags et créera automatiquement un lien cliquable vers le catalogue filtré
+    - Utilise cette fonctionnalité quand le client demande à voir plusieurs produits d'un type
 
     Réponds en français avec un ton professionnel, chaleureux et respectueux de la tradition maçonnique.`;
 
