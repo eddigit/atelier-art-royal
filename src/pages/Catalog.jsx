@@ -161,40 +161,34 @@ export default function Catalog() {
       
       // Apply filters
       return allProducts.filter(product => {
-        if (filters.rite) {
-          const riteIds = Array.isArray(product.rite_ids) && product.rite_ids.length > 0
-            ? product.rite_ids 
-            : (product.rite_id ? [product.rite_id] : []);
-          if (!riteIds.includes(filters.rite)) return false;
-        }
-        if (filters.obedience) {
-          const obedienceIds = Array.isArray(product.obedience_ids) && product.obedience_ids.length > 0
-            ? product.obedience_ids 
-            : (product.obedience_id ? [product.obedience_id] : []);
-          if (!obedienceIds.includes(filters.obedience)) return false;
-        }
-        if (filters.degreeOrder) {
-          const degreeIds = Array.isArray(product.degree_order_ids) && product.degree_order_ids.length > 0
-            ? product.degree_order_ids 
-            : (product.degree_order_id ? [product.degree_order_id] : []);
-          if (!degreeIds.includes(filters.degreeOrder)) return false;
-        }
+        // Normaliser les IDs des relations (supporter anciens et nouveaux formats)
+        const riteIds = Array.isArray(product.rite_ids) && product.rite_ids.length > 0
+          ? product.rite_ids 
+          : (product.rite_id ? [product.rite_id] : []);
+        
+        const obedienceIds = Array.isArray(product.obedience_ids) && product.obedience_ids.length > 0
+          ? product.obedience_ids 
+          : (product.obedience_id ? [product.obedience_id] : []);
+        
+        const degreeIds = Array.isArray(product.degree_order_ids) && product.degree_order_ids.length > 0
+          ? product.degree_order_ids 
+          : (product.degree_order_id ? [product.degree_order_id] : []);
+        
+        const categoryIds = Array.isArray(product.category_ids) && product.category_ids.length > 0
+          ? product.category_ids 
+          : (product.category_id ? [product.category_id] : []);
+        
+        // Filtres sur les relations
+        if (filters.rite && !riteIds.includes(filters.rite)) return false;
+        if (filters.obedience && !obedienceIds.includes(filters.obedience)) return false;
+        if (filters.degreeOrder && !degreeIds.includes(filters.degreeOrder)) return false;
+        if (filters.category && !categoryIds.includes(filters.category)) return false;
+        // Filtre Type de Loge (indirect via DegreeOrder)
         if (filters.logeType) {
-          const degreeIds = Array.isArray(product.degree_order_ids) && product.degree_order_ids.length > 0
-            ? product.degree_order_ids 
-            : (product.degree_order_id ? [product.degree_order_id] : []);
           if (degreeIds.length === 0) return false;
-          
-          // Fetch degree info to check loge_type
           const productDegrees = allDegreeOrders.filter(d => degreeIds.includes(d.id));
           if (productDegrees.length === 0) return false;
           if (!productDegrees.some(d => d.loge_type === filters.logeType)) return false;
-        }
-        if (filters.category) {
-          const categoryIds = Array.isArray(product.category_ids) && product.category_ids.length > 0
-            ? product.category_ids 
-            : (product.category_id ? [product.category_id] : []);
-          if (!categoryIds.includes(filters.category)) return false;
         }
         
         // Promotions filter
