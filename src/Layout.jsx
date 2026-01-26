@@ -150,6 +150,14 @@ export default function Layout({ children, currentPageName }) {
       .catch(() => setUser(null));
   }, []);
 
+  useEffect(() => {
+    const handleOpenCart = () => {
+      setCartSidebarOpen(true);
+    };
+    window.addEventListener('openCartSidebar', handleOpenCart);
+    return () => window.removeEventListener('openCartSidebar', handleOpenCart);
+  }, []);
+
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const isAdmin = user?.role === 'admin';

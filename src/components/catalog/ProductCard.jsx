@@ -82,7 +82,15 @@ export default function ProductCard({ product }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['cart']);
-      toast.success('Produit ajouté au panier');
+      toast.success('✅ Produit ajouté au panier !', {
+        action: {
+          label: 'Voir le panier',
+          onClick: () => {
+            const event = new CustomEvent('openCartSidebar');
+            window.dispatchEvent(event);
+          }
+        }
+      });
     },
     onError: (error) => {
       toast.error('Erreur lors de l\'ajout au panier');
