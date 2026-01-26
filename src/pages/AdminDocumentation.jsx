@@ -1,10 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, Network, Package, Filter, Search } from 'lucide-react';
 
 export default function AdminDocumentation() {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-5xl">
+    <div className="container mx-auto px-4 py-12 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
           <BookOpen className="w-10 h-10 text-primary" />
@@ -13,7 +14,201 @@ export default function AdminDocumentation() {
         <p className="text-muted-foreground">Architecture et logique de filtrage des produits</p>
       </div>
 
-      {/* Structure des entités */}
+      {/* Schéma hiérarchique visuel */}
+      <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-2xl">
+            <Network className="w-8 h-8 text-primary" />
+            Schéma de Catégorisation Hiérarchique
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-white rounded-lg p-8 border-2 border-primary/20">
+            {/* Niveau 1: Familles */}
+            <div className="mb-8">
+              <div className="text-center mb-4">
+                <Badge className="text-lg px-6 py-2 bg-blue-600">NIVEAU 1: FAMILLES PRINCIPALES</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4 max-w-3xl mx-auto">
+                <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 text-center">
+                  <div className="font-bold text-blue-900 text-xl mb-2">🎭 RITES</div>
+                  <div className="text-sm text-blue-700">REAA • RF • RER • Émulation</div>
+                  <div className="text-xs text-blue-600 mt-2">Tradition maçonnique</div>
+                </div>
+                <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 text-center">
+                  <div className="font-bold text-purple-900 text-xl mb-2">🏛️ OBÉDIENCES</div>
+                  <div className="text-sm text-purple-700">GLNF • GODF • GLAMF</div>
+                  <div className="text-xs text-purple-600 mt-2">Organisation maçonnique</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center text-4xl text-primary mb-8">⬇️</div>
+
+            {/* Niveau 2: Type de Loge */}
+            <div className="mb-8">
+              <div className="text-center mb-4">
+                <Badge className="text-lg px-6 py-2 bg-amber-600">NIVEAU 2: TYPE DE LOGE</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4 max-w-3xl mx-auto">
+                <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-4 text-center">
+                  <div className="font-bold text-amber-900 text-xl mb-2">📐 Loge Symbolique</div>
+                  <div className="text-sm text-amber-700">Degrés 1, 2, 3</div>
+                  <div className="text-xs text-amber-600 mt-2">Apprenti • Compagnon • Maître</div>
+                </div>
+                <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-4 text-center">
+                  <div className="font-bold text-amber-900 text-xl mb-2">👑 Loge Hauts Grades</div>
+                  <div className="text-sm text-amber-700">Degrés 4+ et Ordres</div>
+                  <div className="text-xs text-amber-600 mt-2">Perfection • Ordres Supérieurs</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center text-4xl text-primary mb-8">⬇️</div>
+
+            {/* Niveau 3: Degrés */}
+            <div className="mb-8">
+              <div className="text-center mb-4">
+                <Badge className="text-lg px-6 py-2 bg-green-600">NIVEAU 3: DEGRÉS & ORDRES</Badge>
+              </div>
+              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6 max-w-4xl mx-auto">
+                <div className="grid grid-cols-4 gap-3 text-center text-xs">
+                  <div className="bg-white rounded p-3 border border-green-200">
+                    <div className="font-bold text-green-900">1er degré</div>
+                    <div className="text-green-700">Apprenti</div>
+                  </div>
+                  <div className="bg-white rounded p-3 border border-green-200">
+                    <div className="font-bold text-green-900">2ème degré</div>
+                    <div className="text-green-700">Compagnon</div>
+                  </div>
+                  <div className="bg-white rounded p-3 border border-green-200">
+                    <div className="font-bold text-green-900">3ème degré</div>
+                    <div className="text-green-700">Maître</div>
+                  </div>
+                  <div className="bg-white rounded p-3 border border-green-200">
+                    <div className="font-bold text-green-900">4ème+</div>
+                    <div className="text-green-700">Hauts Grades</div>
+                  </div>
+                </div>
+                <div className="text-xs text-center text-green-700 mt-3 p-2 bg-green-100 rounded">
+                  ⚠️ Le Type de Loge est défini dans DegreeOrder.loge_type
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center text-4xl text-primary mb-8">⬇️</div>
+
+            {/* Niveau 4: Catégories */}
+            <div className="mb-8">
+              <div className="text-center mb-4">
+                <Badge className="text-lg px-6 py-2 bg-rose-600">NIVEAU 4: CATÉGORIES PRODUITS</Badge>
+              </div>
+              <div className="grid grid-cols-4 gap-3 max-w-4xl mx-auto">
+                <div className="bg-rose-50 border-2 border-rose-300 rounded-lg p-3 text-center">
+                  <div className="text-2xl mb-1">🎽</div>
+                  <div className="font-bold text-rose-900 text-sm">Tabliers</div>
+                </div>
+                <div className="bg-rose-50 border-2 border-rose-300 rounded-lg p-3 text-center">
+                  <div className="text-2xl mb-1">🎖️</div>
+                  <div className="font-bold text-rose-900 text-sm">Sautoirs</div>
+                </div>
+                <div className="bg-rose-50 border-2 border-rose-300 rounded-lg p-3 text-center">
+                  <div className="text-2xl mb-1">💍</div>
+                  <div className="font-bold text-rose-900 text-sm">Bijoux</div>
+                </div>
+                <div className="bg-rose-50 border-2 border-rose-300 rounded-lg p-3 text-center">
+                  <div className="text-2xl mb-1">🧤</div>
+                  <div className="font-bold text-rose-900 text-sm">Gants</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center text-4xl text-primary mb-8">⬇️</div>
+
+            {/* Niveau 5: Produits */}
+            <div className="mb-8">
+              <div className="text-center mb-4">
+                <Badge className="text-lg px-6 py-2 bg-primary">NIVEAU 5: PRODUITS FINAUX</Badge>
+              </div>
+              <div className="bg-primary/5 border-2 border-primary rounded-lg p-6 max-w-4xl mx-auto">
+                <div className="text-center mb-4">
+                  <Package className="w-12 h-12 text-primary mx-auto mb-2" />
+                  <div className="font-bold text-xl text-primary">Produits avec Relations Multiples</div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="bg-white rounded p-3 border">
+                    <div className="font-semibold mb-2">🔗 Relations Many-to-Many</div>
+                    <ul className="space-y-1 text-xs text-muted-foreground">
+                      <li>• 1 produit → N Rites</li>
+                      <li>• 1 produit → N Obédiences</li>
+                      <li>• 1 produit → N Degrés</li>
+                      <li>• 1 produit → N Catégories</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white rounded p-3 border">
+                    <div className="font-semibold mb-2">📦 Exemple</div>
+                    <div className="text-xs text-muted-foreground">
+                      <div><strong>Tablier Maître REAA</strong></div>
+                      <div>→ Rite: REAA</div>
+                      <div>→ Obédiences: GLNF, GODF</div>
+                      <div>→ Degré: 3ème (Maître)</div>
+                      <div>→ Catégorie: Tabliers</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Logique de filtrage */}
+            <div className="mt-8 pt-8 border-t-2 border-primary/20">
+              <div className="text-center mb-6">
+                <Badge className="text-lg px-6 py-2 bg-slate-700">🔍 LOGIQUE DE FILTRAGE</Badge>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-slate-50 border-2 border-slate-300 rounded-lg p-4">
+                  <div className="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <Filter className="w-4 h-4" />
+                    Filtrage Descendant
+                  </div>
+                  <div className="text-xs text-slate-700 space-y-1">
+                    <div>1️⃣ Choisir Rite/Obédience</div>
+                    <div>2️⃣ Filtrer Type de Loge</div>
+                    <div>3️⃣ Sélectionner Degré</div>
+                    <div>4️⃣ Choisir Catégorie</div>
+                    <div>5️⃣ Voir produits</div>
+                  </div>
+                </div>
+                <div className="bg-slate-50 border-2 border-slate-300 rounded-lg p-4">
+                  <div className="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <Search className="w-4 h-4" />
+                    Recherche Transversale
+                  </div>
+                  <div className="text-xs text-slate-700 space-y-1">
+                    <div>• Par nom produit</div>
+                    <div>• Par mots-clés</div>
+                    <div>• Par SKU</div>
+                    <div>• Multi-critères</div>
+                  </div>
+                </div>
+                <div className="bg-slate-50 border-2 border-slate-300 rounded-lg p-4">
+                  <div className="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <Network className="w-4 h-4" />
+                    Navigation Menu
+                  </div>
+                  <div className="text-xs text-slate-700 space-y-1">
+                    <div>• Menu Obédiences</div>
+                    <div>• Menu Type Loge</div>
+                    <div>• Menu Catégories</div>
+                    <div>• Catalogue complet</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Structure des entités (technique) */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>🗂️ Structure des Entités</CardTitle>
