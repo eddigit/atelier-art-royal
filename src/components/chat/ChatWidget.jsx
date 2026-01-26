@@ -10,18 +10,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 
 export default function ChatWidget() {
-  // Fetch degree orders and categories for filter links
-  const { data: allDegreeOrders = [] } = useQuery({
-    queryKey: ['degreeOrders-chat'],
-    queryFn: () => base44.entities.DegreeOrder.list('level', 200),
-    initialData: []
-  });
-
-  const { data: allCategories = [] } = useQuery({
-    queryKey: ['categories-chat'],
-    queryFn: () => base44.entities.Category.list('order', 100),
-    initialData: []
-  });
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
   { role: 'assistant', content: "Bonjour ! Je suis l'assistant virtuel de l'Atelier Art Royal. Comment puis-je vous aider aujourd'hui ?" }]
@@ -209,47 +197,7 @@ export default function ChatWidget() {
                   'bg-primary text-primary-foreground' :
                   'bg-background border border-border'}`
                   }>
-                        <p className="text-sm whitespace-pre-wrap">
-                          {message.content.split(/\[FILTRES:([^\]]+)\]/).map((part, i) => {
-                            if (i % 2 === 0) {
-                              return part;
-                            } else {
-                              // Parse filters
-                              const filters = {};
-                              part.split(',').forEach(filter => {
-                                const [key, value] = filter.split('=').map(s => s.trim());
-                                filters[key] = value;
-                              });
-                              
-                              // Build URL
-                              const params = new URLSearchParams();
-                              Object.entries(filters).forEach(([k, v]) => {
-                                if (k === 'logeType') params.set('logeType', v);
-                                else if (k === 'degreeOrder') {
-                                  // Find degree ID by name
-                                  const degree = allDegreeOrders?.find(d => d.name === v);
-                                  if (degree) params.set('degreeOrder', degree.id);
-                                }
-                                else if (k === 'category') {
-                                  // Find category ID by name
-                                  const cat = allCategories?.find(c => c.name === v);
-                                  if (cat) params.set('category', cat.id);
-                                }
-                              });
-                              
-                              return (
-                                <Link
-                                  key={i}
-                                  to={createPageUrl('Catalog') + '?' + params.toString()}
-                                  onClick={() => setIsOpen(false)}
-                                  className="text-primary hover:underline font-semibold"
-                                >
-                                  [Voir le catalogue filtré]
-                                </Link>
-                              );
-                            }
-                          })}
-                        </p>
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                       </div>
                     </div>
                     

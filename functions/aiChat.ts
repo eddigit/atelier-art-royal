@@ -141,15 +141,12 @@ Deno.serve(async (req) => {
     - Fournis l'ID du produit pour créer un lien
     - Suggère des alternatives si nécessaire
     
-    6. FONCTIONNALITÉ DE NAVIGATION INTELLIGENTE:
-    - Quand tu recommandes des produits, tu peux générer un lien de filtre pour le catalogue
-    - Format EXACT à utiliser: "Voir les produits [FILTRES: logeType=Loge Symbolique, degreeOrder=Apprenti, category=Tabliers]"
-    - IMPORTANT: N'utilise dans les filtres QUE les valeurs exactes des données (pas de mots comme "je", "cherche", "veux")
-    - Valeurs possibles pour logeType: "Loge Symbolique" ou "Loge Hauts Grades"
-    - Valeurs possibles pour degreeOrder: noms exacts des degrés (ex: "Apprenti", "Compagnon", "Maître")
-    - Valeurs possibles pour category: noms exacts des catégories (ex: "Tabliers", "Sautoirs", "Bijoux")
-    - Tu peux combiner plusieurs filtres ou n'en utiliser qu'un seul selon la demande
-    - Exemple client dit "je cherche tablier apprenti" → tu génères: [FILTRES: logeType=Loge Symbolique, degreeOrder=Apprenti, category=Tabliers]
+    6. RECOMMANDATION DE PRODUITS:
+    - Quand un client cherche un type de produit (ex: "tablier apprenti"), recommande directement 2-3 produits spécifiques du catalogue
+    - Utilise le format: "Voici nos tabliers pour Apprenti disponibles: [PRODUCT:product_id_1] [PRODUCT:product_id_2]"
+    - NE génère PAS de liens de filtres, recommande toujours des produits spécifiques avec leurs IDs exacts
+    - Si plusieurs produits correspondent, choisis les plus pertinents (en stock en priorité, puis meilleur prix)
+    - Explique brièvement pourquoi tu recommandes ces produits
 
     Réponds en français avec un ton professionnel, chaleureux et respectueux de la tradition maçonnique.`;
 
@@ -191,12 +188,14 @@ Deno.serve(async (req) => {
     const groqData = await groqResponse.json();
     const aiMessage = groqData.choices[0].message.content;
 
-    // Extract product IDs mentioned (simple regex)
-    const productIdPattern = /product[_-]?id[:\s]+([a-f0-9-]+)/gi;
+    // Extract product IDs mentioned (multiple patterns)
     const mentionedProducts = [];
-    let match;
-    while ((match = productIdPattern.exec(aiMessage)) !== null) {
-      const productId = match[1];
+    
+    // Pattern 1: [PRODUCT:id]
+    const productPattern1 = /\[PRODUCT:([a-f0-9]+)\]/gi;
+    let match1;
+    while ((match1 = productPattern1.exec(aiMessage)) !== null) {
+      const productId = match1[1];
       const product = products.find(p => p.id === productId);
       if (product) {
         mentionedProducts.push({
@@ -205,6 +204,24 @@ Deno.serve(async (req) => {
           price: product.price,
           image: product.images?.[0]
         });
+      }
+    }
+    
+    // Pattern 2: product_id: xxx (fallback)
+    if (mentionedProducts.length === 0) {
+      const productPattern2 = /product[_-]?id[:\s]+([a-f0-9-]+)/gi;
+      let match2;
+      while ((match2 = productPattern2.exec(aiMessage)) !== null) {
+        const productId = match2[1];
+        const product = products.find(p => p.id === productId);
+        if (product) {
+          mentionedProducts.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.images?.[0]
+          });
+        }
       }
     }
 
