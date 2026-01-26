@@ -19,8 +19,29 @@ export default function HeroSection() {
       return;
     }
 
-    // Redirection DIRECTE avec recherche textuelle uniquement
-    window.location.href = createPageUrl('Catalog') + '?search=' + encodeURIComponent(searchQuery);
+    // Liste des mots à ignorer (stop words français)
+    const stopWords = [
+      'je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles',
+      'cherche', 'recherche', 'veux', 'voudrais', 'aimerais',
+      'un', 'une', 'le', 'la', 'les', 'des', 'du', 'de',
+      'pour', 'avec', 'dans', 'sur', 'mon', 'ma', 'mes',
+      'besoin', 'faut', 'avoir', 'être', 'trouver', 'ai', 'as', 'a'
+    ];
+
+    // Extraire uniquement les mots pertinents
+    const keywords = searchQuery
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlever accents
+      .split(/\s+/)
+      .filter(word => word.length > 2 && !stopWords.includes(word))
+      .join(' ');
+
+    // Redirection avec mots-clés nettoyés
+    if (keywords) {
+      window.location.href = createPageUrl('Catalog') + '?search=' + encodeURIComponent(keywords);
+    } else {
+      window.location.href = createPageUrl('Catalog');
+    }
   };
 
   return (
