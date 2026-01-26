@@ -209,19 +209,33 @@ export default function Catalog() {
           if (productDate < thirtyDaysAgo) return false;
         }
         
-        // Enhanced search
+        // Enhanced search with normalization
         if (filters.search) {
-          const searchTerm = filters.search.toLowerCase();
-          const searchableText = [
+          // Normaliser le terme de recherche : enlever accents, apostrophes, tirets, espaces multiples
+          const normalizeText = (text) => {
+            return text
+              .toLowerCase()
+              .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlever accents
+              .replace(/['\-_]/g, ' ') // Remplacer apostrophes, tirets par espaces
+              .replace(/\s+/g, ' ') // Espaces multiples → espace simple
+              .trim();
+          };
+          
+          const searchTerm = normalizeText(filters.search);
+          const searchableText = normalizeText([
             product.name,
             product.description,
             product.short_description,
             ...(product.materials || []),
             ...(product.colors || []),
             ...(product.tags || [])
-          ].filter(Boolean).join(' ').toLowerCase();
+          ].filter(Boolean).join(' '));
           
-          if (!searchableText.includes(searchTerm)) return false;
+          // Vérifier que tous les mots du terme de recherche sont présents
+          const searchWords = searchTerm.split(' ').filter(w => w.length > 0);
+          const allWordsPresent = searchWords.every(word => searchableText.includes(word));
+          
+          if (!allWordsPresent) return false;
         }
         
         if (filters.minPrice && product.price < parseFloat(filters.minPrice)) return false;
