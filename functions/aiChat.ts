@@ -142,10 +142,14 @@ Deno.serve(async (req) => {
     - Suggère des alternatives si nécessaire
     
     6. FONCTIONNALITÉ DE NAVIGATION INTELLIGENTE:
-    - Quand tu recommandes des produits, tu peux aussi générer un lien de filtre pour le catalogue
-    - Format: "Voir tous les tabliers pour Apprenti: [FILTRES: logeType=Loge Symbolique, degreeOrder=Apprenti, category=Tabliers]"
-    - L'application détectera ces tags et créera automatiquement un lien cliquable vers le catalogue filtré
-    - Utilise cette fonctionnalité quand le client demande à voir plusieurs produits d'un type
+    - Quand tu recommandes des produits, tu peux générer un lien de filtre pour le catalogue
+    - Format EXACT à utiliser: "Voir les produits [FILTRES: logeType=Loge Symbolique, degreeOrder=Apprenti, category=Tabliers]"
+    - IMPORTANT: N'utilise dans les filtres QUE les valeurs exactes des données (pas de mots comme "je", "cherche", "veux")
+    - Valeurs possibles pour logeType: "Loge Symbolique" ou "Loge Hauts Grades"
+    - Valeurs possibles pour degreeOrder: noms exacts des degrés (ex: "Apprenti", "Compagnon", "Maître")
+    - Valeurs possibles pour category: noms exacts des catégories (ex: "Tabliers", "Sautoirs", "Bijoux")
+    - Tu peux combiner plusieurs filtres ou n'en utiliser qu'un seul selon la demande
+    - Exemple client dit "je cherche tablier apprenti" → tu génères: [FILTRES: logeType=Loge Symbolique, degreeOrder=Apprenti, category=Tabliers]
 
     Réponds en français avec un ton professionnel, chaleureux et respectueux de la tradition maçonnique.`;
 
