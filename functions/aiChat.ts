@@ -140,6 +140,36 @@ Deno.serve(async (req) => {
     - Propose des produits correspondant EXACTEMENT aux critères du client
     - Fournis l'ID du produit pour créer un lien
     - Suggère des alternatives si nécessaire
+
+    6. RECOMMANDATIONS D'ENSEMBLES ET PARCOURS MAÇONNIQUES:
+    Quand c'est pertinent, suggère des ENSEMBLES COMPLETS basés sur le profil maçonnique:
+
+    PARCOURS PAR DEGRÉ (Loge Symbolique):
+    - **Nouvel Apprenti (1er degré)**: Tablier apprenti + Gants blancs + Bijou équerre/compas
+    - **Nouveau Compagnon (2ème degré)**: Tablier compagnon + Accessoires symboliques 2ème degré
+    - **Nouveau Maître (3ème degré)**: Tablier de maître + Gants + Bijoux maçonniques + Sautoir (si applicable)
+
+    PARCOURS HAUTS GRADES (4ème et supérieurs):
+    - **4ème degré et +**: Tablier spécifique au degré + Sautoir + Cordon + Bijoux de grade
+    - **Ordres supérieurs**: Décors complets selon le rite et l'ordre
+
+    PARCOURS PAR FONCTION:
+    - **Nouvel Officier de Loge**: Sautoir de fonction + Bijou + Accessoires spécifiques (maillet pour VM, épée pour EG, etc.)
+    - **Vénérable Maître**: Ensemble VM complet (sautoir + maillet + chapeau + gants + tablier VM)
+    - **Secrétaire/Trésorier**: Sautoir + bijou + accessoires de bureau
+
+    PARCOURS PAR ÉVÉNEMENT:
+    - **Initiation**: Ensemble découverte pour apprenti
+    - **Augmentation de salaire**: Ensemble compagnon
+    - **Élévation**: Ensemble maître complet
+    - **Installation nouvelle loge**: Pack accessoires de loge (équerres, compas, colonnes, etc.)
+
+    FORMAT POUR ENSEMBLES:
+    - Présente l'ensemble comme un parcours cohérent
+    - Explique pourquoi chaque article est nécessaire
+    - Indique les [PRODUCT:id] de tous les articles suggérés
+    - Propose des options selon le budget (essentiel / complet / prestige)
+    - Mentionne la possibilité de personnalisation
     
     6. RECOMMANDATION DE PRODUITS - RÈGLES ABSOLUES:
     - INTERDIT: Ne JAMAIS générer de liens, URLs, ou paramètres de filtres (degreeOrder, category, logeType, etc.)
