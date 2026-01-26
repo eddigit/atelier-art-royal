@@ -211,6 +211,13 @@ export default function Catalog() {
         
         // Enhanced search with normalization
         if (filters.search) {
+          // Mots à ignorer (mots de conversation courants)
+          const stopWords = ['je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles',
+            'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'ce', 'cette', 'ces',
+            'mon', 'ma', 'mes', 'ton', 'ta', 'tes', 'son', 'sa', 'ses',
+            'cherche', 'chercher', 'veux', 'vouloir', 'besoin', 'ai', 'as', 'a',
+            'pour', 'avec', 'sans', 'sur', 'sous', 'dans', 'chez', 'en'];
+
           // Normaliser le terme de recherche : enlever accents, apostrophes, tirets, espaces multiples
           const normalizeText = (text) => {
             return text
@@ -220,7 +227,7 @@ export default function Catalog() {
               .replace(/\s+/g, ' ') // Espaces multiples → espace simple
               .trim();
           };
-          
+
           const searchTerm = normalizeText(filters.search);
           const searchableText = normalizeText([
             product.name,
@@ -230,11 +237,18 @@ export default function Catalog() {
             ...(product.colors || []),
             ...(product.tags || [])
           ].filter(Boolean).join(' '));
-          
-          // Vérifier que tous les mots du terme de recherche sont présents
-          const searchWords = searchTerm.split(' ').filter(w => w.length > 0);
+
+          // Filtrer les mots de recherche pour enlever les stop words
+          const searchWords = searchTerm
+            .split(' ')
+            .filter(w => w.length > 1 && !stopWords.includes(w));
+
+          // Si aucun mot pertinent, ne pas filtrer
+          if (searchWords.length === 0) return true;
+
+          // Vérifier que tous les mots pertinents sont présents
           const allWordsPresent = searchWords.every(word => searchableText.includes(word));
-          
+
           if (!allWordsPresent) return false;
         }
         
