@@ -196,7 +196,19 @@ Deno.serve(async (req) => {
     }
 
     const groqData = await groqResponse.json();
-    const aiMessage = groqData.choices[0].message.content;
+    let aiMessage = groqData.choices[0].message.content;
+    
+    // NETTOYER TOUT LIEN OU URL du message de l'IA
+    // Supprimer toutes les URLs et liens générés par erreur
+    aiMessage = aiMessage
+      .replace(/https?:\/\/[^\s]+/g, '') // Supprimer URLs http/https
+      .replace(/\/catalog\?[^\s\]]+/g, '') // Supprimer liens catalog avec paramètres
+      .replace(/\[LINK:[^\]]+\]/g, '') // Supprimer tags [LINK:...]
+      .replace(/\[FILTER:[^\]]+\]/g, '') // Supprimer tags [FILTER:...]
+      .replace(/degreeOrder=[^\s&]+/g, '') // Supprimer paramètres degreeOrder
+      .replace(/category=[^\s&]+/g, '') // Supprimer paramètres category
+      .replace(/logeType=[^\s&]+/g, '') // Supprimer paramètres logeType
+      .trim();
 
     // Extract product IDs mentioned (multiple patterns)
     const mentionedProducts = [];
