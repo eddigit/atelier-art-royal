@@ -24,7 +24,8 @@ import {
   Square,
   Power,
   PowerOff,
-  Award
+  Award,
+  RefreshCcw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -72,7 +73,13 @@ export default function AdminProducts() {
     queryFn: () => base44.auth.me()
   });
 
-  const { data: products = [], isLoading } = useQuery({
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+    error,
+    refetch
+  } = useQuery({
     queryKey: ['admin-products'],
     queryFn: () => base44.entities.Product.list('-created_date', 500),
     initialData: []
@@ -482,7 +489,21 @@ export default function AdminProducts() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-center text-muted-foreground py-8">Chargement...</p>
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+            </div>
+          ) : isError ? (
+            <div className="flex flex-col items-center justify-center py-10 text-center border-2 border-destructive/20 rounded-lg bg-destructive/5">
+              <AlertCircle className="w-10 h-10 text-destructive mb-4" />
+              <h3 className="text-lg font-bold text-destructive mb-2">Erreur de chargement</h3>
+              <p className="text-muted-foreground mb-6 max-w-md">
+                {error?.message || "Impossible de charger les produits. Veuillez vérifier votre connexion."}
+              </p>
+              <Button onClick={() => refetch()} variant="outline" className="border-destructive/50 hover:bg-destructive/20">
+                <RefreshCcw className="w-4 h-4 mr-2" />
+                Réessayer
+              </Button>
+            </div>
           ) : filteredProducts.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
               {searchQuery ? 'Aucun produit trouvé' : 'Aucun produit. Importez un fichier CSV pour commencer.'}
