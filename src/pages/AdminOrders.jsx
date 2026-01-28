@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Package, Search, Eye, Truck, User, Download, Bell, Star } from 'lucide-react';
+import { Package, Search, Eye, Truck, User, Download, Bell, Star, AlertCircle, Loader2, RefreshCcw } from 'lucide-react';
 import OrderReturns from '@/components/admin/OrderReturns';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -40,7 +40,13 @@ export default function AdminOrders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const queryClient = useQueryClient();
 
-  const { data: orders = [], isLoading } = useQuery({
+  const {
+    data: orders = [],
+    isLoading,
+    isError,
+    error,
+    refetch
+  } = useQuery({
     queryKey: ['admin-orders', search, filterStatus, filterChannel],
     queryFn: async () => {
       let allOrders = await base44.entities.Order.list('-created_date', 500);
@@ -235,88 +241,106 @@ export default function AdminOrders() {
 
       {/* Orders List */}
       <div className="space-y-4">
-        {orders.map((order) => {
-          const status = statusConfig[order.status] || statusConfig.pending;
-          
-          return (
-            <Card key={order.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-bold text-lg">{order.order_number}</h3>
-                      <Badge className={status.color}>
-                        {status.label}
-                      </Badge>
-                      {order.payment_status === 'paid' && (
-                        <Badge className="bg-green-600/20 text-green-400 border-green-600/30">
-                          Payée
-                        </Badge>
-                      )}
-                      <Badge variant="outline" className={order.sales_channel === 'website' ? 'bg-blue-600/10' : 'bg-orange-600/10'}>
-                        {order.sales_channel === 'website' ? 'Web' : 'Direct'}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                      <p>Date: {format(new Date(order.created_date), 'dd/MM/yyyy', { locale: fr })}</p>
-                      <p>Articles: {order.items?.length || 0}</p>
-                      <p>
-                        Client:{' '}
-                        {order.customer_id && !order.customer_id.startsWith('guest_') ? (
-                          <Link to={createPageUrl('AdminCustomers') + `?customer_id=${order.customer_id}`} className="text-primary hover:underline">
-                            {getCustomerFullName(order.customer_id)}
-                          </Link>
-                        ) : (
-                          <span>{order.shipping_address?.name || 'Client Invité'}</span>
-                        )}
-                      </p>
-                      <p className="font-bold text-primary">Total: {order.total?.toFixed(2)}€</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => generateInvoiceMutation.mutate(order.id)}
-                      disabled={generateInvoiceMutation.isPending}
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
-                    {order.status === 'delivered' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={async () => {
-                          try {
-                            await base44.functions.invoke('requestReview', { orderId: order.id });
-                            toast.success('Email d\'avis envoyé');
-                          } catch (error) {
-                            toast.error('Erreur lors de l\'envoi');
-                          }
-                        }}
-                      >
-                        <Star className="w-4 h-4" />
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      onClick={() => setSelectedOrder(order)}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Détails
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-
-        {orders.length === 0 && (
+        {isLoading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          </div>
+        ) : isError ? (
+          <Card className="border-destructive/50 bg-destructive/10">
+            <CardContent className="flex flex-col items-center justify-center py-10 text-center">
+              <AlertCircle className="w-10 h-10 text-destructive mb-4" />
+              <h3 className="text-lg font-bold text-destructive mb-2">Erreur de chargement</h3>
+              <p className="text-muted-foreground mb-6 max-w-md">
+                {error?.message || "Une erreur est survenue lors du chargement des commandes."}
+              </p>
+              <Button onClick={() => refetch()} variant="outline" className="border-destructive/50 hover:bg-destructive/20">
+                <RefreshCcw className="w-4 h-4 mr-2" />
+                Réessayer
+              </Button>
+            </CardContent>
+          </Card>
+        ) : orders.length === 0 ? (
           <div className="text-center py-20">
             <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">Aucune commande trouvée</p>
           </div>
+        ) : (
+          orders.map((order) => {
+            const status = statusConfig[order.status] || statusConfig.pending;
+
+            return (
+              <Card key={order.id} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-bold text-lg">{order.order_number}</h3>
+                        <Badge className={status.color}>
+                          {status.label}
+                        </Badge>
+                        {order.payment_status === 'paid' && (
+                          <Badge className="bg-green-600/20 text-green-400 border-green-600/30">
+                            Payée
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className={order.sales_channel === 'website' ? 'bg-blue-600/10' : 'bg-orange-600/10'}>
+                          {order.sales_channel === 'website' ? 'Web' : 'Direct'}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                        <p>Date: {format(new Date(order.created_date), 'dd/MM/yyyy', { locale: fr })}</p>
+                        <p>Articles: {order.items?.length || 0}</p>
+                        <p>
+                          Client:{' '}
+                          {order.customer_id && !order.customer_id.startsWith('guest_') ? (
+                            <Link to={createPageUrl('AdminCustomers') + `?customer_id=${order.customer_id}`} className="text-primary hover:underline">
+                              {getCustomerFullName(order.customer_id)}
+                            </Link>
+                          ) : (
+                            <span>{order.shipping_address?.name || 'Client Invité'}</span>
+                          )}
+                        </p>
+                        <p className="font-bold text-primary">Total: {order.total?.toFixed(2)}€</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => generateInvoiceMutation.mutate(order.id)}
+                        disabled={generateInvoiceMutation.isPending}
+                      >
+                        <Download className="w-4 h-4" />
+                      </Button>
+                      {order.status === 'delivered' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={async () => {
+                            try {
+                              await base44.functions.invoke('requestReview', { orderId: order.id });
+                              toast.success('Email d\'avis envoyé');
+                            } catch (error) {
+                              toast.error('Erreur lors de l\'envoi');
+                            }
+                          }}
+                        >
+                          <Star className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Détails
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
         )}
       </div>
 

@@ -14,7 +14,8 @@ import {
   FileText,
   DollarSign,
   AlertCircle,
-  Award
+  Award,
+  RefreshCcw
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -24,23 +25,45 @@ export default function AdminDashboard({ onNavigateToTab }) {
     queryFn: () => base44.auth.me()
   });
 
-  const { data: products = [], isLoading: loadingProducts } = useQuery({
+  const {
+    data: products = [],
+    isLoading: loadingProducts,
+    isError: errorProducts,
+    refetch: refetchProducts
+  } = useQuery({
     queryKey: ['admin-products'],
     queryFn: () => base44.entities.Product.list('-created_date', 500),
     initialData: []
   });
 
-  const { data: orders = [], isLoading: loadingOrders } = useQuery({
+  const {
+    data: orders = [],
+    isLoading: loadingOrders,
+    isError: errorOrders,
+    refetch: refetchOrders
+  } = useQuery({
     queryKey: ['admin-orders'],
     queryFn: () => base44.entities.Order.list('-created_date', 500),
     initialData: []
   });
 
-  const { data: allUsers = [], isLoading: loadingUsers } = useQuery({
+  const {
+    data: allUsers = [],
+    isLoading: loadingUsers,
+    isError: errorUsers,
+    refetch: refetchUsers
+  } = useQuery({
     queryKey: ['admin-users'],
     queryFn: () => base44.entities.User.list('-created_date', 500),
     initialData: []
   });
+
+  const hasError = errorProducts || errorOrders || errorUsers;
+  const handleRetry = () => {
+    if (errorProducts) refetchProducts();
+    if (errorOrders) refetchOrders();
+    if (errorUsers) refetchUsers();
+  };
 
   if (!user || user.role !== 'admin') {
     return (
@@ -153,6 +176,31 @@ export default function AdminDashboard({ onNavigateToTab }) {
           Bienvenue, {user?.full_name}
         </p>
       </div>
+
+      {hasError && (
+        <Card className="mb-8 border-destructive/50 bg-destructive/10">
+          <CardContent className="p-4 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive" />
+            <div>
+              <p className="font-semibold text-destructive">
+                Certaines données n'ont pas pu être chargées.
+              </p>
+              <p className="text-sm text-destructive/80">
+                Les statistiques peuvent être incomplètes.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRetry}
+              className="ml-auto border-destructive/50 hover:bg-destructive/20"
+            >
+              <RefreshCcw className="w-4 h-4 mr-2" />
+              Réessayer
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { X, Upload, Loader2, Plus } from 'lucide-react';
+import { X, Upload, Loader2, Plus, AlertCircle, RefreshCcw } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -44,29 +44,53 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
   const [newDegreeData, setNewDegreeData] = useState({});
   const [newCategoryData, setNewCategoryData] = useState({});
 
-  const { data: rites = [] } = useQuery({
+  const {
+    data: rites = [],
+    isError: errorRites,
+    refetch: refetchRites
+  } = useQuery({
     queryKey: ['rites'],
     queryFn: () => base44.entities.Rite.list('order', 100),
     initialData: []
   });
 
-  const { data: categories = [] } = useQuery({
+  const {
+    data: categories = [],
+    isError: errorCategories,
+    refetch: refetchCategories
+  } = useQuery({
     queryKey: ['categories'],
     queryFn: () => base44.entities.Category.list('order', 100),
     initialData: []
   });
 
-  const { data: obediences = [] } = useQuery({
+  const {
+    data: obediences = [],
+    isError: errorObediences,
+    refetch: refetchObediences
+  } = useQuery({
     queryKey: ['obediences'],
     queryFn: () => base44.entities.Obedience.list('order', 100),
     initialData: []
   });
 
-  const { data: degreeOrders = [] } = useQuery({
+  const {
+    data: degreeOrders = [],
+    isError: errorDegrees,
+    refetch: refetchDegrees
+  } = useQuery({
     queryKey: ['degreeOrders'],
     queryFn: () => base44.entities.DegreeOrder.list('level', 200),
     initialData: []
   });
+
+  const metaError = errorRites || errorCategories || errorObediences || errorDegrees;
+  const refetchMeta = () => {
+    refetchRites();
+    refetchCategories();
+    refetchObediences();
+    refetchDegrees();
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -260,6 +284,16 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
         <DialogHeader className="flex-shrink-0">
           <DialogTitle>{product?.id ? 'Éditer le produit' : 'Nouveau produit'}</DialogTitle>
         </DialogHeader>
+
+        {metaError && (
+          <div className="mx-6 mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md flex items-center gap-2">
+             <AlertCircle className="w-4 h-4 text-destructive" />
+             <span className="text-sm text-destructive flex-1">Erreur de chargement des catégories/rites.</span>
+             <Button size="sm" variant="outline" onClick={refetchMeta} className="h-7 text-xs border-destructive/30 hover:bg-destructive/20">
+               <RefreshCcw className="w-3 h-3 mr-1" /> Réessayer
+             </Button>
+          </div>
+        )}
 
         <div className="space-y-6 overflow-y-auto flex-1 pr-2">
           {/* AI Assistant */}
