@@ -35,45 +35,52 @@ export default function AdminCustomers() {
   const [sourceFilter, setSourceFilter] = useState('all');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => base44.auth.me(),
+    retry: false
   });
 
   const { data: customers = [], isLoading: loadingCustomers } = useQuery({
     queryKey: ['all-customers'],
     queryFn: () => base44.entities.User.list('-created_date', 500),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: orders = [] } = useQuery({
     queryKey: ['all-orders'],
     queryFn: () => base44.entities.Order.list('-created_date', 1000),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: notes = [] } = useQuery({
     queryKey: ['customer-notes'],
     queryFn: () => base44.entities.CustomerNote.list('-created_date', 500),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: rites = [] } = useQuery({
     queryKey: ['rites'],
     queryFn: () => base44.entities.Rite.list('order', 100),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: obediences = [] } = useQuery({
     queryKey: ['obediences'],
     queryFn: () => base44.entities.Obedience.list('order', 100),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: degreeOrders = [] } = useQuery({
     queryKey: ['degreeOrders'],
     queryFn: () => base44.entities.DegreeOrder.list('level', 200),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   // Calculate customer segments and statistics
@@ -186,6 +193,14 @@ export default function AdminCustomers() {
     new: 'Nouveau',
     'no-purchase': 'Sans achat'
   };
+
+  if (isLoadingUser) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <p className="text-muted-foreground">Chargement...</p>
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     return (

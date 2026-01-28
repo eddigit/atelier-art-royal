@@ -31,9 +31,10 @@ export default function AdminPanel() {
   const initialTab = urlParams.get('tab') || 'dashboard';
   const [activeTab, setActiveTab] = useState(initialTab);
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => base44.auth.me(),
+    retry: false
   });
 
   useEffect(() => {
@@ -52,6 +53,14 @@ export default function AdminPanel() {
     newUrl.searchParams.set('tab', activeTab);
     window.history.replaceState({}, '', newUrl);
   }, [activeTab]);
+
+  if (isLoadingUser) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <p className="text-muted-foreground">Chargement...</p>
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     return (

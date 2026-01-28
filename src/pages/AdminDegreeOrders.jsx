@@ -22,27 +22,31 @@ export default function AdminDegreeOrders() {
   const [search, setSearch] = useState('');
   const [filterRite, setFilterRite] = useState('all');
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => base44.auth.me(),
+    retry: false
   });
 
   const { data: degreeOrders = [], isLoading } = useQuery({
     queryKey: ['admin-degree-orders'],
     queryFn: () => base44.entities.DegreeOrder.list('level', 200),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: rites = [] } = useQuery({
     queryKey: ['rites'],
     queryFn: () => base44.entities.Rite.list('order', 100),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: products = [] } = useQuery({
     queryKey: ['admin-products-count'],
     queryFn: () => base44.entities.Product.list('-created_date', 1000),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const getProductCount = (degreeOrderId) => {
@@ -65,6 +69,14 @@ export default function AdminDegreeOrders() {
     const matchesRite = filterRite === 'all' || deg.rite_id === filterRite;
     return matchesSearch && matchesRite;
   });
+
+  if (isLoadingUser) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <p className="text-muted-foreground">Chargement...</p>
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     return (

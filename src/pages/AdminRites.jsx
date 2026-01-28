@@ -18,26 +18,37 @@ export default function AdminRites() {
   const [selectedRite, setSelectedRite] = useState(null);
   const [showNewDialog, setShowNewDialog] = useState(false);
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => base44.auth.me(),
+    retry: false
   });
 
   const { data: rites = [], isLoading } = useQuery({
     queryKey: ['admin-rites'],
     queryFn: () => base44.entities.Rite.list('order', 100),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: products = [] } = useQuery({
     queryKey: ['admin-products-count'],
     queryFn: () => base44.entities.Product.list('-created_date', 1000),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const getProductCount = (riteId) => {
     return products.filter(p => p.rite_id === riteId).length;
   };
+
+  if (isLoadingUser) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <p className="text-muted-foreground">Chargement...</p>
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     return (

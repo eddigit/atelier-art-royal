@@ -18,21 +18,24 @@ export default function AdminCategories() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showNewDialog, setShowNewDialog] = useState(false);
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => base44.auth.me(),
+    retry: false
   });
 
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ['admin-categories'],
     queryFn: () => base44.entities.Category.list('order', 100),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const { data: products = [] } = useQuery({
     queryKey: ['admin-products-count'],
     queryFn: () => base44.entities.Product.list('-created_date', 1000),
-    initialData: []
+    initialData: [],
+    enabled: !!user && user.role === 'admin'
   });
 
   const getProductCount = (categoryId) => {
@@ -43,6 +46,14 @@ export default function AdminCategories() {
       return p.category_id === categoryId;
     }).length;
   };
+
+  if (isLoadingUser) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <p className="text-muted-foreground">Chargement...</p>
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     return (
