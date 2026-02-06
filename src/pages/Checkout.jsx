@@ -112,6 +112,7 @@ export default function Checkout() {
         return {
           product_id: product.id,
           product_name: product.name,
+          product_sku: product.sku || '',
           quantity: item.quantity,
           price: product.price,
           total: product.price * item.quantity

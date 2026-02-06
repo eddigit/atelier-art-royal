@@ -457,6 +457,11 @@ export default function AdminOrders() {
                       <div key={idx} className="flex justify-between text-sm">
                         <div>
                           <p className="font-medium">{item.product_name}</p>
+                          {item.product_sku && (
+                            <p className="text-xs text-primary font-mono font-semibold">
+                              SKU: {item.product_sku}
+                            </p>
+                          )}
                           <p className="text-muted-foreground">
                             {item.quantity} × {item.price?.toFixed(2)}€
                           </p>
