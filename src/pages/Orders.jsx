@@ -123,6 +123,11 @@ export default function Orders() {
                       <div key={idx} className="flex justify-between items-center text-sm">
                         <div>
                           <p className="font-medium">{item.product_name}</p>
+                          {item.product_sku && (
+                            <p className="text-xs text-primary font-mono font-semibold">
+                              Réf: {item.product_sku}
+                            </p>
+                          )}
                           <p className="text-muted-foreground">
                             Quantité: {item.quantity} × {item.price.toFixed(2)}€
                           </p>
