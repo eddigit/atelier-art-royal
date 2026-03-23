@@ -4,7 +4,7 @@ import { signToken, requireAuth } from '../lib/auth.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 }
 
@@ -52,19 +52,52 @@ async function handleRegister(req, res) {
 }
 
 async function handleMe(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method === 'GET') {
+    const userPayload = requireAuth(req, res);
+    if (!userPayload) return;
 
-  const userPayload = requireAuth(req, res);
-  if (!userPayload) return;
+    const result = await query('SELECT id, email, full_name, role, created_at, updated_at FROM users WHERE id = $1', [userPayload.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
 
-  const result = await query('SELECT id, email, full_name, role, created_at, updated_at FROM users WHERE id = $1', [userPayload.id]);
-  if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    const user = result.rows[0];
+    return res.status(200).json({
+      id: user.id, email: user.email, full_name: user.full_name, role: user.role,
+      created_date: user.created_at, updated_date: user.updated_at,
+    });
+  }
 
-  const user = result.rows[0];
-  return res.status(200).json({
-    id: user.id, email: user.email, full_name: user.full_name, role: user.role,
-    created_date: user.created_at, updated_date: user.updated_at,
-  });
+  if (req.method === 'PUT') {
+    const userPayload = requireAuth(req, res);
+    if (!userPayload) return;
+
+    const { full_name, email } = req.body;
+    const fields = [];
+    const values = [];
+    let idx = 1;
+
+    if (full_name !== undefined) { fields.push(`full_name = $${idx++}`); values.push(full_name); }
+    if (email !== undefined) { fields.push(`email = $${idx++}`); values.push(email.toLowerCase()); }
+
+    if (fields.length === 0) return res.status(400).json({ error: 'No fields to update' });
+
+    fields.push(`updated_at = NOW()`);
+    values.push(userPayload.id);
+
+    const result = await query(
+      `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx} RETURNING id, email, full_name, role, created_at, updated_at`,
+      values
+    );
+
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+
+    const user = result.rows[0];
+    return res.status(200).json({
+      id: user.id, email: user.email, full_name: user.full_name, role: user.role,
+      created_date: user.created_at, updated_date: user.updated_at,
+    });
+  }
+
+  return res.status(405).json({ error: 'Method not allowed' });
 }
 
 export default async function handler(req, res) {
