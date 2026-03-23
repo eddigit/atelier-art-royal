@@ -3,6 +3,8 @@ const { Pool } = pg;
 
 const poolConfig = {
   connectionString: process.env.DATABASE_URL,
+  connectionTimeoutMillis: 8000,
+  max: 3,
 };
 
 // Enable SSL if the connection string indicates it
