@@ -17,7 +17,7 @@ const HANDLERS = {
   'invoke-llm': stub('invoke-llm'),
 };
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -30,4 +30,4 @@ module.exports = async function handler(req, res) {
     console.error('Integration error:', error);
     return res.status(500).json({ error: error.message });
   }
-};
+}

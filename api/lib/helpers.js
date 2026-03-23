@@ -203,7 +203,7 @@ function buildFilterQuery(tableName, filters, sort, limit = 100) {
   return { text, values };
 }
 
-module.exports = {
+export {
   FIELD_TO_COLUMN,
   COLUMN_TO_FIELD,
   ENTITY_TABLE_MAP,

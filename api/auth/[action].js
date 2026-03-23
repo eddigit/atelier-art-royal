@@ -1,6 +1,6 @@
-const bcrypt = require('bcryptjs');
-const { query } = require('../lib/db');
-const { signToken, requireAuth } = require('../lib/auth');
+import bcrypt from 'bcryptjs';
+import { query } from '../lib/db.js';
+import { signToken, requireAuth } from '../lib/auth.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -67,7 +67,7 @@ async function handleMe(req, res) {
   });
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -83,4 +83,4 @@ module.exports = async function handler(req, res) {
     console.error('Auth error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-};
+}

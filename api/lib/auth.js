@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -76,7 +76,7 @@ function requireAdmin(req, res) {
   return user;
 }
 
-module.exports = {
+export {
   signToken,
   verifyToken,
   authenticateRequest,

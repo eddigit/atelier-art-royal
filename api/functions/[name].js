@@ -1,4 +1,4 @@
-const { requireAuth } = require('../lib/auth');
+import { requireAuth } from '../lib/auth.js';
 
 const SUMUP_API_KEY = process.env.SUMUP_API_KEY;
 const SUMUP_MERCHANT_CODE = 'MDELMUGR';
@@ -96,7 +96,7 @@ const HANDLERS = {
   getSecrets: stub('getSecrets'),
 };
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -109,4 +109,4 @@ module.exports = async function handler(req, res) {
     console.error('Function error:', error);
     return res.status(500).json({ error: error.message });
   }
-};
+}

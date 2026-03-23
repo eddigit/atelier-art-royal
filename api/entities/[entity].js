@@ -1,13 +1,13 @@
-const { query } = require('../lib/db');
-const { authenticateRequest, requireAuth, requireAdmin } = require('../lib/auth');
-const {
+import { query } from '../lib/db.js';
+import { authenticateRequest, requireAuth, requireAdmin } from '../lib/auth.js';
+import {
   ENTITY_TABLE_MAP,
   PUBLIC_READ_ENTITIES,
   ADMIN_WRITE_ENTITIES,
   mapToDb,
   mapFromDb,
   buildFilterQuery,
-} = require('../lib/helpers');
+} from '../lib/helpers.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,7 +15,7 @@ function cors(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -158,4 +158,4 @@ module.exports = async function handler(req, res) {
     console.error('Entity API error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-};
+}
