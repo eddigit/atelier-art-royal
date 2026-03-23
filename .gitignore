@@ -28,3 +28,9 @@ dist-ssr
 *.sw?
 
 .env
+.vercel
+
+# Migration artifacts
+scripts/downloaded-images/
+scripts/id-mapping.json
+scripts/image-url-mapping.json
