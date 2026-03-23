@@ -1,5 +1,5 @@
 // Frontend adapter that replaces @base44/sdk
-// All calls are proxied to our own Vercel API routes
+// All calls are proxied to our API server (VPS)
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
