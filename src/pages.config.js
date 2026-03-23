@@ -85,6 +85,7 @@ import SavedCustomizations from './pages/SavedCustomizations';
 import Setup from './pages/Setup';
 import Sitemap from './pages/Sitemap';
 import Wishlist from './pages/Wishlist';
+import Login from "./pages/Login";
 import __Layout from './Layout.jsx';
 
 
@@ -127,6 +128,7 @@ export const PAGES = {
     "Setup": Setup,
     "Sitemap": Sitemap,
     "Wishlist": Wishlist,
+    "Login": Login,
 }
 
 export const pagesConfig = {

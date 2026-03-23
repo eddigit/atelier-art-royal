@@ -1,0 +1,16 @@
+{
+  "name": "Atelier Art Royal",
+  "short_name": "Art Royal",
+  "description": "Haute Couture Maçonnique - Tabliers, décors et accessoires sur mesure",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

@@ -150,7 +150,7 @@ export const base44 = {
     },
 
     redirectToLogin(returnUrl) {
-      window.location.href = `/login?returnUrl=${encodeURIComponent(returnUrl || window.location.href)}`;
+      window.location.href = `/Login?returnUrl=${encodeURIComponent(returnUrl || window.location.href)}`;
     },
 
     async login(email, password) {
