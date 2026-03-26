@@ -112,6 +112,25 @@ function parseSort(sortStr) {
 }
 
 // ---------------------------------------------------------------------------
+// MongoDB ObjectID detection — 24-char hex string (not a UUID)
+// ---------------------------------------------------------------------------
+const MONGO_ID_RE = /^[a-f0-9]{24}$/;
+
+function isMongoId(val) {
+  return typeof val === 'string' && MONGO_ID_RE.test(val);
+}
+
+/**
+ * If filtering by "id" with MongoDB-style values, redirect to "old_id".
+ */
+function resolveIdColumn(column, filterValues) {
+  if (column !== 'id') return column;
+  const vals = Array.isArray(filterValues) ? filterValues : [filterValues];
+  if (vals.some(isMongoId)) return 'old_id';
+  return 'id';
+}
+
+// ---------------------------------------------------------------------------
 // Filter / query builder
 // ---------------------------------------------------------------------------
 
@@ -131,10 +150,11 @@ function buildFilterQuery(tableName, filters, sort, limit = 100) {
 
   if (filters && typeof filters === 'object') {
     for (const [field, value] of Object.entries(filters)) {
-      const column = FIELD_TO_COLUMN[field] || field;
+      let column = FIELD_TO_COLUMN[field] || field;
 
       if (Array.isArray(value)) {
-        // IN query
+        // IN query — redirect id→old_id if MongoDB IDs detected
+        column = resolveIdColumn(column, value);
         const placeholders = value.map((_, i) => `$${idx + i}`).join(', ');
         conditions.push(`"${column}" IN (${placeholders})`);
         values.push(...value);
@@ -142,6 +162,16 @@ function buildFilterQuery(tableName, filters, sort, limit = 100) {
       } else if (typeof value === 'object' && value !== null) {
         // Operator-based filters: { $gt: 5 }, { $like: '%foo%' }, etc.
         for (const [op, opVal] of Object.entries(value)) {
+          let opColumn = column;
+          // For $in operator, also check for MongoDB IDs
+          if (op === '$in' && Array.isArray(opVal)) {
+            opColumn = resolveIdColumn(column, opVal);
+            const placeholders = opVal.map((_, i) => `$${idx + i}`).join(', ');
+            conditions.push(`"${opColumn}" IN (${placeholders})`);
+            values.push(...opVal);
+            idx += opVal.length;
+            continue;
+          }
           switch (op) {
             case '$gt':
               conditions.push(`"${column}" > $${idx}`);
@@ -181,7 +211,8 @@ function buildFilterQuery(tableName, filters, sort, limit = 100) {
           }
         }
       } else {
-        // Simple equality
+        // Simple equality — redirect id→old_id if MongoDB ID detected
+        column = resolveIdColumn(column, value);
         conditions.push(`"${column}" = $${idx}`);
         values.push(value);
         idx++;
