@@ -7,8 +7,13 @@ const poolConfig = {
   max: 3,
 };
 
-// Enable SSL if the connection string indicates it
-if (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('sslmode')) {
+// Enable SSL for cloud-hosted PostgreSQL (Neon, Supabase, etc.)
+if (process.env.DATABASE_URL && (
+  process.env.DATABASE_URL.includes('sslmode') ||
+  process.env.DATABASE_URL.includes('.neon.tech') ||
+  process.env.DATABASE_URL.includes('.supabase.') ||
+  process.env.NODE_ENV === 'production'
+)) {
   poolConfig.ssl = {
     rejectUnauthorized: false,
   };
