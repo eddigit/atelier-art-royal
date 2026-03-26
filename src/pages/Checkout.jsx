@@ -115,7 +115,10 @@ export default function Checkout() {
           product_sku: product.sku || '',
           quantity: item.quantity,
           price: product.price,
-          total: product.price * item.quantity
+          total: product.price * item.quantity,
+          selected_size: item.selected_size || null,
+          selected_color: item.selected_color || null,
+          selected_material: item.selected_material || null,
         };
       });
 
@@ -612,12 +615,16 @@ export default function Checkout() {
                 {activeCartItems.map((item, idx) => {
                   const product = products[idx];
                   if (!product) return null;
+                  const variantParts = [item.selected_size, item.selected_color, item.selected_material].filter(Boolean);
                   return (
-                    <div key={item.id || item.product_id} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        {product.name} × {item.quantity}
-                      </span>
-                      <span className="font-medium">
+                    <div key={item.id || `${item.product_id}-${idx}`} className="flex justify-between text-sm">
+                      <div className="text-muted-foreground">
+                        <span>{product.name} x {item.quantity}</span>
+                        {variantParts.length > 0 && (
+                          <span className="block text-xs">{variantParts.join(' / ')}</span>
+                        )}
+                      </div>
+                      <span className="font-medium whitespace-nowrap ml-2">
                         {(product.price * item.quantity).toFixed(2)}€
                       </span>
                     </div>

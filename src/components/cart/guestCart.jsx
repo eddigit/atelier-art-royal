@@ -7,22 +7,32 @@ export const getGuestCart = () => {
   return cart ? JSON.parse(cart) : [];
 };
 
-export const addToGuestCart = (product, quantity = 1) => {
+export const addToGuestCart = (product, quantity = 1, variantInfo = {}) => {
   const cart = getGuestCart();
-  const existingIndex = cart.findIndex(item => item.product_id === product.id);
-  
+  // Match by product_id AND same variant selections
+  const existingIndex = cart.findIndex(item =>
+    item.product_id === product.id &&
+    (item.selected_size || null) === (variantInfo.selected_size || null) &&
+    (item.selected_color || null) === (variantInfo.selected_color || null) &&
+    (item.selected_material || null) === (variantInfo.selected_material || null)
+  );
+
   if (existingIndex >= 0) {
     cart[existingIndex].quantity += quantity;
   } else {
     cart.push({
       product_id: product.id,
       product_name: product.name,
+      product_sku: product.sku || '',
       quantity,
       price: product.price,
-      product_image: product.images?.[0]
+      product_image: product.images?.[0],
+      selected_size: variantInfo.selected_size || null,
+      selected_color: variantInfo.selected_color || null,
+      selected_material: variantInfo.selected_material || null,
     });
   }
-  
+
   localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
   return cart;
 };

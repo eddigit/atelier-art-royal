@@ -18,6 +18,9 @@ export default function ProductDetail() {
   const productId = urlParams.get('id');
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedMaterial, setSelectedMaterial] = useState('');
   const queryClient = useQueryClient();
 
   const { data: product, isLoading } = useQuery({
@@ -82,45 +85,66 @@ export default function ProductDetail() {
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
+      // Validate variant selection
+      if (product.sizes?.length > 0 && !selectedSize) {
+        throw new Error('Veuillez sélectionner une taille');
+      }
+      if (product.colors?.length > 0 && !selectedColor) {
+        throw new Error('Veuillez sélectionner une couleur');
+      }
+
+      const variantInfo = {
+        selected_size: selectedSize || null,
+        selected_color: selectedColor || null,
+        selected_material: selectedMaterial || null,
+      };
+
       try {
         const user = await base44.auth.me();
-        
+
         if (user) {
           const existingItems = await base44.entities.CartItem.filter({
             user_id: user.id,
             product_id: product.id
           });
 
-          if (existingItems.length > 0) {
-            await base44.entities.CartItem.update(existingItems[0].id, {
-              quantity: existingItems[0].quantity + quantity
+          // Check if same product with same variants exists
+          const matchingItem = existingItems.find(item =>
+            (item.selected_size || null) === variantInfo.selected_size &&
+            (item.selected_color || null) === variantInfo.selected_color &&
+            (item.selected_material || null) === variantInfo.selected_material
+          );
+
+          if (matchingItem) {
+            await base44.entities.CartItem.update(matchingItem.id, {
+              quantity: matchingItem.quantity + quantity
             });
           } else {
             await base44.entities.CartItem.create({
               user_id: user.id,
               product_id: product.id,
               quantity: quantity,
-              price: product.price
+              price: product.price,
+              ...variantInfo
             });
           }
         } else {
-          // Guest user - add to localStorage
-          addToGuestCart(product, quantity);
+          addToGuestCart(product, quantity, variantInfo);
         }
       } catch (error) {
-        // User not logged in - add to guest cart
-        addToGuestCart(product, quantity);
+        if (error.message?.includes('sélectionner')) throw error;
+        addToGuestCart(product, quantity, variantInfo);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['cart']);
       queryClient.invalidateQueries(['guest-cart']);
-      toast.success('✅ Produit ajouté au panier !');
-      setQuantity(1); // Reset quantity after adding
+      toast.success('Produit ajouté au panier !');
+      setQuantity(1);
     },
     onError: (error) => {
       console.error('Cart error:', error);
-      toast.error('Erreur lors de l\'ajout au panier');
+      toast.error(error.message || 'Erreur lors de l\'ajout au panier');
     }
   });
 
@@ -222,6 +246,13 @@ export default function ProductDetail() {
             )}
           </div>
 
+          {/* SKU */}
+          {product.sku && (
+            <p className="text-sm text-muted-foreground font-mono">
+              Réf. : {product.sku}
+            </p>
+          )}
+
           {/* Stock */}
           {product.stock_quantity > 0 ? (
             product.stock_quantity <= product.low_stock_threshold ? (
@@ -233,6 +264,74 @@ export default function ProductDetail() {
             )
           ) : (
             <p className="text-sm text-destructive">Rupture de stock</p>
+          )}
+
+          {/* Variant Selectors */}
+          {product.sizes?.length > 0 && (
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Taille <span className="text-destructive">*</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all ${
+                      selectedSize === size
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border hover:border-primary'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {product.colors?.length > 0 && (
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Couleur <span className="text-destructive">*</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {product.colors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all ${
+                      selectedColor === color
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border hover:border-primary'
+                    }`}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {product.materials?.length > 0 && (
+            <div>
+              <label className="text-sm font-medium mb-2 block">Matière</label>
+              <div className="flex flex-wrap gap-2">
+                {product.materials.map((material) => (
+                  <button
+                    key={material}
+                    onClick={() => setSelectedMaterial(material)}
+                    className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all ${
+                      selectedMaterial === material
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border hover:border-primary'
+                    }`}
+                  >
+                    {material}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* Add to Cart */}

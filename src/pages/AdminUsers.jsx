@@ -14,8 +14,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
-
 function getAuthHeaders() {
   const token = localStorage.getItem('auth_token');
   return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : {};
@@ -25,13 +23,13 @@ async function fetchUsers(search, role) {
   const params = new URLSearchParams();
   if (search) params.set('search', search);
   if (role && role !== 'all') params.set('role', role);
-  const res = await fetch(`${API_URL}/api/auth/admin-users?${params}`, { headers: getAuthHeaders() });
+  const res = await fetch(`/api/auth/admin-users?${params}`, { headers: getAuthHeaders() });
   if (!res.ok) throw new Error('Failed to fetch users');
   return res.json();
 }
 
 async function createUser(data) {
-  const res = await fetch(`${API_URL}/api/auth/admin-users`, {
+  const res = await fetch(`/api/auth/admin-users`, {
     method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(data)
   });
   const json = await res.json();
@@ -40,7 +38,7 @@ async function createUser(data) {
 }
 
 async function updateUser(id, data) {
-  const res = await fetch(`${API_URL}/api/auth/admin-users?id=${id}`, {
+  const res = await fetch(`/api/auth/admin-users?id=${id}`, {
     method: 'PUT', headers: getAuthHeaders(), body: JSON.stringify(data)
   });
   const json = await res.json();
@@ -49,7 +47,7 @@ async function updateUser(id, data) {
 }
 
 async function disableUser(id) {
-  const res = await fetch(`${API_URL}/api/auth/admin-users?id=${id}`, {
+  const res = await fetch(`/api/auth/admin-users?id=${id}`, {
     method: 'DELETE', headers: getAuthHeaders()
   });
   const json = await res.json();

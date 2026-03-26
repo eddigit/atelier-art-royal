@@ -170,12 +170,23 @@ export default function OrderConfirmation() {
             <div className="pt-4 border-t">
               <h3 className="font-semibold mb-3">Articles commandés</h3>
               <div className="space-y-2">
-                {order.items.map((item, idx) => (
-                  <div key={idx} className="flex justify-between text-sm">
-                    <span>{item.product_name} × {item.quantity}</span>
-                    <span className="font-medium">{item.total.toFixed(2)}€</span>
-                  </div>
-                ))}
+                {order.items.map((item, idx) => {
+                  const variants = [item.selected_size, item.selected_color, item.selected_material].filter(Boolean);
+                  return (
+                    <div key={idx} className="flex justify-between text-sm">
+                      <div>
+                        <span>{item.product_name} x {item.quantity}</span>
+                        {item.product_sku && (
+                          <span className="text-xs text-muted-foreground ml-2 font-mono">({item.product_sku})</span>
+                        )}
+                        {variants.length > 0 && (
+                          <p className="text-xs text-muted-foreground">{variants.join(' / ')}</p>
+                        )}
+                      </div>
+                      <span className="font-medium">{item.total.toFixed(2)}€</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
