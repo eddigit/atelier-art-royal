@@ -133,7 +133,8 @@ export const base44 = {
     async me() {
       const token = localStorage.getItem('auth_token');
       if (!token) return null;
-      const response = await fetch(`${API_URL}/api/auth/me`, {
+      // Auth calls go to Vercel serverless functions (same origin), not VPS
+      const response = await fetch(`/api/auth/me`, {
         headers: { ...getAuthHeaders() }
       });
       if (!response.ok) {
@@ -152,14 +153,14 @@ export const base44 = {
     },
 
     async login(email, password) {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await fetch(`/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({ message: 'Login failed' }));
-        throw new Error(error.message || 'Login failed');
+        throw new Error(error.error || error.message || 'Login failed');
       }
       const data = await response.json();
       localStorage.setItem('auth_token', data.token);
@@ -167,14 +168,14 @@ export const base44 = {
     },
 
     async register(email, password, fullName) {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      const response = await fetch(`/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, full_name: fullName })
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({ message: 'Registration failed' }));
-        throw new Error(error.message || 'Registration failed');
+        throw new Error(error.error || error.message || 'Registration failed');
       }
       const data = await response.json();
       localStorage.setItem('auth_token', data.token);
@@ -188,14 +189,14 @@ export const base44 = {
 
     // Update current user profile
     async updateMe(data) {
-      const response = await fetch(`${API_URL}/api/auth/me`, {
+      const response = await fetch(`/api/auth/me`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify(data)
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({ message: 'Update failed' }));
-        throw new Error(error.message || 'Update failed');
+        throw new Error(error.error || error.message || 'Update failed');
       }
       return await response.json();
     }
