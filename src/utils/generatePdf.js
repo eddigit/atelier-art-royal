@@ -57,7 +57,7 @@ export function generateOrderPdf(order, customer, docType = 'auto') {
 
   // Logo (854x124 ratio → ~80x12)
   try {
-    doc.addImage(LOGO_BASE64, 'PNG', ml, y, 80, 12);
+    doc.addImage(LOGO_BASE64, 'JPEG', ml, y, 80, 12);
   } catch {
     // Fallback text if image fails
     doc.setFontSize(16);
