@@ -8,11 +8,14 @@ import { ShoppingCart, Star, Eye, Heart } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import QuickViewModal from './QuickViewModal';
 
 export default function ProductCard({ product }) {
   const [showQuickView, setShowQuickView] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const hasVariants = (product.sizes?.length > 0) || (product.colors?.length > 0);
 
   const { data: user } = useQuery({
     queryKey: ['current-user'],
@@ -211,13 +214,27 @@ export default function ProductCard({ product }) {
             className="rounded-full bg-primary hover:bg-primary/90"
             onClick={(e) => {
               e.preventDefault();
-              addToCartMutation.mutate();
+              if (hasVariants) {
+                navigate(createPageUrl('ProductDetail') + `?id=${product.id}`);
+              } else {
+                addToCartMutation.mutate();
+              }
             }}
             disabled={product.stock_quantity <= 0 || addToCartMutation.isPending}
+            title={hasVariants ? 'Choisir les options' : 'Ajouter au panier'}
           >
             <ShoppingCart className="w-4 h-4" />
           </Button>
         </div>
+
+        {product.sizes?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {product.sizes.slice(0, 5).map(size => (
+              <span key={size} className="text-xs bg-muted px-1.5 py-0.5 rounded">{size}</span>
+            ))}
+            {product.sizes.length > 5 && <span className="text-xs text-muted-foreground">+{product.sizes.length - 5}</span>}
+          </div>
+        )}
 
         {product.stock_quantity > 0 && product.stock_quantity <= product.low_stock_threshold && (
           <p className="text-xs text-destructive mt-2">

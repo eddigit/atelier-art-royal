@@ -24,7 +24,7 @@ async function createSumupCheckout(req, res) {
     currency: 'EUR',
     merchant_code: SUMUP_MERCHANT_CODE,
     description: description || 'Atelier Art Royal - Commande',
-    redirect_url: `https://artroyal.fr/OrderConfirmation?order=${reference}`,
+    redirect_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://artroyal.fr'}/OrderConfirmation?order=${reference}`,
     hosted_checkout: { enabled: true },
   };
 

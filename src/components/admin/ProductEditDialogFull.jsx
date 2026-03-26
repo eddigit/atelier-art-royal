@@ -21,14 +21,14 @@ import {
 export default function ProductEditDialogFull({ product, open, onClose, onSaved }) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState(() => ({
-    sizes: [],
-    colors: [],
-    materials: [],
-    rite_ids: [],
-    obedience_ids: [],
-    degree_order_ids: [],
-    category_ids: [],
-    ...product
+    ...product,
+    sizes: Array.isArray(product?.sizes) ? product.sizes : [],
+    colors: Array.isArray(product?.colors) ? product.colors : [],
+    materials: Array.isArray(product?.materials) ? product.materials : [],
+    rite_ids: Array.isArray(product?.rite_ids) ? product.rite_ids : [],
+    obedience_ids: Array.isArray(product?.obedience_ids) ? product.obedience_ids : [],
+    degree_order_ids: Array.isArray(product?.degree_order_ids) ? product.degree_order_ids : [],
+    category_ids: Array.isArray(product?.category_ids) ? product.category_ids : [],
   }));
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -731,7 +731,7 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
                 value={newSize}
                 onChange={(e) => setNewSize(e.target.value)}
                 placeholder="Ex: S, M, L, 42, 44..."
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSize())}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSize(); } }}
               />
               <Button type="button" onClick={addSize} variant="outline">
                 <Plus className="w-4 h-4" />
@@ -758,7 +758,7 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
                 value={newColor}
                 onChange={(e) => setNewColor(e.target.value)}
                 placeholder="Ex: Or, Argent, Noir..."
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addColor())}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addColor(); } }}
               />
               <Button type="button" onClick={addColor} variant="outline">
                 <Plus className="w-4 h-4" />
@@ -785,7 +785,7 @@ export default function ProductEditDialogFull({ product, open, onClose, onSaved 
                 value={newMaterial}
                 onChange={(e) => setNewMaterial(e.target.value)}
                 placeholder="Ex: Soie, Velours, Coton..."
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addMaterial())}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addMaterial(); } }}
               />
               <Button type="button" onClick={addMaterial} variant="outline">
                 <Plus className="w-4 h-4" />

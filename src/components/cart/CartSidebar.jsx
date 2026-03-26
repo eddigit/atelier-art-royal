@@ -146,6 +146,19 @@ export default function CartSidebar({ open, onClose }) {
                         <h4 className="font-semibold text-sm mb-1 line-clamp-2">
                           {product.name}
                         </h4>
+                        {(item.selected_size || item.selected_color || item.selected_material) && (
+                          <div className="flex flex-wrap gap-1 mb-1">
+                            {item.selected_size && (
+                              <span className="text-xs bg-muted px-1.5 py-0.5 rounded">Taille: {item.selected_size}</span>
+                            )}
+                            {item.selected_color && (
+                              <span className="text-xs bg-muted px-1.5 py-0.5 rounded">Couleur: {item.selected_color}</span>
+                            )}
+                            {item.selected_material && (
+                              <span className="text-xs bg-muted px-1.5 py-0.5 rounded">Matière: {item.selected_material}</span>
+                            )}
+                          </div>
+                        )}
                         <p className="text-sm font-bold text-primary mb-3">
                           {product.price.toFixed(2)}€
                         </p>

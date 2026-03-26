@@ -21,6 +21,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { downloadOrderPdf } from '@/utils/generatePdf';
 
 const statusConfig = {
   pending: { label: 'Commande reçue', color: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' },
@@ -100,20 +101,16 @@ export default function AdminOrders() {
   });
 
   const generateInvoiceMutation = useMutation({
-    mutationFn: async (orderId) => {
-      const { data } = await base44.functions.invoke('generateInvoice', { orderId });
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `facture-${orderId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      a.remove();
+    mutationFn: async (order) => {
+      const customer = customers.find(c => c.id === order.customer_id);
+      downloadOrderPdf(order, customer);
     },
     onSuccess: () => {
-      toast.success('Facture générée');
+      toast.success('Document PDF généré');
+    },
+    onError: (error) => {
+      console.error('PDF generation error:', error);
+      toast.error('Erreur lors de la génération du PDF');
     }
   });
 
@@ -259,7 +256,6 @@ export default function AdminOrders() {
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                       <p>Date: {format(new Date(order.created_date), 'dd/MM/yyyy', { locale: fr })}</p>
-                      <p>Articles: {order.items?.length || 0}</p>
                       <p>
                         Client:{' '}
                         {order.customer_id && !order.customer_id.startsWith('guest_') ? (
@@ -270,15 +266,36 @@ export default function AdminOrders() {
                           <span>{order.shipping_address?.name || 'Client Invité'}</span>
                         )}
                       </p>
-                      <p className="font-bold text-primary">Total: {order.total?.toFixed(2)}€</p>
+                      <div className="col-span-2">
+                        <p className="font-medium text-foreground mb-1">
+                          {order.items?.length || 0} article{(order.items?.length || 0) > 1 ? 's' : ''} :
+                        </p>
+                        <ul className="space-y-0.5">
+                          {order.items?.slice(0, 3).map((item, idx) => {
+                            const variants = [item.selected_size, item.selected_color].filter(Boolean).join(' / ');
+                            return (
+                              <li key={idx} className="text-xs">
+                                {item.quantity}x {item.product_name}
+                                {item.product_sku && <span className="font-mono text-primary ml-1">({item.product_sku})</span>}
+                                {variants && <span className="ml-1">- {variants}</span>}
+                              </li>
+                            );
+                          })}
+                          {(order.items?.length || 0) > 3 && (
+                            <li className="text-xs italic">+{order.items.length - 3} autre(s)...</li>
+                          )}
+                        </ul>
+                      </div>
+                      <p className="font-bold text-primary col-span-2">Total: {order.total?.toFixed(2)}€</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => generateInvoiceMutation.mutate(order.id)}
+                      onClick={() => generateInvoiceMutation.mutate(order)}
                       disabled={generateInvoiceMutation.isPending}
+                      title={order.payment_status === 'paid' ? 'Télécharger la facture' : 'Télécharger le bon de commande'}
                     >
                       <Download className="w-4 h-4" />
                     </Button>
@@ -453,22 +470,34 @@ export default function AdminOrders() {
                     </div>
                   )}
                   <div className="space-y-3">
-                    {selectedOrder.items?.map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-sm">
-                        <div>
-                          <p className="font-medium">{item.product_name}</p>
-                          {item.product_sku && (
-                            <p className="text-xs text-primary font-mono font-semibold">
-                              SKU: {item.product_sku}
+                    {selectedOrder.items?.map((item, idx) => {
+                      const variantParts = [
+                        item.selected_size && `Taille: ${item.selected_size}`,
+                        item.selected_color && `Couleur: ${item.selected_color}`,
+                        item.selected_material && `Matière: ${item.selected_material}`
+                      ].filter(Boolean);
+                      return (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <div>
+                            <p className="font-medium">{item.product_name}</p>
+                            {item.product_sku && (
+                              <p className="text-xs text-primary font-mono font-semibold">
+                                Réf: {item.product_sku}
+                              </p>
+                            )}
+                            {variantParts.length > 0 && (
+                              <p className="text-xs text-muted-foreground">
+                                {variantParts.join(' • ')}
+                              </p>
+                            )}
+                            <p className="text-muted-foreground">
+                              {item.quantity} x {item.price?.toFixed(2)}€
                             </p>
-                          )}
-                          <p className="text-muted-foreground">
-                            {item.quantity} × {item.price?.toFixed(2)}€
-                          </p>
+                          </div>
+                          <p className="font-bold">{item.total?.toFixed(2)}€</p>
                         </div>
-                        <p className="font-bold">{item.total?.toFixed(2)}€</p>
-                      </div>
-                    ))}
+                      );
+                    })}
                     <div className="border-t border-border pt-3 flex justify-between font-bold">
                       <span>Total</span>
                       <span className="text-primary">{selectedOrder.total?.toFixed(2)}€</span>

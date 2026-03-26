@@ -106,7 +106,8 @@ export const base44 = {
 
   functions: {
     async invoke(functionName, payload) {
-      const response = await fetch(`${API_URL}/api/functions/${functionName}`, {
+      // Functions always call Vercel endpoints (not VPS) since they need Vercel env vars
+      const response = await fetch(`/api/functions/${functionName}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify(payload)
