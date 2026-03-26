@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp, ClipboardList, Grid, Briefcase, MessageCircle, Download, Key, BookOpen } from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Package, Users, Factory, ShoppingCart, Award, Warehouse, Star, Sparkles, Building2, GraduationCap, Home, TrendingUp, ClipboardList, Grid, Briefcase, MessageCircle, Download, Key, BookOpen, UserCog } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCustomers from './AdminCustomers';
@@ -25,6 +25,7 @@ import AdminExport from './AdminExport';
 import AdminSecrets from './AdminSecrets';
 import AdminDocumentation from './AdminDocumentation';
 import AdminProductRelations from './AdminProductRelations';
+import AdminUsers from './AdminUsers';
 
 export default function AdminPanel() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -92,6 +93,10 @@ export default function AdminPanel() {
           <TabsTrigger value="customers" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Users className="w-5 h-5" />
             <span className="text-xs font-medium">Clients</span>
+          </TabsTrigger>
+          <TabsTrigger value="users" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <UserCog className="w-5 h-5" />
+            <span className="text-xs font-medium">Utilisateurs</span>
           </TabsTrigger>
           <TabsTrigger value="leads" className="flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-none border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Users className="w-5 h-5" />
@@ -181,6 +186,10 @@ export default function AdminPanel() {
 
         <TabsContent value="customers" className="space-y-4">
           <AdminCustomers />
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-4">
+          <AdminUsers />
         </TabsContent>
 
         <TabsContent value="leads" className="space-y-4">
