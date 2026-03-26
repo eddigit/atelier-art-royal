@@ -1,5 +1,9 @@
 import pg from 'pg';
-const { Pool } = pg;
+const { Pool, types } = pg;
+
+// PostgreSQL returns DECIMAL/NUMERIC (OID 1700) as strings.
+// Parse them as JavaScript floats so .toFixed() works in the frontend.
+types.setTypeParser(1700, (val) => parseFloat(val));
 
 const poolConfig = {
   connectionString: process.env.DATABASE_URL,
