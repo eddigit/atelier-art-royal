@@ -180,8 +180,8 @@ export function generateOrderPdf(order, customer, docType = 'auto') {
     doc.setFont('helvetica', 'normal');
     doc.text(sanitize(item.product_sku || '-'), 95, y);
     doc.text(String(item.quantity || 1), 120, y, { align: 'center' });
-    doc.text(sanitize(`${(item.price || 0).toFixed(2)} \u20ac`), 148, y, { align: 'center' });
-    doc.text(sanitize(`${(item.total || 0).toFixed(2)} \u20ac`), 185, y, { align: 'right' });
+    doc.text(sanitize(`${Number(item.price || 0).toFixed(2)} \u20ac`), 148, y, { align: 'center' });
+    doc.text(sanitize(`${Number(item.total || 0).toFixed(2)} \u20ac`), 185, y, { align: 'right' });
 
     y += variants.length > 0 ? 14 : 10;
   });
@@ -197,16 +197,16 @@ export function generateOrderPdf(order, customer, docType = 'auto') {
   doc.setTextColor(...dark);
 
   doc.text('Sous-total HT:', 130, y);
-  const subtotalHT = ((order.subtotal || order.total || 0) / 1.20);
+  const subtotalHT = (Number(order.subtotal || order.total || 0) / 1.20);
   doc.text(sanitize(`${subtotalHT.toFixed(2)} \u20ac`), 185, y, { align: 'right' });
   y += 7;
 
   doc.text('Frais de livraison:', 130, y);
-  doc.text(sanitize(`${(order.shipping_cost || 0).toFixed(2)} \u20ac`), 185, y, { align: 'right' });
+  doc.text(sanitize(`${Number(order.shipping_cost || 0).toFixed(2)} \u20ac`), 185, y, { align: 'right' });
   y += 7;
 
   doc.text('TVA (20%):', 130, y);
-  const tva = (order.total || 0) - subtotalHT - (order.shipping_cost || 0);
+  const tva = Number(order.total || 0) - subtotalHT - Number(order.shipping_cost || 0);
   doc.text(sanitize(`${Math.max(0, tva).toFixed(2)} \u20ac`), 185, y, { align: 'right' });
   y += 10;
 
@@ -219,7 +219,7 @@ export function generateOrderPdf(order, customer, docType = 'auto') {
   doc.setTextColor(255, 255, 255);
   doc.text('TOTAL TTC:', 130, y + 3);
   doc.setFontSize(13);
-  doc.text(sanitize(`${(order.total || 0).toFixed(2)} \u20ac`), 185, y + 3, { align: 'right' });
+  doc.text(sanitize(`${Number(order.total || 0).toFixed(2)} \u20ac`), 185, y + 3, { align: 'right' });
 
   // ── Payment status note ──
   if (!isPaid) {
