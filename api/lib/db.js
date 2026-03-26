@@ -1,5 +1,9 @@
 import pg from 'pg';
-const { Pool } = pg;
+const { Pool, types } = pg;
+
+// PostgreSQL returns DECIMAL/NUMERIC (OID 1700) as strings.
+// Parse them as JavaScript floats so .toFixed() works in the frontend.
+types.setTypeParser(1700, (val) => parseFloat(val));
 
 const poolConfig = {
   connectionString: process.env.DATABASE_URL,
@@ -7,8 +11,13 @@ const poolConfig = {
   max: 3,
 };
 
-// Enable SSL if the connection string indicates it
-if (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('sslmode')) {
+// Enable SSL for cloud-hosted PostgreSQL (Neon, Supabase, etc.)
+if (process.env.DATABASE_URL && (
+  process.env.DATABASE_URL.includes('sslmode') ||
+  process.env.DATABASE_URL.includes('.neon.tech') ||
+  process.env.DATABASE_URL.includes('.supabase.') ||
+  process.env.NODE_ENV === 'production'
+)) {
   poolConfig.ssl = {
     rejectUnauthorized: false,
   };
