@@ -45,10 +45,10 @@ export default function FeaturedRites() {
               >
                 <Button
                   variant="outline"
-                  className="w-full h-12 px-4 justify-start group hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                  className="w-full min-h-12 h-auto px-4 py-2 justify-start group hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all whitespace-normal text-left"
                 >
-                  <Award className="w-4 h-4 mr-2 text-primary group-hover:text-primary-foreground" />
-                  <span className="font-semibold text-sm truncate">{rite.name}</span>
+                  <Award className="w-4 h-4 mr-2 shrink-0 text-primary group-hover:text-primary-foreground" />
+                  <span className="font-semibold text-sm">{rite.name}</span>
                 </Button>
               </Link>
             ))

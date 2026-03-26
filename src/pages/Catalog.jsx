@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Filters from '@/components/catalog/Filters';
@@ -27,6 +28,7 @@ export default function Catalog() {
     inStockOnly: false
   });
   const [sortBy, setSortBy] = useState('-created_date');
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // SEO Meta Tags
   React.useEffect(() => {
@@ -45,90 +47,49 @@ export default function Catalog() {
     };
   }, []);
 
-  // Read URL params and apply filters on mount and navigation
+  // Sync filters from URL search params (reactive via react-router)
   useEffect(() => {
-    const syncFiltersFromUrl = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      
-      // Si aucun paramètre URL, on reset tout
-      if (urlParams.toString() === '') {
-        setFilters({
-          rite: '',
-          obedience: '',
-          degreeOrder: '',
-          logeType: '',
-          category: '',
-          search: '',
-          minPrice: '',
-          maxPrice: '',
-          size: 'all',
-          color: 'all',
-          material: 'all',
-          showPromotions: false,
-          showNew: false,
-          inStockOnly: false
-        });
-      } else {
-        // Sinon on applique les paramètres de l'URL
-        setFilters({
-          rite: urlParams.get('rite') || '',
-          obedience: urlParams.get('obedience') || '',
-          degreeOrder: urlParams.get('degreeOrder') || '',
-          logeType: urlParams.get('logeType') || '',
-          category: urlParams.get('category') || '',
-          search: urlParams.get('search') || '',
-          minPrice: urlParams.get('minPrice') || '',
-          maxPrice: urlParams.get('maxPrice') || '',
-          size: urlParams.get('size') || 'all',
-          color: urlParams.get('color') || 'all',
-          material: urlParams.get('material') || 'all',
-          showPromotions: urlParams.get('showPromotions') === 'true',
-          showNew: urlParams.get('showNew') === 'true',
-          inStockOnly: urlParams.get('inStockOnly') === 'true'
-        });
-      }
-    };
-
-    // Initial sync
-    syncFiltersFromUrl();
-
-    // Listen for popstate (back/forward navigation)
-    window.addEventListener('popstate', syncFiltersFromUrl);
-
-    // Listen for custom urlchange event (from layout links)
-    window.addEventListener('urlchange', syncFiltersFromUrl);
-
-    return () => {
-      window.removeEventListener('popstate', syncFiltersFromUrl);
-      window.removeEventListener('urlchange', syncFiltersFromUrl);
-    };
-  }, []);
-
-  // Update URL when filters change (but don't create a new history entry)
-  useEffect(() => {
-    const params = new URLSearchParams();
-    
-    if (filters.rite) params.set('rite', filters.rite);
-    if (filters.obedience) params.set('obedience', filters.obedience);
-    if (filters.degreeOrder) params.set('degreeOrder', filters.degreeOrder);
-    if (filters.logeType) params.set('logeType', filters.logeType);
-    if (filters.category) params.set('category', filters.category);
-    if (filters.search) params.set('search', filters.search);
-    if (filters.minPrice) params.set('minPrice', filters.minPrice);
-    if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
-    if (filters.size && filters.size !== 'all') params.set('size', filters.size);
-    if (filters.color && filters.color !== 'all') params.set('color', filters.color);
-    if (filters.material && filters.material !== 'all') params.set('material', filters.material);
-    if (filters.showPromotions) params.set('showPromotions', 'true');
-    if (filters.showNew) params.set('showNew', 'true');
-    if (filters.inStockOnly) params.set('inStockOnly', 'true');
-    
-    const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
-    
-    // Only update if URL actually changed to avoid infinite loops
-    if (window.location.pathname + window.location.search !== newUrl) {
-      window.history.replaceState({}, '', newUrl);
+    if (searchParams.toString() === '') {
+      setFilters({
+        rite: '',
+        obedience: '',
+        degreeOrder: '',
+        logeType: '',
+        category: '',
+        search: '',
+        minPrice: '',
+        maxPrice: '',
+        size: 'all',
+        color: 'all',
+        material: 'all',
+        showPromotions: false,
+        showNew: false,
+        inStockOnly: false
+      });
+    } else {
+      setFilters({
+        rite: searchParams.get('rite') || '',
+        obedience: searchParams.get('obedience') || '',
+        degreeOrder: searchParams.get('degreeOrder') || '',
+        logeType: searchParams.get('logeType') || '',
+        category: searchParams.get('category') || '',
+        search: searchParams.get('search') || '',
+        minPrice: searchParams.get('minPrice') || '',
+        maxPrice: searchParams.get('maxPrice') || '',
+        size: searchParams.get('size') || 'all',
+        color: searchParams.get('color') || 'all',
+        material: searchParams.get('material') || 'all',
+        showPromotions: searchParams.get('showPromotions') === 'true',
+        showNew: searchParams.get('showNew') === 'true',
+        inStockOnly: searchParams.get('inStockOnly') === 'true'
+      });
     }
+  }, [searchParams]);
+
+  // Update URL when filters change internally (not from URL navigation)
+  const filtersRef = React.useRef(filters);
+  useEffect(() => {
+    filtersRef.current = filters;
   }, [filters]);
 
   const { data: allDegreeOrders = [] } = useQuery({
@@ -178,11 +139,12 @@ export default function Catalog() {
           ? product.category_ids 
           : (product.category_id ? [product.category_id] : []);
         
-        // Filtres sur les relations
-        if (filters.rite && !riteIds.includes(filters.rite)) return false;
-        if (filters.obedience && !obedienceIds.includes(filters.obedience)) return false;
-        if (filters.degreeOrder && !degreeIds.includes(filters.degreeOrder)) return false;
-        if (filters.category && !categoryIds.includes(filters.category)) return false;
+        // Filtres sur les relations (coerce to string for comparison since URL params are strings)
+        const matchesId = (ids, filterVal) => ids.some(id => String(id) === String(filterVal));
+        if (filters.rite && !matchesId(riteIds, filters.rite)) return false;
+        if (filters.obedience && !matchesId(obedienceIds, filters.obedience)) return false;
+        if (filters.degreeOrder && !matchesId(degreeIds, filters.degreeOrder)) return false;
+        if (filters.category && !matchesId(categoryIds, filters.category)) return false;
         // Filtre Type de Loge (indirect via DegreeOrder)
         if (filters.logeType) {
           if (degreeIds.length === 0) return false;
@@ -282,9 +244,9 @@ export default function Catalog() {
   };
 
   const handleResetFilters = () => {
-    // Clear URL
-    window.history.pushState({}, '', window.location.pathname);
-    
+    // Clear URL params via react-router
+    setSearchParams({});
+
     // Clear filters
     setFilters({
       rite: '',

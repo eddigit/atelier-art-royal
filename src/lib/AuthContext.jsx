@@ -33,12 +33,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Auth check failed:', error);
       setIsAuthenticated(false);
-      if (error.status === 401 || error.status === 403) {
-        setAuthError({
-          type: 'auth_required',
-          message: 'Authentication required'
-        });
-      }
+      localStorage.removeItem('auth_token');
     } finally {
       setIsLoadingAuth(false);
     }
@@ -64,19 +59,17 @@ export const AuthProvider = ({ children }) => {
     return newUser;
   };
 
-  const logout = (shouldRedirect = true) => {
+  const logout = () => {
+    localStorage.removeItem('auth_token');
     setUser(null);
     setIsAuthenticated(false);
-
-    if (shouldRedirect) {
-      base44.auth.logout(window.location.href);
-    } else {
-      base44.auth.logout();
-    }
+    setAuthError(null);
+    window.location.href = '/';
   };
 
-  const navigateToLogin = () => {
-    base44.auth.redirectToLogin(window.location.href);
+  const navigateToLogin = (returnUrl) => {
+    const url = returnUrl || window.location.href;
+    window.location.href = `/Login?returnUrl=${encodeURIComponent(url)}`;
   };
 
   return (

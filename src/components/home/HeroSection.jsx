@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Sparkles, Loader2 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function HeroSection() {
-  const [isSearching, setIsSearching] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
     const searchQuery = e.target.search.value.trim();
 
@@ -19,7 +17,6 @@ export default function HeroSection() {
       return;
     }
 
-    // Liste des mots à ignorer (stop words français)
     const stopWords = [
       'je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles',
       'cherche', 'recherche', 'veux', 'voudrais', 'aimerais',
@@ -28,19 +25,17 @@ export default function HeroSection() {
       'besoin', 'faut', 'avoir', 'être', 'trouver', 'ai', 'as', 'a'
     ];
 
-    // Extraire uniquement les mots pertinents
     const keywords = searchQuery
       .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlever accents
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .split(/\s+/)
       .filter(word => word.length > 2 && !stopWords.includes(word))
       .join(' ');
 
-    // Redirection avec mots-clés nettoyés
     if (keywords) {
-      window.location.href = createPageUrl('Catalog') + '?search=' + encodeURIComponent(keywords);
+      navigate(`/Catalog?search=${encodeURIComponent(keywords)}`);
     } else {
-      window.location.href = createPageUrl('Catalog');
+      navigate('/Catalog');
     }
   };
 
@@ -74,43 +69,32 @@ export default function HeroSection() {
               <div className="w-1.5 h-5 bg-white border-x border-gray-200"></div>
               <div className="w-1.5 h-5 bg-red-600 rounded-r"></div>
             </div>
-            <span className="text-xs font-bold text-gray-900 uppercase tracking-wide">Sur-Mesure • Made in France</span>
+            <span className="text-xs font-bold text-gray-900 uppercase tracking-wide">Sur-Mesure - Made in France</span>
           </div>
         </div>
-        
+
         <h1 className="text-hero text-white mb-6" style={{ textShadow: '0 3px 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6)' }}>
           Atelier Art Royal
         </h1>
-        
+
         <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-10 leading-relaxed" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.5)' }}>
           Création d'exception pour tous les Rites et Grades.<br />
           L'élégance au service de la Tradition.
         </p>
 
-        {/* AI-Powered Search */}
+        {/* Search */}
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
           <div className="relative group">
-            {isSearching ?
-            <Loader2 className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-primary animate-spin z-10" /> :
-
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-hover:text-primary group-focus-within:text-primary transition-colors z-10" />
-            }
             <Input
               type="text"
               name="search"
-              placeholder="Ex: tablier REAA maître, sautoir 18ème degré GLNF, bijoux apprenti..."
-              disabled={isSearching}
-              className="h-16 pl-16 pr-32 text-lg bg-black/60 hover:bg-black/80 focus:bg-black/90 text-white placeholder:text-gray-300 border-2 border-white/20 hover:border-primary/50 focus:border-primary transition-all rounded-full backdrop-blur-sm disabled:opacity-70" />
-
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/20 text-primary text-xs font-medium">
-                <Sparkles className="w-3 h-3" />
-                {isSearching ? 'Analyse...' : 'Recherche IA'}
-              </div>
-            </div>
+              placeholder="Ex: tablier REAA maître, sautoir 18ème degré, bijoux apprenti..."
+              className="h-16 pl-16 pr-6 text-lg bg-black/60 hover:bg-black/80 focus:bg-black/90 text-white placeholder:text-gray-300 border-2 border-white/20 hover:border-primary/50 focus:border-primary transition-all rounded-full backdrop-blur-sm"
+            />
           </div>
           <p className="text-sm text-white mt-3 text-center" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
-            Décrivez ce que vous cherchez en langage naturel
+            Rechercher un produit par mot-clé
           </p>
         </form>
 
@@ -126,10 +110,10 @@ export default function HeroSection() {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-primary" />
-            Support 24/7
+            Support dédié
           </div>
         </div>
       </div>
-    </section>);
-
+    </section>
+  );
 }

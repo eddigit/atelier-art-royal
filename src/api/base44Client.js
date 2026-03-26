@@ -142,11 +142,8 @@ export const base44 = {
       return await response.json();
     },
 
-    logout(redirectUrl) {
+    logout() {
       localStorage.removeItem('auth_token');
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      }
     },
 
     redirectToLogin(returnUrl) {

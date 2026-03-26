@@ -32,21 +32,9 @@ export default function ProductCard({ product }) {
 
   const isInWishlist = wishlistItems.some(item => item.product_id === product.id);
 
-  const { data: reviews = [] } = useQuery({
-    queryKey: ['reviews-count', product.id],
-    queryFn: async () => {
-      const productReviews = await base44.entities.ProductReview.filter({
-        product_id: product.id,
-        is_approved: true
-      });
-      return productReviews;
-    },
-    initialData: []
-  });
-
-  const averageRating = reviews.length > 0
-    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-    : 0;
+  // Use product-level rating data if available (avoids N+1 queries)
+  const averageRating = product.average_rating || 0;
+  const reviewCount = product.review_count || 0;
   const primaryImage = product.images?.[0] || 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=2105';
   
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
@@ -188,13 +176,15 @@ export default function ProductCard({ product }) {
           </h3>
         </Link>
         
-        {reviews.length > 0 && (
+        {averageRating > 0 && (
           <div className="flex items-center gap-2 mb-2">
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 fill-primary text-primary" />
-              <span className="text-sm font-semibold">{averageRating}</span>
+              <span className="text-sm font-semibold">{Number(averageRating).toFixed(1)}</span>
             </div>
-            <span className="text-xs text-muted-foreground">({reviews.length})</span>
+            {reviewCount > 0 && (
+              <span className="text-xs text-muted-foreground">({reviewCount})</span>
+            )}
           </div>
         )}
 
