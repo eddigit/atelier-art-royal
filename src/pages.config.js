@@ -82,10 +82,12 @@ import Orders from './pages/Orders';
 import POS from './pages/POS';
 import ProductDetail from './pages/ProductDetail';
 import SavedCustomizations from './pages/SavedCustomizations';
-import Setup from './pages/Setup';
 import Sitemap from './pages/Sitemap';
 import Wishlist from './pages/Wishlist';
 import Login from "./pages/Login";
+import MentionsLegales from "./pages/MentionsLegales";
+import CGV from "./pages/CGV";
+import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import __Layout from './Layout.jsx';
 
 
@@ -125,10 +127,12 @@ export const PAGES = {
     "POS": POS,
     "ProductDetail": ProductDetail,
     "SavedCustomizations": SavedCustomizations,
-    "Setup": Setup,
     "Sitemap": Sitemap,
     "Wishlist": Wishlist,
     "Login": Login,
+    "MentionsLegales": MentionsLegales,
+    "CGV": CGV,
+    "PolitiqueConfidentialite": PolitiqueConfidentialite,
 }
 
 export const pagesConfig = {

@@ -11,7 +11,6 @@ import {
   X,
   LogOut,
   ChevronDown,
-  Package,
   Grid,
   Award,
   UserCircle,
@@ -21,8 +20,6 @@ import {
 } from 'lucide-react';
 import ChatWidget from '@/components/chat/ChatWidget';
 import CartSidebar from '@/components/cart/CartSidebar';
-import VisitorTracker from '@/components/analytics/VisitorTracker';
-import VisitorNotifier from '@/components/analytics/VisitorNotifier';
 import WelcomeOnboarding from '@/components/onboarding/WelcomeOnboarding';
 import SignUpBanner from '@/components/onboarding/SignUpBanner';
 import LoyaltyBadge from '@/components/loyalty/LoyaltyBadge';
@@ -35,13 +32,14 @@ import {
   DropdownMenuLabel
 } from '@/components/ui/dropdown-menu';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 
 export default function Layout({ children, currentPageName }) {
   const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartSidebarOpen, setCartSidebarOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, logout, isAuthenticated } = useAuth();
 
   const { data: cartItems = [] } = useQuery({
     queryKey: ['cart'],
@@ -145,12 +143,6 @@ export default function Layout({ children, currentPageName }) {
   }, [darkMode]);
 
   useEffect(() => {
-    base44.auth.me()
-      .then(u => setUser(u))
-      .catch(() => setUser(null));
-  }, []);
-
-  useEffect(() => {
     const handleOpenCart = () => {
       setCartSidebarOpen(true);
     };
@@ -236,10 +228,6 @@ export default function Layout({ children, currentPageName }) {
                           <Link 
                             to={createPageUrl('Catalog') + `?obedience=${obedience.id}`} 
                             className="cursor-pointer"
-                            onClick={() => {
-                              // Trigger custom event for same-page navigation
-                              setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
-                            }}
                           >
                             <Award className="w-4 h-4 mr-2" />
                             {obedience.name}
@@ -263,7 +251,6 @@ export default function Layout({ children, currentPageName }) {
                         <Link 
                           to={createPageUrl('Catalog') + `?logeType=Loge Symbolique`} 
                           className="cursor-pointer"
-                          onClick={() => setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0)}
                         >
                           <Award className="w-4 h-4 mr-2" />
                           Loge Symbolique (1er - 3ème degré)
@@ -273,7 +260,6 @@ export default function Layout({ children, currentPageName }) {
                         <Link 
                           to={createPageUrl('Catalog') + `?logeType=Loge Hauts Grades`} 
                           className="cursor-pointer"
-                          onClick={() => setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0)}
                         >
                           <Award className="w-4 h-4 mr-2" />
                           Loge Hauts Grades (4ème+ & Ordres)
@@ -297,7 +283,6 @@ export default function Layout({ children, currentPageName }) {
                           <Link 
                             to={createPageUrl('Catalog') + `?category=${category.id}`} 
                             className="cursor-pointer"
-                            onClick={() => setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0)}
                           >
                             <Grid className="w-4 h-4 mr-2" />
                             {category.name}
@@ -418,7 +403,7 @@ export default function Layout({ children, currentPageName }) {
                     )}
 
                         <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => base44.auth.logout()} className="cursor-pointer text-destructive">
+                    <DropdownMenuItem onClick={() => logout()} className="cursor-pointer text-destructive">
                       <LogOut className="w-4 h-4 mr-2" />
                       Déconnexion
                     </DropdownMenuItem>
@@ -428,10 +413,10 @@ export default function Layout({ children, currentPageName }) {
                 <Button
                   variant="default"
                   size="sm"
-                  onClick={() => base44.auth.redirectToLogin()}
+                  asChild
                   className="bg-primary hover:bg-primary/90"
                 >
-                  Connexion
+                  <Link to="/Login">Connexion</Link>
                 </Button>
               )}
 
@@ -463,51 +448,39 @@ export default function Layout({ children, currentPageName }) {
                   <>
                     <div className="text-xs text-muted-foreground font-semibold mt-2">Obédiences</div>
                     {obediences.map(obedience => (
-                      <Link 
+                      <Link
                         key={obedience.id}
                         to={createPageUrl('Catalog') + `?obedience=${obedience.id}`}
                         className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
-                        }}
+                        onClick={() => setMobileMenuOpen(false)}
                       >
                         {obedience.name}
                       </Link>
                     ))}
 
                     <div className="text-xs text-muted-foreground font-semibold mt-4">Type de Loge</div>
-                    <Link 
+                    <Link
                       to={createPageUrl('Catalog') + `?logeType=Loge Symbolique`}
                       className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
-                      }}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Loge Symbolique
                     </Link>
-                    <Link 
+                    <Link
                       to={createPageUrl('Catalog') + `?logeType=Loge Hauts Grades`}
                       className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
-                      }}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Loge Hauts Grades
                     </Link>
 
                     <div className="text-xs text-muted-foreground font-semibold mt-4">Catégories de Produits</div>
                     {categories.map(category => (
-                      <Link 
+                      <Link
                         key={category.id}
                         to={createPageUrl('Catalog') + `?category=${category.id}`}
                         className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          setTimeout(() => window.dispatchEvent(new Event('urlchange')), 0);
-                        }}
+                        onClick={() => setMobileMenuOpen(false)}
                       >
                         {category.name}
                       </Link>
@@ -567,18 +540,12 @@ export default function Layout({ children, currentPageName }) {
         {children}
       </main>
 
-      {/* Analytics Tracking */}
-      <VisitorTracker pageName={currentPageName} />
-
       {/* Chat Widget */}
       <ChatWidget />
 
       {/* Onboarding */}
       <WelcomeOnboarding />
       <SignUpBanner />
-
-      {/* Admin Visitor Notifications */}
-      {isAdmin && <VisitorNotifier />}
 
       {/* Cart Sidebar */}
       <CartSidebar open={cartSidebarOpen} onClose={() => setCartSidebarOpen(false)} />
@@ -637,19 +604,25 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           <div className="border-t border-border pt-6">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground mb-4">
+              <Link to="/MentionsLegales" className="hover:text-primary transition-colors">Mentions légales</Link>
+              <span>•</span>
+              <Link to="/CGV" className="hover:text-primary transition-colors">CGV</Link>
+              <span>•</span>
+              <Link to="/PolitiqueConfidentialite" className="hover:text-primary transition-colors">Politique de confidentialité</Link>
+              <span>•</span>
+              <Link to="/Contact" className="hover:text-primary transition-colors">Contact</Link>
+            </div>
             <div className="flex flex-col md:flex-row items-center justify-center gap-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <Link to={createPageUrl('Setup')}>
-                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-muted-foreground text-xs font-bold cursor-pointer hover:border-primary hover:text-primary transition-colors">©</span>
-                </Link>
-                <span>{new Date().getFullYear()} Atelier Art Royal</span>
+                <span>© {new Date().getFullYear()} Atelier Art Royal</span>
               </div>
               <span className="hidden md:inline">•</span>
               <span>
                 Design et E-commerce réalisé par{' '}
-                <a 
-                  href="https://coachdigitalparis.com" 
-                  target="_blank" 
+                <a
+                  href="https://coachdigitalparis.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold hover:text-primary transition-colors"
                 >
