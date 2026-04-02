@@ -28,20 +28,14 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      await base44.integrations.Core.SendEmail({
-        to: 'contact@artroyal.fr',
-        subject: `Nouveau message de ${formData.name}`,
-        body: `
-Nom: ${formData.name}
-Email: ${formData.email}
-Téléphone: ${formData.phone || 'Non renseigné'}
-
-Message:
-${formData.message}
-        `
+      await base44.functions.invoke('notifyLeadCreated', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
       });
 
-      toast.success('Message envoyé avec succès ! Nous vous répondrons rapidement.');
+      toast.success('Message envoyé avec succès ! Vous recevrez un accusé de réception par email.');
       setFormData({ name: '', email: '', phone: '', message: '' });
     } catch (error) {
       toast.error('Erreur lors de l\'envoi du message');

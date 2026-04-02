@@ -30,10 +30,15 @@ export default function Catalog() {
   const [sortBy, setSortBy] = useState('-created_date');
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // SEO Meta Tags
+  // SEO Meta Tags — dynamic based on active filter
   React.useEffect(() => {
-    document.title = 'Catalogue - Atelier Art Royal | Haute Couture Maçonnique';
-    
+    const search = filters.search;
+    const logeType = filters.logeType;
+    let title = 'Catalogue — Atelier Art Royal';
+    if (search) title = `Recherche "${search}" — Atelier Art Royal`;
+    else if (logeType) title = `${logeType} — Atelier Art Royal`;
+    document.title = title;
+
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
       metaDescription = document.createElement('meta');
@@ -41,11 +46,11 @@ export default function Catalog() {
       document.head.appendChild(metaDescription);
     }
     metaDescription.content = 'Découvrez notre collection de produits maçonniques d\'exception : tabliers, sautoirs, bijoux et accessoires de haute qualité, fabriqués en France.';
-    
+
     return () => {
       document.title = 'Atelier Art Royal';
     };
-  }, []);
+  }, [filters.search, filters.logeType]);
 
   // Sync filters from URL search params (reactive via react-router)
   useEffect(() => {

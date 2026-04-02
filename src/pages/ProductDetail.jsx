@@ -35,19 +35,41 @@ export default function ProductDetail() {
   // SEO Meta Tags
   React.useEffect(() => {
     if (product) {
-      document.title = `${product.name} - Atelier Art Royal`;
-      
-      let metaDescription = document.querySelector('meta[name="description"]');
-      if (!metaDescription) {
-        metaDescription = document.createElement('meta');
-        metaDescription.name = 'description';
-        document.head.appendChild(metaDescription);
-      }
-      metaDescription.content = product.short_description || product.description?.substring(0, 155) || `${product.name} - Haute couture maçonnique`;
+      document.title = `${product.name} — Atelier Art Royal`;
+
+      const desc = product.short_description || product.description?.substring(0, 155) || `${product.name} - Haute couture maçonnique`;
+      const image = product.images?.[0] || '';
+
+      const metaTags = {
+        'description': desc,
+        'og:title': `${product.name} — Atelier Art Royal`,
+        'og:description': desc,
+        'og:image': image,
+        'og:type': 'product',
+        'og:url': window.location.href,
+      };
+
+      Object.entries(metaTags).forEach(([key, value]) => {
+        if (!value) return;
+        const isOg = key.startsWith('og:');
+        const selector = isOg ? `meta[property="${key}"]` : `meta[name="${key}"]`;
+        let tag = document.querySelector(selector);
+        if (!tag) {
+          tag = document.createElement('meta');
+          if (isOg) tag.setAttribute('property', key);
+          else tag.setAttribute('name', key);
+          document.head.appendChild(tag);
+        }
+        tag.setAttribute('content', value);
+      });
     }
-    
+
     return () => {
       document.title = 'Atelier Art Royal';
+      ['og:title', 'og:description', 'og:image', 'og:type', 'og:url'].forEach(key => {
+        const tag = document.querySelector(`meta[property="${key}"]`);
+        if (tag) tag.remove();
+      });
     };
   }, [product]);
 

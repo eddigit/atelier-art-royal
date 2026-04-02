@@ -84,6 +84,8 @@ import ProductDetail from './pages/ProductDetail';
 import SavedCustomizations from './pages/SavedCustomizations';
 import Sitemap from './pages/Sitemap';
 import Wishlist from './pages/Wishlist';
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Login from "./pages/Login";
 import MentionsLegales from "./pages/MentionsLegales";
 import CGV from "./pages/CGV";
@@ -129,6 +131,8 @@ export const PAGES = {
     "SavedCustomizations": SavedCustomizations,
     "Sitemap": Sitemap,
     "Wishlist": Wishlist,
+    "ForgotPassword": ForgotPassword,
+    "ResetPassword": ResetPassword,
     "Login": Login,
     "MentionsLegales": MentionsLegales,
     "CGV": CGV,

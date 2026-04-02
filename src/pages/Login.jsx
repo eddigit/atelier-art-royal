@@ -151,6 +151,11 @@ export default function Login() {
                       </>
                     )}
                   </Button>
+                  <div className="text-center mt-2">
+                    <Link to="/ForgotPassword" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      Mot de passe oublié ?
+                    </Link>
+                  </div>
                 </form>
               </TabsContent>
 
