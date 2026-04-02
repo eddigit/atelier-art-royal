@@ -1,3 +1,5 @@
+import { sendEmail } from '../lib/ses.js';
+
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -11,8 +13,22 @@ function stub(name) {
   };
 }
 
+async function handleSendEmail(req, res) {
+  const { to, subject, body, html } = req.body;
+  if (!to || !subject) return res.status(400).json({ error: 'to and subject required' });
+
+  const result = await sendEmail({
+    to,
+    subject,
+    bodyHtml: html || undefined,
+    bodyText: body || undefined,
+  });
+
+  return res.status(result.success ? 200 : 500).json(result);
+}
+
 const HANDLERS = {
-  'send-email': stub('send-email'),
+  'send-email': handleSendEmail,
   'upload-file': stub('upload-file'),
   'invoke-llm': stub('invoke-llm'),
 };
