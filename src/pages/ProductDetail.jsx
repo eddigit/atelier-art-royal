@@ -40,13 +40,14 @@ export default function ProductDetail() {
     if (product.materials?.length === 1 && !selectedMaterial) setSelectedMaterial(product.materials[0]);
   }, [product]);
 
-  // SEO Meta Tags
+  // SEO Meta Tags + Schema.org JSON-LD + canonical
   React.useEffect(() => {
     if (product) {
       document.title = `${product.name} — Atelier Art Royal`;
 
       const desc = product.short_description || product.description?.substring(0, 155) || `${product.name} - Haute couture maçonnique`;
       const image = product.images?.[0] || '';
+      const canonicalUrl = `https://artroyal.fr/ProductDetail?id=${product.id}`;
 
       const metaTags = {
         'description': desc,
@@ -54,12 +55,17 @@ export default function ProductDetail() {
         'og:description': desc,
         'og:image': image,
         'og:type': 'product',
-        'og:url': window.location.href,
+        'og:url': canonicalUrl,
+        'og:site_name': 'Atelier Art Royal',
+        'twitter:card': 'summary_large_image',
+        'twitter:title': `${product.name} — Atelier Art Royal`,
+        'twitter:description': desc,
+        'twitter:image': image,
       };
 
       Object.entries(metaTags).forEach(([key, value]) => {
         if (!value) return;
-        const isOg = key.startsWith('og:');
+        const isOg = key.startsWith('og:') || key.startsWith('twitter:');
         const selector = isOg ? `meta[property="${key}"]` : `meta[name="${key}"]`;
         let tag = document.querySelector(selector);
         if (!tag) {
@@ -70,14 +76,57 @@ export default function ProductDetail() {
         }
         tag.setAttribute('content', value);
       });
+
+      // Canonical
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonical);
+      }
+      canonical.setAttribute('href', canonicalUrl);
+
+      // JSON-LD Product (Rich Snippets Google)
+      const stock = product.stock_quantity || 0;
+      const inStock = stock > 0 || product.allow_backorders;
+      const jsonLd = {
+        '@context': 'https://schema.org/',
+        '@type': 'Product',
+        name: product.name,
+        image: product.images?.length ? product.images : (image ? [image] : []),
+        description: desc,
+        sku: product.sku || undefined,
+        brand: { '@type': 'Brand', name: 'Atelier Art Royal' },
+        offers: {
+          '@type': 'Offer',
+          url: canonicalUrl,
+          priceCurrency: 'EUR',
+          price: product.price?.toFixed(2),
+          availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          itemCondition: 'https://schema.org/NewCondition',
+          seller: { '@type': 'Organization', name: 'Atelier Art Royal' },
+        },
+      };
+      let ldTag = document.getElementById('product-jsonld');
+      if (!ldTag) {
+        ldTag = document.createElement('script');
+        ldTag.type = 'application/ld+json';
+        ldTag.id = 'product-jsonld';
+        document.head.appendChild(ldTag);
+      }
+      ldTag.textContent = JSON.stringify(jsonLd);
     }
 
     return () => {
       document.title = 'Atelier Art Royal';
-      ['og:title', 'og:description', 'og:image', 'og:type', 'og:url'].forEach(key => {
-        const tag = document.querySelector(`meta[property="${key}"]`);
+      ['og:title', 'og:description', 'og:image', 'og:type', 'og:url', 'twitter:title', 'twitter:description', 'twitter:image'].forEach(key => {
+        const tag = document.querySelector(`meta[property="${key}"], meta[name="${key}"]`);
         if (tag) tag.remove();
       });
+      const ldTag = document.getElementById('product-jsonld');
+      if (ldTag) ldTag.remove();
+      const canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) canonical.remove();
     };
   }, [product]);
 

@@ -23,6 +23,7 @@ import CartSidebar from '@/components/cart/CartSidebar';
 import WelcomeOnboarding from '@/components/onboarding/WelcomeOnboarding';
 import SignUpBanner from '@/components/onboarding/SignUpBanner';
 import LoyaltyBadge from '@/components/loyalty/LoyaltyBadge';
+import VisitorTracker from '@/components/analytics/VisitorTracker';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -560,6 +561,9 @@ export default function Layout({ children, currentPageName }) {
       <main className="min-h-[calc(100vh-5rem)]">
         {children}
       </main>
+
+      {/* Analytics — track page views into page_views table */}
+      <VisitorTracker pageName={currentPageName} />
 
       {/* Chat Widget */}
       <ChatWidget />
