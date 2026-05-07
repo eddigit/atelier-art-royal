@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
-import { ShoppingCart, Star, Package, Truck, Shield, ArrowLeft, Phone, Wrench } from 'lucide-react';
+import { ShoppingCart, Star, Package, Truck, Shield, ArrowLeft, Phone, Wrench, Info, Ruler, MapPin } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -434,13 +435,41 @@ export default function ProductDetail() {
             </div>
           </Card>
 
-          {/* Description */}
-          {product.description && (
-            <Card className="p-6 mt-6">
-              <h3 className="font-semibold text-lg mb-3">Description</h3>
-              <p className="text-muted-foreground whitespace-pre-line">{product.description}</p>
-            </Card>
-          )}
+          {/* Onglets infos produit */}
+          <Card className="p-2 mt-6">
+            <Tabs defaultValue="description">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="description" className="gap-2"><Info className="w-4 h-4" />Description</TabsTrigger>
+                <TabsTrigger value="caracteristiques" className="gap-2"><Ruler className="w-4 h-4" />Caractéristiques</TabsTrigger>
+                <TabsTrigger value="livraison" className="gap-2"><MapPin className="w-4 h-4" />Livraison</TabsTrigger>
+              </TabsList>
+              <TabsContent value="description" className="p-4">
+                {product.description ? (
+                  <p className="text-muted-foreground whitespace-pre-line leading-relaxed">{product.description}</p>
+                ) : (
+                  <p className="text-muted-foreground italic">Description complète à venir. Pour toute question : 06 46 68 36 10</p>
+                )}
+              </TabsContent>
+              <TabsContent value="caracteristiques" className="p-4 space-y-2 text-sm">
+                {product.sku && <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">Référence</span><span className="font-mono">{product.sku}</span></div>}
+                {product.materials?.length > 0 && <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">Matériaux</span><span>{product.materials.join(', ')}</span></div>}
+                {product.colors?.length > 0 && <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">Couleurs</span><span>{product.colors.join(', ')}</span></div>}
+                {product.sizes?.length > 0 && <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">{product.sizes.length === 1 ? 'Dimensions' : 'Tailles'}</span><span>{product.sizes.join(' / ')}</span></div>}
+                {product.length && <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">Longueur</span><span>{product.length} cm</span></div>}
+                {product.width && <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">Largeur</span><span>{product.width} cm</span></div>}
+                {product.height && <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">Hauteur</span><span>{product.height} cm</span></div>}
+                {product.weight && <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">Poids</span><span>{product.weight} g</span></div>}
+                <div className="flex justify-between border-b py-2"><span className="text-muted-foreground">Fabrication</span><span>Made in France 🇫🇷</span></div>
+                <div className="flex justify-between py-2"><span className="text-muted-foreground">Garantie</span><span>Satisfait ou remboursé</span></div>
+              </TabsContent>
+              <TabsContent value="livraison" className="p-4 space-y-3 text-sm">
+                <div className="flex gap-3"><Truck className="w-5 h-5 text-primary shrink-0 mt-0.5" /><div><p className="font-medium">Expédition sous 5-7 jours ouvrés</p><p className="text-muted-foreground text-xs">Pièces fabriquées sur commande, contrôle qualité avant envoi.</p></div></div>
+                <div className="flex gap-3"><Package className="w-5 h-5 text-primary shrink-0 mt-0.5" /><div><p className="font-medium">Emballage soigné</p><p className="text-muted-foreground text-xs">Chaque pièce est protégée individuellement et expédiée dans un emballage discret.</p></div></div>
+                <div className="flex gap-3"><Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" /><div><p className="font-medium">Livraison suivie en France</p><p className="text-muted-foreground text-xs">Numéro de suivi communiqué dès l'expédition. Franco de port dès 500€ d'achat.</p></div></div>
+                <div className="flex gap-3"><Phone className="w-5 h-5 text-primary shrink-0 mt-0.5" /><div><p className="font-medium">Une question ?</p><p className="text-muted-foreground text-xs">06 46 68 36 10 ou contact@artroyal.fr — un interlocuteur dédié.</p></div></div>
+              </TabsContent>
+            </Tabs>
+          </Card>
         </div>
       </div>
 
