@@ -1,151 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+
+// Lightweight tracker: writes one row to page_views per navigation.
+// Schema (existing): page_name, url, referrer, user_agent, ip_address, country, city, user_id, session_id
 
 export default function VisitorTracker({ pageName }) {
   useEffect(() => {
-    const trackPageView = async () => {
+    const track = async () => {
       try {
-        // Get or create visitor ID
-        let visitorId = localStorage.getItem('visitor_id');
-        let isNewVisitor = false;
-        
-        if (!visitorId) {
-          visitorId = `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          localStorage.setItem('visitor_id', visitorId);
-          localStorage.setItem('first_visit', new Date().toISOString());
-          isNewVisitor = true;
+        let sessionId = sessionStorage.getItem('artroyal_session_id');
+        if (!sessionId) {
+          sessionId = `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+          sessionStorage.setItem('artroyal_session_id', sessionId);
         }
 
-        // Get current user if logged in
         let userId = null;
         try {
-          const user = await base44.auth.me();
-          userId = user?.id;
+          const u = await base44.auth.me();
+          userId = u?.id || null;
         } catch {}
 
-        // Get product ID from URL if on product page
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
-        
-        // Capture UTM parameters and source
-        const utmSource = urlParams.get('utm_source') || null;
-        const utmMedium = urlParams.get('utm_medium') || null;
-        const utmCampaign = urlParams.get('utm_campaign') || null;
-        
-        // Detect source from referrer
-        const referrer = document.referrer;
-        let source = 'direct';
-        if (referrer) {
-          if (referrer.includes('google')) source = 'google';
-          else if (referrer.includes('facebook')) source = 'facebook';
-          else if (referrer.includes('instagram')) source = 'instagram';
-          else if (referrer.includes('linkedin')) source = 'linkedin';
-          else if (utmSource) source = utmSource;
-          else source = 'referral';
-        }
-        
-        // Simple bot detection
-        const ua = navigator.userAgent.toLowerCase();
-        const isLikelyBot = ua.includes('bot') || 
-                           ua.includes('crawler') || 
-                           ua.includes('spider');
-
-        // Get IP and geolocation
-        let geoData = null;
+        let geo = {};
         try {
-          const geoResponse = await fetch('https://ipapi.co/json/');
-          geoData = await geoResponse.json();
-        } catch (e) {
-          console.log('Geolocation failed:', e);
-        }
+          const r = await fetch('https://ipapi.co/json/', { cache: 'no-store' });
+          if (r.ok) geo = await r.json();
+        } catch {}
 
-        // Track page view
         await base44.entities.PageView.create({
-          visitor_id: visitorId,
-          user_id: userId,
-          page_url: window.location.pathname + window.location.search,
-          page_name: pageName,
-          product_id: productId,
-          referrer: referrer || null,
+          page_name: pageName || document.title || 'unknown',
+          url: window.location.pathname + window.location.search,
+          referrer: document.referrer || null,
           user_agent: navigator.userAgent,
-          source: source,
-          utm_source: utmSource,
-          utm_medium: utmMedium,
-          utm_campaign: utmCampaign,
-          is_likely_bot: isLikelyBot
-        });
-
-        // Update active visitor
-        await base44.entities.ActiveVisitor.create({
-          visitor_id: visitorId,
+          ip_address: geo.ip || null,
+          country: geo.country_name || null,
+          city: geo.city || null,
           user_id: userId,
-          current_page: pageName,
-          last_activity: new Date().toISOString(),
-          is_new_visitor: isNewVisitor,
-          source: source,
-          referrer: referrer || null,
-          user_agent: navigator.userAgent,
-          is_likely_bot: isLikelyBot,
-          visitor_ip: geoData?.ip || null,
-          visitor_country: geoData?.country_name || null,
-          visitor_city: geoData?.city || null,
-          visitor_region: geoData?.region || null
+          session_id: sessionId,
         });
-
-        // Track visit count by IP
-        if (geoData?.ip) {
-          const existingQuals = await base44.entities.VisitorQualification.filter({
-            visitor_ip: geoData.ip
-          });
-          
-          if (existingQuals.length > 0) {
-            // Returning visitor - increment count
-            const qual = existingQuals[0];
-            await base44.entities.VisitorQualification.update(qual.id, {
-              visit_count: (qual.visit_count || 1) + 1,
-              last_visit_date: new Date().toISOString(),
-              visitor_id: visitorId,
-              visitor_city: geoData.city || qual.visitor_city,
-              visitor_country: geoData.country_name || qual.visitor_country,
-              visitor_region: geoData.region || qual.visitor_region
-            });
-          } else if (isNewVisitor) {
-            // First time visitor - create record
-            await base44.entities.VisitorQualification.create({
-              visitor_id: visitorId,
-              visitor_ip: geoData.ip,
-              visitor_city: geoData.city || null,
-              visitor_country: geoData.country_name || null,
-              visitor_region: geoData.region || null,
-              visit_count: 1,
-              first_visit_date: new Date().toISOString(),
-              last_visit_date: new Date().toISOString()
-            });
-          }
-        }
-
-        // Update activity every 30 seconds
-        const interval = setInterval(async () => {
-          try {
-            const activeVisitors = await base44.entities.ActiveVisitor.filter({ visitor_id: visitorId });
-            if (activeVisitors.length > 0) {
-              await base44.entities.ActiveVisitor.update(activeVisitors[0].id, {
-                last_activity: new Date().toISOString(),
-                current_page: pageName
-              });
-            }
-          } catch (error) {
-            console.error('Failed to update activity:', error);
-          }
-        }, 30000);
-
-        return () => clearInterval(interval);
-      } catch (error) {
-        console.error('Tracking error:', error);
+      } catch (e) {
+        // Silently fail — analytics must never break the UX
       }
     };
-
-    trackPageView();
+    track();
   }, [pageName]);
 
   return null;
