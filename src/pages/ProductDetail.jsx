@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,13 @@ export default function ProductDetail() {
     },
     enabled: !!productId
   });
+
+  useEffect(() => {
+    if (!product) return;
+    if (product.sizes?.length === 1 && !selectedSize) setSelectedSize(product.sizes[0]);
+    if (product.colors?.length === 1 && !selectedColor) setSelectedColor(product.colors[0]);
+    if (product.materials?.length === 1 && !selectedMaterial) setSelectedMaterial(product.materials[0]);
+  }, [product]);
 
   // SEO Meta Tags
   React.useEffect(() => {

@@ -1,6 +1,11 @@
 // Guest cart management using localStorage
 const GUEST_CART_KEY = 'artroyal_guest_cart';
 
+const notifyGuestCartChanged = () => {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new Event('guestCartChanged'));
+};
+
 export const getGuestCart = () => {
   if (typeof window === 'undefined') return [];
   const cart = localStorage.getItem(GUEST_CART_KEY);
@@ -34,6 +39,7 @@ export const addToGuestCart = (product, quantity = 1, variantInfo = {}) => {
   }
 
   localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
+  notifyGuestCartChanged();
   return cart;
 };
 
@@ -50,17 +56,20 @@ export const updateGuestCartItem = (productId, quantity) => {
   }
   
   localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
+  notifyGuestCartChanged();
   return cart;
 };
 
 export const removeFromGuestCart = (productId) => {
   const cart = getGuestCart().filter(item => item.product_id !== productId);
   localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
+  notifyGuestCartChanged();
   return cart;
 };
 
 export const clearGuestCart = () => {
   localStorage.removeItem(GUEST_CART_KEY);
+  notifyGuestCartChanged();
   return [];
 };
 

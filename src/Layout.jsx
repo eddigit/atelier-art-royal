@@ -34,6 +34,7 @@ import {
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
+import { getGuestCart } from '@/components/cart/guestCart';
 
 export default function Layout({ children, currentPageName }) {
   const [darkMode, setDarkMode] = useState(false);
@@ -54,6 +55,23 @@ export default function Layout({ children, currentPageName }) {
     },
     initialData: []
   });
+
+  const [guestCartTick, setGuestCartTick] = useState(0);
+  const { data: guestCartItems = [] } = useQuery({
+    queryKey: ['layout-guest-cart', guestCartTick],
+    queryFn: () => getGuestCart(),
+    initialData: []
+  });
+
+  useEffect(() => {
+    const refresh = () => setGuestCartTick(t => t + 1);
+    window.addEventListener('storage', refresh);
+    window.addEventListener('guestCartChanged', refresh);
+    return () => {
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener('guestCartChanged', refresh);
+    };
+  }, []);
 
   const { data: loyaltyData } = useQuery({
     queryKey: ['loyalty', user?.id],
@@ -150,7 +168,9 @@ export default function Layout({ children, currentPageName }) {
     return () => window.removeEventListener('openCartSidebar', handleOpenCart);
   }, []);
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = user
+    ? cartItems.reduce((sum, item) => sum + item.quantity, 0)
+    : guestCartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const isAdmin = user?.role === 'admin';
   const isAdminPage = currentPageName?.startsWith('Admin');
@@ -314,19 +334,20 @@ export default function Layout({ children, currentPageName }) {
 
               {/* Cart */}
               {!isAdminPage && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-full relative"
-                  onClick={() => setCartSidebarOpen(true)}
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-bold">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
+                <Link to={createPageUrl('Cart')} aria-label="Voir le panier">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full relative"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-bold">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
               )}
 
               {/* User Menu */}
