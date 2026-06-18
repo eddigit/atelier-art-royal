@@ -1,7 +1,12 @@
 // Frontend adapter that replaces @base44/sdk
-// All calls are proxied to our API server (VPS)
+// Production calls are proxied to same-origin Vercel API routes.
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+import { resolveApiUrl } from './apiUrl';
+
+const API_URL = resolveApiUrl(
+  import.meta.env?.VITE_API_URL,
+  typeof window !== 'undefined' ? window.location.hostname : ''
+);
 
 function getAuthHeaders() {
   const token = localStorage.getItem('auth_token');

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const SITE = 'https://artroyal.fr';
-const API = 'https://api-artroyal.mybotia.com';
+const API = process.env.SITEMAP_API_URL || SITE;
 
 const STATIC_PAGES = [
   { loc: '/', priority: '1.0', changefreq: 'daily' },
