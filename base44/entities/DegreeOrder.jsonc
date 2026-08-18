@@ -1,0 +1,40 @@
+{
+  "name": "DegreeOrder",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du degr\u00e9 & ordre (ex: Apprenti, 4\u00e8me degr\u00e9, 1er Ordre)"
+    },
+    "level": {
+      "type": "number",
+      "description": "Niveau hi\u00e9rarchique"
+    },
+    "loge_type": {
+      "type": "string",
+      "enum": [
+        "Loge Symbolique",
+        "Loge Hauts Grades"
+      ],
+      "description": "Type de loge"
+    },
+    "rite_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence au Rite"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description du degr\u00e9 & ordre"
+    },
+    "order": {
+      "type": "number",
+      "description": "Ordre d'affichage",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "level",
+    "loge_type"
+  ]
+}

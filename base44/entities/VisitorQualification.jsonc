@@ -1,0 +1,89 @@
+{
+  "name": "VisitorQualification",
+  "type": "object",
+  "properties": {
+    "visitor_id": {
+      "type": "string",
+      "description": "ID du visiteur"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nom complet du visiteur"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "Pr\u00e9nom"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Nom"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "description": "T\u00e9l\u00e9phone"
+    },
+    "loge_name": {
+      "type": "string",
+      "description": "Nom de la loge"
+    },
+    "rite_id": {
+      "type": "string",
+      "description": "Rite"
+    },
+    "obedience_id": {
+      "type": "string",
+      "description": "Ob\u00e9dience"
+    },
+    "degree_order_id": {
+      "type": "string",
+      "description": "Degr\u00e9 & Ordre"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes de qualification"
+    },
+    "lead_created": {
+      "type": "boolean",
+      "description": "Lead cr\u00e9\u00e9",
+      "default": false
+    },
+    "visit_count": {
+      "type": "number",
+      "description": "Nombre de visites",
+      "default": 1
+    },
+    "first_visit_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date de premi\u00e8re visite"
+    },
+    "last_visit_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date de derni\u00e8re visite"
+    },
+    "visitor_ip": {
+      "type": "string",
+      "description": "IP du visiteur"
+    },
+    "visitor_city": {
+      "type": "string",
+      "description": "Ville du visiteur"
+    },
+    "visitor_country": {
+      "type": "string",
+      "description": "Pays du visiteur"
+    },
+    "visitor_region": {
+      "type": "string",
+      "description": "R\u00e9gion du visiteur"
+    }
+  },
+  "required": [
+    "visitor_id"
+  ]
+}

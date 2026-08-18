@@ -1,0 +1,64 @@
+{
+  "name": "LoyaltyPoints",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence utilisateur"
+    },
+    "points": {
+      "type": "number",
+      "description": "Points de fid\u00e9lit\u00e9 accumul\u00e9s",
+      "default": 0
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "bronze",
+        "silver",
+        "gold",
+        "platinum"
+      ],
+      "default": "bronze",
+      "description": "Palier de fid\u00e9lit\u00e9"
+    },
+    "lifetime_points": {
+      "type": "number",
+      "description": "Total des points gagn\u00e9s (pour d\u00e9terminer le palier)",
+      "default": 0
+    },
+    "points_history": {
+      "type": "array",
+      "description": "Historique des transactions de points",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "points": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "earned",
+              "redeemed",
+              "expired"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "user_id"
+  ]
+}

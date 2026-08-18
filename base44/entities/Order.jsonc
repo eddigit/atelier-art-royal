@@ -1,0 +1,153 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "order_number": {
+      "type": "string",
+      "description": "Num\u00e9ro de commande unique"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence client (User)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "design",
+        "production",
+        "quality_control",
+        "packaging",
+        "shipped",
+        "delivered",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Statut de la commande"
+    },
+    "items": {
+      "type": "array",
+      "description": "Produits command\u00e9s",
+      "items": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Sous-total"
+    },
+    "shipping_cost": {
+      "type": "number",
+      "description": "Frais de port"
+    },
+    "total": {
+      "type": "number",
+      "description": "Total TTC"
+    },
+    "shipping_address": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    },
+    "billing_address": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      }
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "failed",
+        "refunded"
+      ],
+      "default": "pending"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "card",
+        "bank_transfer",
+        "cash",
+        "phone_validation"
+      ],
+      "description": "M\u00e9thode de paiement"
+    },
+    "stripe_payment_id": {
+      "type": "string"
+    },
+    "tracking_number": {
+      "type": "string",
+      "description": "Num\u00e9ro de suivi livraison"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes client ou admin"
+    },
+    "sales_channel": {
+      "type": "string",
+      "enum": [
+        "website",
+        "direct"
+      ],
+      "default": "website",
+      "description": "Canal de vente - site web ou vente directe"
+    }
+  },
+  "required": [
+    "customer_id",
+    "items",
+    "total"
+  ]
+}

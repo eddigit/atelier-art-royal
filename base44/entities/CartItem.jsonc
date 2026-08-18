@@ -1,0 +1,28 @@
+{
+  "name": "CartItem",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence utilisateur"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence produit"
+    },
+    "quantity": {
+      "type": "number",
+      "default": 1
+    },
+    "price": {
+      "type": "number",
+      "description": "Prix unitaire au moment de l'ajout"
+    }
+  },
+  "required": [
+    "user_id",
+    "product_id",
+    "quantity",
+    "price"
+  ]
+}

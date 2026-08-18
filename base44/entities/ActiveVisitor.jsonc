@@ -1,0 +1,70 @@
+{
+  "name": "ActiveVisitor",
+  "type": "object",
+  "properties": {
+    "visitor_id": {
+      "type": "string",
+      "description": "Identifiant unique du visiteur"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID utilisateur si connect\u00e9"
+    },
+    "current_page": {
+      "type": "string",
+      "description": "Page actuelle"
+    },
+    "last_activity": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Derni\u00e8re activit\u00e9"
+    },
+    "is_new_visitor": {
+      "type": "boolean",
+      "description": "Premier visiteur",
+      "default": false
+    },
+    "source": {
+      "type": "string",
+      "description": "Source du trafic"
+    },
+    "referrer": {
+      "type": "string",
+      "description": "URL de provenance"
+    },
+    "user_agent": {
+      "type": "string",
+      "description": "User agent du navigateur"
+    },
+    "is_likely_bot": {
+      "type": "boolean",
+      "description": "D\u00e9tection de bot",
+      "default": false
+    },
+    "admin_chat_open": {
+      "type": "boolean",
+      "description": "Chat admin ouvert pour ce visiteur",
+      "default": false
+    },
+    "visitor_ip": {
+      "type": "string",
+      "description": "Adresse IP du visiteur"
+    },
+    "visitor_country": {
+      "type": "string",
+      "description": "Pays du visiteur"
+    },
+    "visitor_city": {
+      "type": "string",
+      "description": "Ville du visiteur"
+    },
+    "visitor_region": {
+      "type": "string",
+      "description": "R\u00e9gion du visiteur"
+    }
+  },
+  "required": [
+    "visitor_id",
+    "current_page"
+  ]
+}

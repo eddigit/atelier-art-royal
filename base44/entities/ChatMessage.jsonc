@@ -1,0 +1,41 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "visitor_id": {
+      "type": "string",
+      "description": "ID du visiteur"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID utilisateur si connect\u00e9"
+    },
+    "sender_type": {
+      "type": "string",
+      "enum": [
+        "visitor",
+        "admin",
+        "ai"
+      ],
+      "description": "Type d'exp\u00e9diteur"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Nom de l'exp\u00e9diteur"
+    },
+    "message": {
+      "type": "string",
+      "description": "Contenu du message"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Message lu"
+    }
+  },
+  "required": [
+    "visitor_id",
+    "sender_type",
+    "message"
+  ]
+}

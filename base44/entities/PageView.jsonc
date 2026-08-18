@@ -1,0 +1,67 @@
+{
+  "name": "PageView",
+  "type": "object",
+  "properties": {
+    "visitor_id": {
+      "type": "string",
+      "description": "Identifiant unique du visiteur (cookie)"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID utilisateur si connect\u00e9"
+    },
+    "page_url": {
+      "type": "string",
+      "description": "URL de la page visit\u00e9e"
+    },
+    "page_name": {
+      "type": "string",
+      "description": "Nom de la page"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "ID produit si page produit"
+    },
+    "referrer": {
+      "type": "string",
+      "description": "URL de provenance"
+    },
+    "user_agent": {
+      "type": "string",
+      "description": "Navigateur utilis\u00e9"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "Adresse IP"
+    },
+    "session_duration": {
+      "type": "number",
+      "description": "Dur\u00e9e de la session en secondes"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source du trafic (google, facebook, direct, etc.)"
+    },
+    "utm_source": {
+      "type": "string",
+      "description": "Param\u00e8tre UTM source"
+    },
+    "utm_medium": {
+      "type": "string",
+      "description": "Param\u00e8tre UTM medium"
+    },
+    "utm_campaign": {
+      "type": "string",
+      "description": "Param\u00e8tre UTM campaign"
+    },
+    "is_likely_bot": {
+      "type": "boolean",
+      "description": "D\u00e9tection de bot",
+      "default": false
+    }
+  },
+  "required": [
+    "visitor_id",
+    "page_url"
+  ]
+}

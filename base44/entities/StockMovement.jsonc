@@ -1,0 +1,60 @@
+{
+  "name": "StockMovement",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence au produit"
+    },
+    "movement_type": {
+      "type": "string",
+      "enum": [
+        "entry",
+        "exit",
+        "adjustment",
+        "return",
+        "initial"
+      ],
+      "description": "Type de mouvement - entr\u00e9e, sortie, ajustement, retour ou stock initial"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Quantit\u00e9 d\u00e9plac\u00e9e (positive pour entr\u00e9e, n\u00e9gative pour sortie)"
+    },
+    "previous_stock": {
+      "type": "number",
+      "description": "Stock avant le mouvement"
+    },
+    "new_stock": {
+      "type": "number",
+      "description": "Stock apr\u00e8s le mouvement"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Raison du mouvement"
+    },
+    "reference": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence externe (bon de livraison, commande, etc.)"
+    },
+    "supplier": {
+      "type": "string",
+      "description": "Nom du fournisseur pour les entr\u00e9es"
+    },
+    "cost_per_unit": {
+      "type": "number",
+      "description": "Co\u00fbt unitaire pour les entr\u00e9es"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes additionnelles"
+    }
+  },
+  "required": [
+    "product_id",
+    "movement_type",
+    "quantity",
+    "previous_stock",
+    "new_stock"
+  ]
+}

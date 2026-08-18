@@ -1,0 +1,28 @@
+{
+  "name": "Category",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom de la cat\u00e9gorie (Tabliers, Sautoirs, Bijoux, Gants)"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Slug URL"
+    },
+    "description": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "slug"
+  ]
+}

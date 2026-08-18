@@ -1,0 +1,158 @@
+{
+  "name": "Quote",
+  "type": "object",
+  "properties": {
+    "quote_number": {
+      "type": "string",
+      "description": "Num\u00e9ro du devis unique"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence client (User)"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Nom du client"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Email du client"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "T\u00e9l\u00e9phone du client"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sent",
+        "accepted",
+        "rejected",
+        "expired",
+        "converted"
+      ],
+      "default": "draft",
+      "description": "Statut du devis"
+    },
+    "items": {
+      "type": "array",
+      "description": "Produits du devis",
+      "items": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Sous-total"
+    },
+    "shipping_cost": {
+      "type": "number",
+      "description": "Frais de port",
+      "default": 0
+    },
+    "discount": {
+      "type": "number",
+      "description": "Remise",
+      "default": 0
+    },
+    "tax_rate": {
+      "type": "number",
+      "description": "Taux de TVA",
+      "default": 20
+    },
+    "tax_amount": {
+      "type": "number",
+      "description": "Montant TVA"
+    },
+    "total": {
+      "type": "number",
+      "description": "Total TTC"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Date de validit\u00e9 du devis"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes et conditions"
+    },
+    "shipping_address": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    },
+    "billing_address": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      }
+    },
+    "order_id": {
+      "type": "string",
+      "description": "ID de la commande si le devis a \u00e9t\u00e9 converti"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "URL du PDF du devis"
+    }
+  },
+  "required": [
+    "customer_name",
+    "items",
+    "total"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "name": "ProductReview",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence au produit"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence \u00e0 l'utilisateur"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Note de 1 \u00e0 5",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "title": {
+      "type": "string",
+      "description": "Titre de l'avis"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Commentaire d\u00e9taill\u00e9"
+    },
+    "is_approved": {
+      "type": "boolean",
+      "default": false,
+      "description": "Approuv\u00e9 par l'admin"
+    },
+    "is_verified_purchase": {
+      "type": "boolean",
+      "default": false,
+      "description": "Achat v\u00e9rifi\u00e9"
+    }
+  },
+  "required": [
+    "product_id",
+    "user_id",
+    "rating"
+  ]
+}

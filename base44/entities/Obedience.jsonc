@@ -1,0 +1,31 @@
+{
+  "name": "Obedience",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom de l'ob\u00e9dience (ex: GLNF, GODF, GLAMF)"
+    },
+    "code": {
+      "type": "string",
+      "description": "Code court de l'ob\u00e9dience"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description de l'ob\u00e9dience"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Image repr\u00e9sentative de l'ob\u00e9dience"
+    },
+    "order": {
+      "type": "number",
+      "description": "Ordre d'affichage",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "code"
+  ]
+}

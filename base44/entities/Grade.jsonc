@@ -1,0 +1,25 @@
+{
+  "name": "Grade",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du grade"
+    },
+    "level": {
+      "type": "number",
+      "description": "Niveau hi\u00e9rarchique"
+    },
+    "rite_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence au Rite"
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "level"
+  ]
+}

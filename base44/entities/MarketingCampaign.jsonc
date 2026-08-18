@@ -1,0 +1,60 @@
+{
+  "name": "MarketingCampaign",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence utilisateur"
+    },
+    "campaign_type": {
+      "type": "string",
+      "enum": [
+        "abandoned_cart",
+        "reactivation",
+        "product_recommendation",
+        "review_request"
+      ],
+      "description": "Type de campagne"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "opened",
+        "clicked",
+        "converted"
+      ],
+      "default": "pending",
+      "description": "Statut de la campagne"
+    },
+    "email_subject": {
+      "type": "string",
+      "description": "Sujet de l'email"
+    },
+    "email_content": {
+      "type": "string",
+      "description": "Contenu de l'email"
+    },
+    "sent_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date d'envoi"
+    },
+    "cart_items": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Articles du panier abandonn\u00e9"
+    },
+    "order_id": {
+      "type": "string",
+      "description": "Commande g\u00e9n\u00e9r\u00e9e suite \u00e0 la campagne"
+    }
+  },
+  "required": [
+    "user_id",
+    "campaign_type"
+  ]
+}

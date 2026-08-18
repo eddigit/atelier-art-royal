@@ -1,0 +1,65 @@
+{
+  "name": "OrderReturn",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence commande"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence client"
+    },
+    "items": {
+      "type": "array",
+      "description": "Produits \u00e0 retourner",
+      "items": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "requested",
+        "approved",
+        "received",
+        "refunded",
+        "rejected"
+      ],
+      "default": "requested",
+      "description": "Statut du retour"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Raison du retour"
+    },
+    "refund_amount": {
+      "type": "number",
+      "description": "Montant du remboursement"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Notes administrateur"
+    }
+  },
+  "required": [
+    "order_id",
+    "customer_id",
+    "items",
+    "reason"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "name": "LeadRequest",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence utilisateur si connect\u00e9"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Nom du prospect"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Email du prospect"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "T\u00e9l\u00e9phone du prospect"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence produit si li\u00e9 \u00e0 une demande sp\u00e9cifique"
+    },
+    "request_details": {
+      "type": "string",
+      "description": "D\u00e9tails de la demande du client"
+    },
+    "rite": {
+      "type": "string",
+      "description": "Rite mentionn\u00e9 par le client"
+    },
+    "obedience": {
+      "type": "string",
+      "description": "Ob\u00e9dience mentionn\u00e9e"
+    },
+    "degree_order": {
+      "type": "string",
+      "description": "Degr\u00e9 & Ordre mentionn\u00e9"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "nouveau",
+        "contacte",
+        "en_cours",
+        "converti",
+        "perdu"
+      ],
+      "default": "nouveau",
+      "description": "Statut de la demande"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "basse",
+        "normale",
+        "haute",
+        "urgente"
+      ],
+      "default": "normale",
+      "description": "Priorit\u00e9 de la demande"
+    },
+    "source": {
+      "type": "string",
+      "default": "chat_ia",
+      "description": "Source de la demande"
+    },
+    "conversation_context": {
+      "type": "string",
+      "description": "Contexte de la conversation avec l'IA"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Notes administrateur"
+    }
+  },
+  "required": [
+    "request_details"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "name": "SavedCustomization",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence utilisateur"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence produit"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nom donn\u00e9 \u00e0 la personnalisation"
+    },
+    "customization_details": {
+      "type": "object",
+      "description": "D\u00e9tails de la personnalisation (broderie, dimensions, mat\u00e9riaux, etc.)",
+      "properties": {
+        "embroidery_text": {
+          "type": "string"
+        },
+        "embroidery_color": {
+          "type": "string"
+        },
+        "material": {
+          "type": "string"
+        },
+        "dimensions": {
+          "type": "string"
+        },
+        "special_notes": {
+          "type": "string"
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes personnelles"
+    }
+  },
+  "required": [
+    "user_id",
+    "product_id",
+    "name"
+  ]
+}

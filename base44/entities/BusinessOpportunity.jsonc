@@ -1,0 +1,101 @@
+{
+  "name": "BusinessOpportunity",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Titre de l'affaire"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description d\u00e9taill\u00e9e"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence au client (User)"
+    },
+    "lead_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence au lead (LeadRequest)"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "ID du vendeur assign\u00e9 (User)"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Montant estim\u00e9 de l'affaire",
+      "default": 0
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "analyse",
+        "nego",
+        "conclusion"
+      ],
+      "default": "analyse",
+      "description": "\u00c9tape du pipeline"
+    },
+    "probability": {
+      "type": "number",
+      "description": "Probabilit\u00e9 de succ\u00e8s (0-100%)",
+      "default": 50,
+      "minimum": 0,
+      "maximum": 100
+    },
+    "expected_close_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date de cl\u00f4ture pr\u00e9vue"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "won",
+        "lost"
+      ],
+      "default": "active",
+      "description": "Statut de l'affaire"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Nom du contact principal"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Email du contact"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "T\u00e9l\u00e9phone du contact"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes et observations"
+    },
+    "products_interested": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Produits qui int\u00e9ressent le client"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "basse",
+        "normale",
+        "haute",
+        "urgente"
+      ],
+      "default": "normale",
+      "description": "Priorit\u00e9 de l'affaire"
+    }
+  },
+  "required": [
+    "title",
+    "amount"
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du produit"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Slug URL"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description d\u00e9taill\u00e9e"
+    },
+    "short_description": {
+      "type": "string",
+      "description": "Description courte"
+    },
+    "price": {
+      "type": "number",
+      "description": "Prix en euros"
+    },
+    "compare_at_price": {
+      "type": "number",
+      "description": "Prix barr\u00e9 pour promotions"
+    },
+    "promo_start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date de d\u00e9but de promo"
+    },
+    "promo_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date de fin de promo"
+    },
+    "rite_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "R\u00e9f\u00e9rences aux Rites (plusieurs possibles)"
+    },
+    "obedience_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "R\u00e9f\u00e9rences aux Ob\u00e9diences (plusieurs possibles)"
+    },
+    "degree_order_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "R\u00e9f\u00e9rences aux Degr\u00e9s & Ordres (plusieurs possibles)"
+    },
+    "category_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "R\u00e9f\u00e9rences aux Cat\u00e9gories (plusieurs possibles)"
+    },
+    "product_type": {
+      "type": "string",
+      "description": "Type de produit"
+    },
+    "images": {
+      "type": "array",
+      "description": "URLs des images",
+      "items": {
+        "type": "string"
+      }
+    },
+    "video_url": {
+      "type": "string",
+      "description": "URL vid\u00e9o courte produit"
+    },
+    "stock_quantity": {
+      "type": "number",
+      "description": "Quantit\u00e9 en stock",
+      "default": 0
+    },
+    "low_stock_threshold": {
+      "type": "number",
+      "description": "Seuil alerte stock",
+      "default": 5
+    },
+    "allow_backorders": {
+      "type": "boolean",
+      "description": "Autoriser les commandes en rupture",
+      "default": true
+    },
+    "sku": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence produit"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "featured": {
+      "type": "boolean",
+      "description": "Produit mis en avant",
+      "default": false
+    },
+    "sold_individually": {
+      "type": "boolean",
+      "description": "Vendre individuellement",
+      "default": false
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sizes": {
+      "type": "array",
+      "description": "Tailles disponibles",
+      "items": {
+        "type": "string"
+      }
+    },
+    "colors": {
+      "type": "array",
+      "description": "Couleurs disponibles",
+      "items": {
+        "type": "string"
+      }
+    },
+    "materials": {
+      "type": "array",
+      "description": "Mati\u00e8res disponibles",
+      "items": {
+        "type": "string"
+      }
+    },
+    "weight": {
+      "type": "number",
+      "description": "Poids en kg"
+    },
+    "length": {
+      "type": "number",
+      "description": "Longueur en cm"
+    },
+    "width": {
+      "type": "number",
+      "description": "Largeur en cm"
+    },
+    "height": {
+      "type": "number",
+      "description": "Hauteur en cm"
+    },
+    "tax_status": {
+      "type": "string",
+      "description": "\u00c9tat de la TVA"
+    },
+    "tax_class": {
+      "type": "string",
+      "description": "Classe de TVA"
+    },
+    "shipping_class": {
+      "type": "string",
+      "description": "Classe d'exp\u00e9dition"
+    },
+    "enable_reviews": {
+      "type": "boolean",
+      "description": "Autoriser les avis clients",
+      "default": true
+    },
+    "customer_note": {
+      "type": "string",
+      "description": "Note de commande du client"
+    },
+    "product_groups": {
+      "type": "array",
+      "description": "Groupes de produits",
+      "items": {
+        "type": "string"
+      }
+    },
+    "related_products": {
+      "type": "array",
+      "description": "Produits sugg\u00e9r\u00e9s",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cross_sell_products": {
+      "type": "array",
+      "description": "Ventes crois\u00e9es",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "price"
+  ]
+}

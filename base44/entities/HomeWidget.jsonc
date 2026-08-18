@@ -1,0 +1,74 @@
+{
+  "name": "HomeWidget",
+  "type": "object",
+  "properties": {
+    "widget_type": {
+      "type": "string",
+      "enum": [
+        "promotions",
+        "nouveautes",
+        "featured_products",
+        "banner"
+      ],
+      "description": "Type de widget"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titre du widget"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Sous-titre optionnel"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Widget actif"
+    },
+    "display_order": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordre d'affichage"
+    },
+    "config": {
+      "type": "object",
+      "description": "Configuration sp\u00e9cifique au widget",
+      "properties": {
+        "show_promotions_only": {
+          "type": "boolean"
+        },
+        "show_new_only": {
+          "type": "boolean"
+        },
+        "limit": {
+          "type": "number"
+        },
+        "rite_id": {
+          "type": "string"
+        },
+        "category_id": {
+          "type": "string"
+        },
+        "product_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "banner_image": {
+          "type": "string"
+        },
+        "banner_link": {
+          "type": "string"
+        },
+        "banner_cta": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "widget_type",
+    "title"
+  ]
+}

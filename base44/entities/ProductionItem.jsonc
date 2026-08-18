@@ -1,0 +1,65 @@
+{
+  "name": "ProductionItem",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence au client"
+    },
+    "order_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence \u00e0 la commande"
+    },
+    "product_name": {
+      "type": "string",
+      "description": "Nom du produit \u00e0 fabriquer"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "en_attente",
+        "en_design",
+        "en_fabrication",
+        "terminee",
+        "livree"
+      ],
+      "default": "en_attente",
+      "description": "Statut de la production"
+    },
+    "specifications": {
+      "type": "string",
+      "description": "Cahier des charges d\u00e9taill\u00e9"
+    },
+    "design_images": {
+      "type": "array",
+      "description": "Images et dessins du projet",
+      "items": {
+        "type": "string"
+      }
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date de livraison pr\u00e9vue"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "basse",
+        "normale",
+        "haute",
+        "urgente"
+      ],
+      "default": "normale",
+      "description": "Priorit\u00e9 de fabrication"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes internes de production"
+    }
+  },
+  "required": [
+    "customer_id",
+    "product_name"
+  ]
+}

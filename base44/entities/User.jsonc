@@ -1,0 +1,98 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "avatar_url": {
+      "type": "string",
+      "description": "URL de la photo de profil de l'utilisateur"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Num\u00e9ro de t\u00e9l\u00e9phone"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "default": "France"
+        }
+      }
+    },
+    "customer_source": {
+      "type": "string",
+      "enum": [
+        "web",
+        "pos",
+        "direct",
+        "phone"
+      ],
+      "default": "web",
+      "description": "Source du client - web, POS boutique, vente directe ou t\u00e9l\u00e9phone"
+    },
+    "sales_representative": {
+      "type": "string",
+      "description": "Nom du commercial (pour clients vente directe)"
+    },
+    "lodge_number": {
+      "type": "string",
+      "description": "Num\u00e9ro de la loge"
+    },
+    "lodge_name": {
+      "type": "string",
+      "description": "Nom de la loge"
+    },
+    "lodge_city": {
+      "type": "string",
+      "description": "Ville de la loge"
+    },
+    "rite_id": {
+      "type": "string",
+      "description": "Rite pratiqu\u00e9 par le client"
+    },
+    "obedience_id": {
+      "type": "string",
+      "description": "Ob\u00e9dience du client"
+    },
+    "degree_order_id": {
+      "type": "string",
+      "description": "Degr\u00e9 & Ordre du client"
+    },
+    "company_name": {
+      "type": "string",
+      "description": "Nom de l'entreprise (pour clients professionnels)"
+    },
+    "siret": {
+      "type": "string",
+      "description": "Num\u00e9ro SIRET (pour clients professionnels)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notes internes sur le client"
+    }
+  },
+  "required": [
+    "avatar_url",
+    "phone",
+    "address",
+    "sales_representative",
+    "lodge_number",
+    "lodge_name",
+    "lodge_city",
+    "rite_id",
+    "obedience_id",
+    "degree_order_id",
+    "company_name",
+    "siret",
+    "notes"
+  ]
+}

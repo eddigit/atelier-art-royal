@@ -1,0 +1,29 @@
+{
+  "name": "CustomerNote",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "description": "R\u00e9f\u00e9rence au client (User)"
+    },
+    "note": {
+      "type": "string",
+      "description": "Note sur le client"
+    },
+    "note_type": {
+      "type": "string",
+      "enum": [
+        "general",
+        "important",
+        "warning",
+        "positive"
+      ],
+      "default": "general",
+      "description": "Type de note"
+    }
+  },
+  "required": [
+    "customer_id",
+    "note"
+  ]
+}

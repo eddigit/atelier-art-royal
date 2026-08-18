@@ -1,0 +1,23 @@
+{
+  "name": "AIConfig",
+  "type": "object",
+  "properties": {
+    "config_key": {
+      "type": "string",
+      "description": "Cl\u00e9 de configuration (ex: system_instructions, knowledge_base)"
+    },
+    "config_value": {
+      "type": "string",
+      "description": "Valeur de la configuration"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Configuration active"
+    }
+  },
+  "required": [
+    "config_key",
+    "config_value"
+  ]
+}
